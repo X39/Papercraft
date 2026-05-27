@@ -205,6 +205,27 @@ public partial class DeferredCanvasMock
     }
 
     [StackTraceHidden]
+    public void AssertDrawRect(Rectangle rectangle, Color color)
+    {
+        Assert.NotEmpty(_drawRectCalls);
+        var actual = _drawRectCalls.FirstOrDefault();
+        var expected = new DrawRectCall(rectangle, color);
+        Assert.Equal(expected, actual);
+    }
+
+    [StackTraceHidden]
+    public void AssertDrawRect(params (Rectangle rectangle, Color color)[] drawRectCalls)
+    {
+        Assert.Equal(drawRectCalls.Length, _drawRectCalls.Count);
+        var zipped = _drawRectCalls.Zip(drawRectCalls);
+        foreach (var (actual, callExpected) in zipped)
+        {
+            var expected = new DrawRectCall(callExpected.rectangle, callExpected.color);
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [StackTraceHidden]
     public void AssertClip(Rectangle rectangle)
     {
         Assert.NotEmpty(_clipCalls);

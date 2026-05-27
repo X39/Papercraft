@@ -71,6 +71,7 @@ public class BorderControl : AlignableContentControl
         in Size remainingSize,
         CultureInfo cultureInfo)
     {
+        _arrangedSizes.Clear();
         var thickness     = Thickness.ToRectangle(fullPageSize, dpi);
         var thicknessOffset = new Size(thickness.Left, thickness.Top) + new Size(thickness.Width, thickness.Height);
         var size          = Size.Zero;
