@@ -4,8 +4,6 @@ using System.Xml;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Services;
-using X39.Solutions.PdfTemplate.Test.Mock;
 using X39.Solutions.PdfTemplate.Xml;
 
 namespace X39.Solutions.PdfTemplate.Test;
@@ -28,18 +26,22 @@ public static class Util
         );
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
-        ITemplateData templateData = new TemplateData();
-        var transformers = new TransformerList().AddDefaultTransformers();
-        using var xmlTemplateReader = new XmlTemplateReader(default, CultureInfo.InvariantCulture, templateData, transformers);
-        var root = await xmlTemplateReader.ReadAsync(xmlReader);
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddPdfTemplateServices();
+        serviceCollection.AddPdfTemplateDefaults();
+        serviceCollection.AddPdfTemplateControl<Mock.MockControl>();
         await using var serviceProvider = serviceCollection.BuildServiceProvider();
         using var scope = serviceProvider.CreateScope();
-        var controlStorage = new ControlStorage(serviceProvider.GetRequiredService<ControlExpressionCache>());
-        controlStorage.AddDefaultControls();
-        controlStorage.AddControl<MockControl>();
-        var t = await Template.CreateAsync(root, controlStorage, CultureInfo.InvariantCulture, null, default);
+        ITemplateData templateData = new TemplateData();
+        var transformers = scope.ServiceProvider.GetServices<ITransformer>().ToArray();
+        using var xmlTemplateReader = new XmlTemplateReader(default, CultureInfo.InvariantCulture, templateData, transformers);
+        var root = await xmlTemplateReader.ReadAsync(xmlReader);
+        var t = await Template.CreateAsync(
+            root,
+            scope.ServiceProvider.GetRequiredService<IControlFactory>(),
+            CultureInfo.InvariantCulture,
+            null,
+            default);
         return t.BodyControls.Cast<T>().First();
     }
 }

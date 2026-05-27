@@ -1,52 +1,42 @@
-using X39.Solutions.PdfTemplate.Abstraction;
+using Microsoft.Extensions.DependencyInjection;
 using X39.Solutions.PdfTemplate.Transformers;
 
 namespace X39.Solutions.PdfTemplate;
 
 /// <summary>
-/// Methods to set up the generator with default controls.
+/// Methods to set up default controls and transformers.
 /// </summary>
 [PublicAPI]
 public static class GeneratorDefaults
 {
     /// <summary>
-    /// Adds the default controls to the generator.
+    /// Adds the default controls and transformers to the service collection.
     /// </summary>
-    /// <param name="self">The generator to add the controls to.</param>
-    /// <returns>The <paramref name="self"/> passed to allow chaining.</returns>
-    public static Generator AddDefaults(this Generator self)
+    /// <param name="services">The service collection to add the defaults to.</param>
+    /// <returns>The <paramref name="services"/> passed to allow chaining.</returns>
+    public static IServiceCollection AddPdfTemplateDefaults(this IServiceCollection services)
     {
-        AddDefaultControls(self);
-        self.AddDefaultTransformers();
-        return self;
-    }
+        services.AddPdfTemplateControl<Controls.BarChart>();
+        services.AddPdfTemplateControl<Controls.BorderControl>();
+        services.AddPdfTemplateControl<Controls.ChartControl>();
+        services.AddPdfTemplateControl<Controls.ChartDataControl>();
+        services.AddPdfTemplateControl<Controls.ImageControl>();
+        services.AddPdfTemplateControl<Controls.LineChart>();
+        services.AddPdfTemplateControl<Controls.LineControl>();
+        services.AddPdfTemplateControl<Controls.PageNumberControl>();
+        services.AddPdfTemplateControl<Controls.PieChart>();
+        services.AddPdfTemplateControl<Controls.TableCellControl>();
+        services.AddPdfTemplateControl<Controls.TableControl>();
+        services.AddPdfTemplateControl<Controls.TableHeaderControl>();
+        services.AddPdfTemplateControl<Controls.TableRowControl>();
+        services.AddPdfTemplateControl<Controls.TextControl>();
 
-    internal static T AddDefaultControls<T>(this T self) where T : IAddControls
-    {
-        self.AddControl<Controls.BarChart>();
-        self.AddControl<Controls.BorderControl>();
-        self.AddControl<Controls.ChartControl>();
-        self.AddControl<Controls.ChartDataControl>();
-        self.AddControl<Controls.ImageControl>();
-        self.AddControl<Controls.LineChart>();
-        self.AddControl<Controls.LineControl>();
-        self.AddControl<Controls.PageNumberControl>();
-        self.AddControl<Controls.PieChart>();
-        self.AddControl<Controls.TableCellControl>();
-        self.AddControl<Controls.TableControl>();
-        self.AddControl<Controls.TableHeaderControl>();
-        self.AddControl<Controls.TableRowControl>();
-        self.AddControl<Controls.TextControl>();
-        return self;
-    }
+        services.AddPdfTemplateTransformer<ForTransformer>();
+        services.AddPdfTemplateTransformer<IfTransformer>();
+        services.AddPdfTemplateTransformer<ForEachTransformer>();
+        services.AddPdfTemplateTransformer<AlternateTransformer>();
+        services.AddPdfTemplateTransformer<VariableTransformer>();
 
-    internal static T AddDefaultTransformers<T>(this T self) where T : IAddTransformers
-    {
-        self.AddTransformer(new ForTransformer());
-        self.AddTransformer(new IfTransformer());
-        self.AddTransformer(new ForEachTransformer());
-        self.AddTransformer(new AlternateTransformer());
-        self.AddTransformer(new VariableTransformer());
-        return self;
+        return services;
     }
 }

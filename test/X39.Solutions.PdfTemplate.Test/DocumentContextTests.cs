@@ -7,7 +7,6 @@ using X39.Solutions.PdfTemplate.Abstraction;
 using X39.Solutions.PdfTemplate.Attributes;
 using X39.Solutions.PdfTemplate.Controls;
 using X39.Solutions.PdfTemplate.Data;
-using X39.Solutions.PdfTemplate.Services;
 using X39.Solutions.PdfTemplate.Services.ResourceResolver;
 
 namespace X39.Solutions.PdfTemplate.Test;
@@ -20,10 +19,10 @@ public class DocumentContextTests
         var resolver = new RecordingResourceResolver();
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddPdfTemplateServices();
+        serviceCollection.AddPdfTemplateControl<ImageControl>();
         serviceCollection.AddSingleton<IResourceResolver>(resolver);
         await using var serviceProvider = serviceCollection.BuildServiceProvider();
-        using var generator = CreateGenerator(serviceProvider);
-        generator.AddControl<ImageControl>();
+        using var generator = serviceProvider.GetRequiredService<Generator>();
         var context = new PrintRequestContext("print-request-1");
         using var xmlReader = CreateReader("""<image source="logo:customer" />""");
 
@@ -44,10 +43,10 @@ public class DocumentContextTests
         var recorder = new InitializationContextRecorder();
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddPdfTemplateServices();
+        serviceCollection.AddPdfTemplateControl<ContextRecordingControl>();
         serviceCollection.AddSingleton(recorder);
         await using var serviceProvider = serviceCollection.BuildServiceProvider();
-        using var generator = CreateGenerator(serviceProvider);
-        generator.AddControl<ContextRecordingControl>();
+        using var generator = serviceProvider.GetRequiredService<Generator>();
         var context = new PrintRequestContext("print-request-2");
         using var xmlReader = CreateReader("""<context-recording-control />""");
 
@@ -66,9 +65,9 @@ public class DocumentContextTests
     {
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddPdfTemplateServices();
+        serviceCollection.AddPdfTemplateControl<ImageControl>();
         await using var serviceProvider = serviceCollection.BuildServiceProvider();
-        using var generator = CreateGenerator(serviceProvider);
-        generator.AddControl<ImageControl>();
+        using var generator = serviceProvider.GetRequiredService<Generator>();
         using var xmlReader = CreateReader($"""<image source="{Convert.ToBase64String(PngBytes)}" />""");
 
         var bitmaps = await generator.GenerateBitmapsAsync(xmlReader, CultureInfo.InvariantCulture);
@@ -81,14 +80,6 @@ public class DocumentContextTests
         {
             Dispose(bitmaps);
         }
-    }
-
-    private static Generator CreateGenerator(IServiceProvider serviceProvider)
-    {
-        return new Generator(
-            serviceProvider.GetRequiredService<SkPaintCache>(),
-            serviceProvider.GetRequiredService<ControlExpressionCache>(),
-            Array.Empty<IFunction>());
     }
 
     private static XmlReader CreateReader(string body)

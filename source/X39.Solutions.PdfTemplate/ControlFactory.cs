@@ -1,0 +1,55 @@
+﻿using X39.Solutions.PdfTemplate.Abstraction;
+using X39.Solutions.PdfTemplate.Services;
+
+namespace X39.Solutions.PdfTemplate;
+
+/// <summary>
+/// Creates control instances for template nodes.
+/// </summary>
+public sealed class ControlFactory : IControlFactory
+{
+    private readonly IServiceProvider       _serviceProvider;
+    private readonly ControlExpressionCache _controlExpressionCache;
+    private readonly ControlRegistry        _controlRegistry;
+
+    /// <summary>
+    /// Creates a new <see cref="ControlFactory"/>.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider to resolve constructor dependencies from.</param>
+    /// <param name="controlExpressionCache">The expression cache used for control activation and parameter binding.</param>
+    /// <param name="controlRegistry">The registry containing available controls.</param>
+    public ControlFactory(
+        IServiceProvider serviceProvider,
+        ControlExpressionCache controlExpressionCache,
+        ControlRegistry controlRegistry)
+    {
+        _serviceProvider        = serviceProvider;
+        _controlExpressionCache = controlExpressionCache;
+        _controlRegistry        = controlRegistry;
+    }
+
+    /// <summary>
+    /// Creates a control instance and applies XML parameters and content.
+    /// </summary>
+    /// <param name="namespace">The XML namespace of the control.</param>
+    /// <param name="name">The XML name of the control.</param>
+    /// <param name="parameterDictionary">The XML attributes to apply.</param>
+    /// <param name="content">The XML text content to apply, if any.</param>
+    /// <param name="cultureInfo">The culture to use for parameter conversion.</param>
+    /// <returns>The created control.</returns>
+    public IControl Create(
+        string @namespace,
+        string name,
+        IReadOnlyDictionary<string, string> parameterDictionary,
+        string? content,
+        CultureInfo cultureInfo)
+    {
+        var type = _controlRegistry.GetControlType(@namespace, name);
+        return _controlExpressionCache.CreateControl(
+            _serviceProvider,
+            type,
+            parameterDictionary,
+            content,
+            cultureInfo);
+    }
+}

@@ -1,7 +1,6 @@
 ﻿using System.Xml;
 using SkiaSharp;
 using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Attributes;
 using X39.Solutions.PdfTemplate.Canvas;
 using X39.Solutions.PdfTemplate.Data;
 using X39.Solutions.PdfTemplate.Functions;
@@ -18,7 +17,7 @@ namespace X39.Solutions.PdfTemplate;
 /// This class is not thread safe. Make sure to implement locking if you want to use it in a multi-threaded environment.
 /// </remarks>
 [PublicAPI]
-public sealed class Generator : IDisposable, IAsyncDisposable, IAddControls, IAddTransformers
+public sealed class Generator : IDisposable, IAsyncDisposable
 {
     /// <summary>
     /// The data available to the templates processed by this generator.
@@ -26,20 +25,22 @@ public sealed class Generator : IDisposable, IAsyncDisposable, IAddControls, IAd
     public ITemplateData TemplateData { get; }
 
     private readonly SkPaintCache               _skPaintCache;
-    private readonly ControlStorage             _controlStorage;
+    private readonly IControlFactory            _controlFactory;
     private readonly Dictionary<string, object> _data         = new();
-    private readonly List<ITransformer>         _transformers = new();
+    private readonly IReadOnlyCollection<ITransformer> _transformers;
 
     /// <summary>
     /// Creates a new instance of the <see cref="Generator"/> class.
     /// </summary>
     /// <param name="skPaintCache">The paint cache to use.</param>
-    /// <param name="controlExpressionCache">The control expression cache to use.</param>
+    /// <param name="controlFactory">The control factory to use.</param>
     /// <param name="functions">The functions to register.</param>
+    /// <param name="transformers">The transformers to register.</param>
     public Generator(
         SkPaintCache skPaintCache,
-        ControlExpressionCache controlExpressionCache,
-        IEnumerable<IFunction> functions
+        IControlFactory controlFactory,
+        IEnumerable<IFunction> functions,
+        IEnumerable<ITransformer> transformers
     )
     {
         TemplateData = new TemplateData();
@@ -50,31 +51,17 @@ public sealed class Generator : IDisposable, IAsyncDisposable, IAddControls, IAd
             TemplateData.RegisterFunction(function);
         }
 
+        var transformerArray = transformers.ToArray();
+        var duplicateTransformers = transformerArray
+                                    .GroupBy((q) => q.Name, StringComparer.OrdinalIgnoreCase)
+                                    .FirstOrDefault((q) => q.Count() > 1);
+        if (duplicateTransformers is not null)
+            throw new InvalidOperationException(
+                $"The transformer {duplicateTransformers.Key} is registered more than once.");
+
         _skPaintCache   = skPaintCache;
-        _controlStorage = new(controlExpressionCache);
-    }
-
-
-    /// <summary>
-    /// Adds a control to the generator, making it available for use in templates.
-    /// </summary>
-    /// <typeparam name="TControl">The type of the control to add.</typeparam>
-    /// <exception cref="InvalidOperationException">Thrown when the type does not have a <see cref="ControlAttribute"/>.</exception>
-    public void AddControl<
-        [MeansImplicitUse(
-            ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature | ImplicitUseKindFlags.Assign
-        )]
-        TControl>()
-        where TControl : IControl
-        => _controlStorage.AddControl<TControl>();
-
-    /// <summary>
-    /// Adds a transformer to the generator, making it available for use in templates.
-    /// </summary>
-    /// <param name="transformer"></param>
-    public void AddTransformer(ITransformer transformer)
-    {
-        _transformers.Add(transformer);
+        _controlFactory = controlFactory;
+        _transformers   = transformerArray;
     }
 
     /// <summary>
@@ -220,7 +207,7 @@ public sealed class Generator : IDisposable, IAsyncDisposable, IAddControls, IAd
 
         await using var template = await Template.CreateAsync(
                 rootNode,
-                _controlStorage,
+                _controlFactory,
                 cultureInfo,
                 options.Context,
                 cancellationToken)
@@ -565,7 +552,6 @@ public sealed class Generator : IDisposable, IAsyncDisposable, IAddControls, IAd
         }
 
         _data.Clear();
-        _controlStorage.Clear();
     }
 
     /// <inheritdoc />
@@ -585,6 +571,5 @@ public sealed class Generator : IDisposable, IAsyncDisposable, IAddControls, IAd
         }
 
         _data.Clear();
-        _controlStorage.Clear();
     }
 }

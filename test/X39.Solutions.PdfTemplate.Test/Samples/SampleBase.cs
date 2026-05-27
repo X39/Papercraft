@@ -1,7 +1,6 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Services;
 using X39.Solutions.PdfTemplate.Test.Mock;
 using X39.Util;
 
@@ -9,29 +8,30 @@ namespace X39.Solutions.PdfTemplate.Test.Samples;
 
 public abstract class SampleBase : IAsyncDisposable
 {
-    private readonly ServiceProvider _serviceProvider;
-
-    public SampleBase()
-    {
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddPdfTemplateServices();
-        _serviceProvider = serviceCollection.BuildServiceProvider();
-    }
+    private readonly List<ServiceProvider> _serviceProviders = new();
 
     public Generator CreateGenerator(params IFunction[] functions)
     {
-        var generator = new Generator(
-            _serviceProvider.GetRequiredService<SkPaintCache>(),
-            _serviceProvider.GetRequiredService<ControlExpressionCache>(),
-            functions);
-        generator.AddDefaults();
-        generator.AddControl<MockControl>();
-        return generator;
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddPdfTemplateServices();
+        serviceCollection.AddPdfTemplateDefaults();
+        serviceCollection.AddPdfTemplateControl<MockControl>();
+        foreach (var function in functions)
+        {
+            serviceCollection.AddSingleton<IFunction>(function);
+        }
+
+        var serviceProvider = serviceCollection.BuildServiceProvider();
+        _serviceProviders.Add(serviceProvider);
+        return serviceProvider.GetRequiredService<Generator>();
     }
 
     public async ValueTask DisposeAsync()
     {
-        await _serviceProvider.DisposeAsync();
+        foreach (var serviceProvider in _serviceProviders)
+        {
+            await serviceProvider.DisposeAsync();
+        }
     }
 
     public static IDisposable CreateStream(out Stream stream)

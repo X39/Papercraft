@@ -13,56 +13,48 @@ namespace X39.Solutions.PdfTemplate.Services;
 /// </summary>
 public sealed class ControlExpressionCache : IDisposable
 {
-    private readonly IServiceProvider     _serviceProvider;
     private readonly ReaderWriterLockSlim _setParameterDelegatesLock = new();
     private readonly ReaderWriterLockSlim _createDelegatesLock       = new();
 
     private readonly
-        Dictionary<Type, (ParameterAttribute attribute, string parameterName, Action<IControl, string, CultureInfo>
+        Dictionary<Type, (ParameterAttribute attribute, string parameterName, Action<IServiceProvider, IControl, string, CultureInfo>
             setter)[]>
         _setParameterDelegates = new();
 
     private readonly Dictionary<Type, Func<IServiceProvider, IControl>> _createDelegates = new();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ControlExpressionCache"/> class.
-    /// </summary>
-    /// <param name="serviceProvider">The service provider.</param>
-    public ControlExpressionCache(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
-
-    /// <summary>
     /// Creates a control of the specified type.
     /// </summary>
+    /// <param name="serviceProvider">The service provider to resolve constructor dependencies from.</param>
     /// <param name="type">The type of the control to create.</param>
     /// <param name="parameterDictionary">The attributes to set on the control.</param>
     /// <param name="content">The content to set on the control or <see langword="null"/> if no content is provided.</param>
     /// <param name="cultureInfo">The culture to use for parameter conversion.</param>
     /// <returns>The created control.</returns>
     public IControl CreateControl(
+        IServiceProvider                    serviceProvider,
         Type                                type,
         IReadOnlyDictionary<string, string> parameterDictionary,
         string?                             content,
         CultureInfo                         cultureInfo)
     {
-        var control = CreateControlInstance(type);
-        SetParametersOfControl(type, control, parameterDictionary, content, cultureInfo);
+        var control = CreateControlInstance(serviceProvider, type);
+        SetParametersOfControl(serviceProvider, type, control, parameterDictionary, content, cultureInfo);
         return control;
     }
 
-    private IControl CreateControlInstance(Type type)
+    private IControl CreateControlInstance(IServiceProvider serviceProvider, Type type)
     {
         return _createDelegatesLock.UpgradeableReadLocked(
             () =>
             {
-                if (_createDelegates.TryGetValue(type, out var @delegate)) return @delegate(_serviceProvider);
+                if (_createDelegates.TryGetValue(type, out var @delegate)) return @delegate(serviceProvider);
                 return _createDelegatesLock.WriteLocked(
                     () =>
                     {
                         if (_createDelegates.TryGetValue(type, out @delegate))
-                            return (IControl) @delegate.DynamicInvoke()!;
+                            return @delegate(serviceProvider);
                         var constructors = type.GetConstructors(
                             BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static
                         );
@@ -97,7 +89,7 @@ public sealed class ControlExpressionCache : IDisposable
                         );
                         @delegate = expression.Compile();
                         _createDelegates.Add(type, @delegate);
-                        return @delegate(_serviceProvider);
+                        return @delegate(serviceProvider);
                     }
                 );
             }
@@ -105,6 +97,7 @@ public sealed class ControlExpressionCache : IDisposable
     }
 
     private void SetParametersOfControl(
+        IServiceProvider                    serviceProvider,
         Type                                controlType,
         IControl                            control,
         IReadOnlyDictionary<string, string> parameterDictionary,
@@ -120,9 +113,10 @@ public sealed class ControlExpressionCache : IDisposable
                     {
                         if (_setParameterDelegates.TryGetValue(controlType, out var setterTupleArray2))
                             return setterTupleArray2;
-                        var controlParameter     = Expression.Parameter(typeof(IControl));
-                        var valueParameter       = Expression.Parameter(typeof(string));
-                        var cultureInfoParameter = Expression.Parameter(typeof(CultureInfo));
+                        var serviceProviderParameter = Expression.Parameter(typeof(IServiceProvider));
+                        var controlParameter         = Expression.Parameter(typeof(IControl));
+                        var valueParameter           = Expression.Parameter(typeof(string));
+                        var cultureInfoParameter     = Expression.Parameter(typeof(CultureInfo));
                         var tuples = controlType
                                      .GetProperties(
                                          BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
@@ -137,7 +131,7 @@ public sealed class ControlExpressionCache : IDisposable
 
                         var setterTuples =
                             new List<(ParameterAttribute attribute, string parameterName,
-                                Action<IControl, string, CultureInfo> setter)>();
+                                Action<IServiceProvider, IControl, string, CultureInfo> setter)>();
                         foreach (var (propertyInfo, parameterAttribute) in tuples)
                         {
                             var propertySetter = propertyInfo.GetSetMethod(true)
@@ -173,7 +167,6 @@ public sealed class ControlExpressionCache : IDisposable
                                                            ?? converterConstructors.MaxBy(
                                                                (q) => q.GetParameters().Length
                                                            );
-                                var serviceProviderParameter = Expression.Parameter(typeof(IServiceProvider));
                                 var newExpression = converterConstructor is null
                                                     || converterConstructor.GetParameters().Length is 0
                                     ? Expression.New(converter)
@@ -181,12 +174,15 @@ public sealed class ControlExpressionCache : IDisposable
                                         converterConstructor,
                                         converterConstructor.GetParameters()
                                                             .Select(
-                                                                (q) => Expression.Call(
-                                                                    serviceProviderParameter,
-                                                                    typeof(IServiceProvider).GetMethod(
-                                                                        nameof(IServiceProvider.GetService)
-                                                                    )!,
-                                                                    Expression.Constant(q.ParameterType)
+                                                                (q) => Expression.Convert(
+                                                                    Expression.Call(
+                                                                        serviceProviderParameter,
+                                                                        typeof(IServiceProvider).GetMethod(
+                                                                            nameof(IServiceProvider.GetService)
+                                                                        )!,
+                                                                        Expression.Constant(q.ParameterType)
+                                                                    ),
+                                                                    q.ParameterType
                                                                 )
                                                             )
                                                             .Cast<Expression>()
@@ -197,7 +193,7 @@ public sealed class ControlExpressionCache : IDisposable
                                     castExpression,
                                     interfaceType.GetMethod(nameof(IParameterConverter<int>.Convert))!,
                                     valueParameter,
-                                    Expression.Constant(parameterAttribute.Format),
+                                    Expression.Constant(parameterAttribute.Format, typeof(string)),
                                     cultureInfoParameter
                                 );
                                 var castToControlTypeExpression = Expression.Convert(
@@ -209,8 +205,9 @@ public sealed class ControlExpressionCache : IDisposable
                                     propertySetter,
                                     callConverterExpression
                                 );
-                                var expression = Expression.Lambda<Action<IControl, string, CultureInfo>>(
+                                var expression = Expression.Lambda<Action<IServiceProvider, IControl, string, CultureInfo>>(
                                     setPropertyExpression,
+                                    serviceProviderParameter,
                                     controlParameter,
                                     valueParameter,
                                     cultureInfoParameter
@@ -233,8 +230,9 @@ public sealed class ControlExpressionCache : IDisposable
                                     propertySetter,
                                     valueParameter
                                 );
-                                var expression = Expression.Lambda<Action<IControl, string, CultureInfo>>(
+                                var expression = Expression.Lambda<Action<IServiceProvider, IControl, string, CultureInfo>>(
                                     setPropertyExpression,
+                                    serviceProviderParameter,
                                     controlParameter,
                                     valueParameter,
                                     cultureInfoParameter
@@ -274,8 +272,9 @@ public sealed class ControlExpressionCache : IDisposable
                                     propertySetter,
                                     castExpression
                                 );
-                                var expression = Expression.Lambda<Action<IControl, string, CultureInfo>>(
+                                var expression = Expression.Lambda<Action<IServiceProvider, IControl, string, CultureInfo>>(
                                     setPropertyExpression,
+                                    serviceProviderParameter,
                                     controlParameter,
                                     valueParameter,
                                     cultureInfoParameter
@@ -314,8 +313,9 @@ public sealed class ControlExpressionCache : IDisposable
                                     propertySetter,
                                     callConverterExpression
                                 );
-                                var expression = Expression.Lambda<Action<IControl, string, CultureInfo>>(
+                                var expression = Expression.Lambda<Action<IServiceProvider, IControl, string, CultureInfo>>(
                                     setPropertyExpression,
+                                    serviceProviderParameter,
                                     controlParameter,
                                     valueParameter,
                                     cultureInfoParameter
@@ -345,7 +345,7 @@ public sealed class ControlExpressionCache : IDisposable
         {
             if (parameterDictionary.TryGetValue(parameter, out var value))
             {
-                setter(control, value, cultureInfo);
+                setter(serviceProvider, control, value, cultureInfo);
                 used[parameter] = true;
             }
         }
@@ -366,7 +366,7 @@ public sealed class ControlExpressionCache : IDisposable
         {
             var (_, parameterName, setter) = array.FirstOrDefault(q => q.attribute.IsContent);
             if (parameterName is not null)
-                setter(control, content, cultureInfo);
+                setter(serviceProvider, control, content, cultureInfo);
             else
                 throw new InvalidOperationException($"The control {controlType.FullName()} does not support content.");
         }

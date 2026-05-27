@@ -53,14 +53,13 @@ For the best reading experience, use the [GitHub README](https://github.com/X39/
       * [`IDeferredCanvas`](#ideferredcanvas)
       * [`IImmediateCanvas`](#iimmediatecanvas)
       * [`IControl`](#icontrol)
+      * [`IControlFactory`](#icontrolfactory)
       * [`IContentControl`](#icontentcontrol)
       * [`IFunction`](#ifunction)
       * [`IInitializeControlAsync`](#iinitializecontrolasync)
       * [`IParameterConverter`](#iparameterconverter)
       * [`ITemplateData`](#itemplatedata)
       * [`ITransformer`](#itransformer)
-      * [`IAddControls`](#iaddcontrols)
-      * [`IAddTransformers`](#iaddtransformers)
       * [`IPropertyAccessCache`](#ipropertyaccesscache)
       * [`ITextService`](#itextservice)
       * [`IResourceResolver`](#iresourceresolver)
@@ -138,27 +137,21 @@ Register the library services at startup:
 
 ```csharp
 services.AddPdfTemplateServices();
+services.AddPdfTemplateDefaults();
 ```
 
-Then resolve the registered services from your application `IServiceProvider`, create a
-generator, register the default controls and transformers, and render:
+Then resolve the registered generator from your application `IServiceProvider` and render:
 
 ```csharp
 using System.Globalization;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
 using X39.Solutions.PdfTemplate;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Services;
 
 // IServiceProvider serviceProvider
 // Stream xmlTemplateStream
-var paintCache = serviceProvider.GetRequiredService<SkPaintCache>();
-var controlExpressionCache = serviceProvider.GetRequiredService<ControlExpressionCache>();
-var functions = Enumerable.Empty<IFunction>();
-
-await using var generator = new Generator(paintCache, controlExpressionCache, functions);
-generator.AddDefaults();
+await using var scope = serviceProvider.CreateAsyncScope();
+var generator = scope.ServiceProvider.GetRequiredService<Generator>();
 
 using var reader = XmlReader.Create(xmlTemplateStream);
 using var pdfStream = new MemoryStream();
@@ -168,17 +161,17 @@ await generator.GeneratePdfAsync(pdfStream, reader, CultureInfo.CurrentUICulture
 // pdfStream now contains the PDF
 ```
 
-`AddPdfTemplateServices` registers the supporting services used by `Generator`.
-It does not register `Generator` itself and does not discover custom `IFunction`
-implementations automatically. Pass any custom functions to the `Generator`
-constructor, then call `generator.AddDefaults()` to register the built-in controls
-and transformers.
+`AddPdfTemplateServices` registers the supporting services and `Generator`.
+`AddPdfTemplateDefaults` registers the built-in controls and transformers.
+Custom `IFunction` implementations are resolved from dependency injection, so register them as `IFunction`
+services before building the service provider.
 
 ### Useful next steps
 
 - Set template variables with `generator.TemplateData.SetVariable("Name", value)`.
-- Add custom functions by passing `IFunction` instances to the `Generator` constructor.
-- Add custom controls with `generator.AddControl<TControl>()`.
+- Add custom functions with `services.AddScoped<IFunction, MyFunction>()`.
+- Add custom controls with `services.AddPdfTemplateControl<TControl>()`.
+- Add custom transformers with `services.AddPdfTemplateTransformer<TTransformer>()`.
 - Configure document-level options such as margin through `DocumentOptions`.
 - Use the samples in `test/X39.Solutions.PdfTemplate.Test/Samples` as executable examples.
 
@@ -295,7 +288,7 @@ and `allVariables()`.
 These functions are used to list all available functions and variables, respectively.
 
 To create your own function, derive a class from the `IFunction` interface and implement the `ExecuteAsync` method.
-Pass function instances to the `Generator` constructor when creating a generator. Here is an example:
+Register the function in dependency injection before resolving a generator. Here is an example:
 
 ```csharp
 public class MyFunction : IFunction
@@ -318,6 +311,10 @@ public class MyFunction : IFunction
         return ValueTask.FromResult<object?>("Hello, world!");
     }
 }
+```
+
+```csharp
+services.AddScoped<IFunction, MyFunction>();
 ```
 
 ### Variables
@@ -460,10 +457,10 @@ public class MyControl : Control
 }
 ```
 
-Later in your code, add the control to the `Generator` instance:
+Later in your service registration, add the control:
 
 ```csharp
-generator.AddControl<MyControl>();
+services.AddPdfTemplateControl<MyControl>();
 ```
 
 You can now use the control in your XML templates (note the namespace import at the top):
@@ -848,14 +845,11 @@ public class MyTransformer : ITransformer
 }
 ```
 
-Afterwards, add the transformer to the `Generator` instance:
+Afterwards, add the transformer to the service collection:
 
 ```csharp
-generator.AddTransformer(new MyTransformer());
+services.AddPdfTemplateTransformer<MyTransformer>();
 ```
-
-Note that the way transformers are added is subject to change in the future to allow for a better integration with
-dependency injection.
 
 ##### Evaluating user data
 
@@ -1070,6 +1064,14 @@ The base class already handles common XML parameters such as `Margin`, `Padding`
 arrangement state and canvas state management.
 Implement `IControl` directly only when you need full control over the layout lifecycle.
 
+#### `IControlFactory`
+
+`IControlFactory` creates control instances from template nodes.
+The default implementation resolves the registered control type, constructs a fresh control instance and applies XML
+parameters.
+Most consumers should register controls with `AddPdfTemplateControl<TControl>()` instead of replacing the factory.
+Replace it only when you need custom activation behavior such as diagnostics, pooling or another creation strategy.
+
 #### `IContentControl`
 
 `IContentControl` extends `IControl` for controls that can contain child controls.
@@ -1083,7 +1085,7 @@ from scratch.
 `IFunction` is the intended extension point for values that should be calculated from template expressions,
 for example `@customerName()` or `@formatCurrency(@total)`.
 Implement it when template authors need reusable logic or data access that should not be encoded directly in XML.
-Functions are registered on `ITemplateData`; the `Generator` constructor registers the function instances it receives.
+Functions are registered through dependency injection as `IFunction` services.
 Use `IsVariadic` only when the function can accept more arguments than the fixed `Arguments` count.
 
 #### `IInitializeControlAsync`
@@ -1117,20 +1119,6 @@ Built-in examples are `@if`, `@for`, `@foreach`, `@var` and `@alternate`.
 Implement a transformer when you need to add, remove or repeat XML nodes before controls are constructed.
 Transformers are powerful and operate on raw template nodes, so prefer functions for simple value substitution.
 Use `ITemplateData.Scope` when introducing variables so changes stay limited to the transformed nodes.
-
-#### `IAddControls`
-
-`IAddControls` is an internal registration abstraction used by the default-control helper methods.
-It is not intended for external implementation.
-Consumer code should call `generator.AddControl<TControl>()` for custom controls and `generator.AddDefaults()` for
-the built-in control set.
-
-#### `IAddTransformers`
-
-`IAddTransformers` is an internal registration abstraction used by the default-transformer helper methods.
-It is not intended for external implementation.
-Consumer code should call `generator.AddTransformer(transformer)` for custom transformers and `generator.AddDefaults()`
-for the built-in transformer set.
 
 #### `IPropertyAccessCache`
 

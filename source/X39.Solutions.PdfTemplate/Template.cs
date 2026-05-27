@@ -83,7 +83,7 @@ internal sealed class Template : IAsyncDisposable
     [SuppressMessage("ReSharper", "InvertIf")]
     public static async Task<Template> CreateAsync(
         XmlNodeInformation rootNode,
-        ControlStorage cache,
+        IControlFactory controlFactory,
         CultureInfo cultureInfo,
         object? context,
         CancellationToken cancellationToken
@@ -99,7 +99,7 @@ internal sealed class Template : IAsyncDisposable
         {
             foreach (var node in headerNode.Children)
             {
-                var control = await CreateControlAsync(node, cache, cultureInfo, context, cancellationToken)
+                var control = await CreateControlAsync(node, controlFactory, cultureInfo, context, cancellationToken)
                     .ConfigureAwait(false);
                 headerControls.Add(control);
             }
@@ -109,7 +109,7 @@ internal sealed class Template : IAsyncDisposable
         {
             foreach (var node in bodyNode.Children)
             {
-                var control = await CreateControlAsync(node, cache, cultureInfo, context, cancellationToken)
+                var control = await CreateControlAsync(node, controlFactory, cultureInfo, context, cancellationToken)
                     .ConfigureAwait(false);
                 bodyControls.Add(control);
             }
@@ -119,7 +119,7 @@ internal sealed class Template : IAsyncDisposable
         {
             foreach (var node in footerNode.Children)
             {
-                var control = await CreateControlAsync(node, cache, cultureInfo, context, cancellationToken)
+                var control = await CreateControlAsync(node, controlFactory, cultureInfo, context, cancellationToken)
                     .ConfigureAwait(false);
                 footerControls.Add(control);
             }
@@ -129,7 +129,7 @@ internal sealed class Template : IAsyncDisposable
         {
             foreach (var node in backgroundNode.Children)
             {
-                var control = await CreateControlAsync(node, cache, cultureInfo, context, cancellationToken)
+                var control = await CreateControlAsync(node, controlFactory, cultureInfo, context, cancellationToken)
                     .ConfigureAwait(false);
                 backgroundControls.Add(control);
             }
@@ -139,7 +139,7 @@ internal sealed class Template : IAsyncDisposable
         {
             foreach (var node in foregroundNode.Children)
             {
-                var control = await CreateControlAsync(node, cache, cultureInfo, context, cancellationToken)
+                var control = await CreateControlAsync(node, controlFactory, cultureInfo, context, cancellationToken)
                     .ConfigureAwait(false);
                 foregroundControls.Add(control);
             }
@@ -184,7 +184,7 @@ internal sealed class Template : IAsyncDisposable
                 var controls = new List<IControl>();
                 foreach (var node in areaNodeChild.Children)
                 {
-                    var control = await CreateControlAsync(node, cache, cultureInfo, context, cancellationToken)
+                    var control = await CreateControlAsync(node, controlFactory, cultureInfo, context, cancellationToken)
                         .ConfigureAwait(false);
                     controls.Add(control);
                 }
@@ -205,7 +205,7 @@ internal sealed class Template : IAsyncDisposable
 
     private static async Task<IControl> CreateControlAsync(
         XmlNodeInformation node,
-        ControlStorage storage,
+        IControlFactory controlFactory,
         CultureInfo cultureInfo,
         object? context,
         CancellationToken cancellationToken
@@ -214,7 +214,7 @@ internal sealed class Template : IAsyncDisposable
         IControl? control = null;
         try
         {
-            control = storage.Create(node.NodeNamespace, node.NodeName, node.Attributes, node.TextContent, cultureInfo);
+            control = controlFactory.Create(node.NodeNamespace, node.NodeName, node.Attributes, node.TextContent, cultureInfo);
             if (control is not IContentControl contentControl)
             {
                 if (node.Children.Count != 0)
@@ -233,7 +233,7 @@ internal sealed class Template : IAsyncDisposable
                     IControl? childControl = null;
                     try
                     {
-                        childControl = await CreateControlAsync(child, storage, cultureInfo, context, cancellationToken)
+                        childControl = await CreateControlAsync(child, controlFactory, cultureInfo, context, cancellationToken)
                             .ConfigureAwait(false);
                         var childType = childControl.GetType();
                         if (!contentControl.CanAdd(childType))
