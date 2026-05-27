@@ -14,6 +14,14 @@ public record struct DocumentOptions()
     public static DocumentOptions Default => new();
 
     /// <summary>
+    /// Additional consumer-defined context for the current document generation request.
+    /// </summary>
+    /// <remarks>
+    /// The context is opaque to the library and passed unchanged to context-aware extension points.
+    /// </remarks>
+    public object? Context { get; set; }
+
+    /// <summary>
     /// The DPI of the document.
     /// </summary>
     public float DotsPerInch { get; init; } = 96;

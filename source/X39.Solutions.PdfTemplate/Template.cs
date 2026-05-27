@@ -85,6 +85,7 @@ internal sealed class Template : IAsyncDisposable
         XmlNodeInformation rootNode,
         ControlStorage cache,
         CultureInfo cultureInfo,
+        object? context,
         CancellationToken cancellationToken
     )
     {
@@ -98,7 +99,7 @@ internal sealed class Template : IAsyncDisposable
         {
             foreach (var node in headerNode.Children)
             {
-                var control = await CreateControlAsync(node, cache, cultureInfo, cancellationToken)
+                var control = await CreateControlAsync(node, cache, cultureInfo, context, cancellationToken)
                     .ConfigureAwait(false);
                 headerControls.Add(control);
             }
@@ -108,7 +109,7 @@ internal sealed class Template : IAsyncDisposable
         {
             foreach (var node in bodyNode.Children)
             {
-                var control = await CreateControlAsync(node, cache, cultureInfo, cancellationToken)
+                var control = await CreateControlAsync(node, cache, cultureInfo, context, cancellationToken)
                     .ConfigureAwait(false);
                 bodyControls.Add(control);
             }
@@ -118,7 +119,7 @@ internal sealed class Template : IAsyncDisposable
         {
             foreach (var node in footerNode.Children)
             {
-                var control = await CreateControlAsync(node, cache, cultureInfo, cancellationToken)
+                var control = await CreateControlAsync(node, cache, cultureInfo, context, cancellationToken)
                     .ConfigureAwait(false);
                 footerControls.Add(control);
             }
@@ -128,7 +129,7 @@ internal sealed class Template : IAsyncDisposable
         {
             foreach (var node in backgroundNode.Children)
             {
-                var control = await CreateControlAsync(node, cache, cultureInfo, cancellationToken)
+                var control = await CreateControlAsync(node, cache, cultureInfo, context, cancellationToken)
                     .ConfigureAwait(false);
                 backgroundControls.Add(control);
             }
@@ -138,7 +139,7 @@ internal sealed class Template : IAsyncDisposable
         {
             foreach (var node in foregroundNode.Children)
             {
-                var control = await CreateControlAsync(node, cache, cultureInfo, cancellationToken)
+                var control = await CreateControlAsync(node, cache, cultureInfo, context, cancellationToken)
                     .ConfigureAwait(false);
                 foregroundControls.Add(control);
             }
@@ -183,7 +184,7 @@ internal sealed class Template : IAsyncDisposable
                 var controls = new List<IControl>();
                 foreach (var node in areaNodeChild.Children)
                 {
-                    var control = await CreateControlAsync(node, cache, cultureInfo, cancellationToken)
+                    var control = await CreateControlAsync(node, cache, cultureInfo, context, cancellationToken)
                         .ConfigureAwait(false);
                     controls.Add(control);
                 }
@@ -206,6 +207,7 @@ internal sealed class Template : IAsyncDisposable
         XmlNodeInformation node,
         ControlStorage storage,
         CultureInfo cultureInfo,
+        object? context,
         CancellationToken cancellationToken
     )
     {
@@ -231,7 +233,7 @@ internal sealed class Template : IAsyncDisposable
                     IControl? childControl = null;
                     try
                     {
-                        childControl = await CreateControlAsync(child, storage, cultureInfo, cancellationToken)
+                        childControl = await CreateControlAsync(child, storage, cultureInfo, context, cancellationToken)
                             .ConfigureAwait(false);
                         var childType = childControl.GetType();
                         if (!contentControl.CanAdd(childType))
@@ -258,8 +260,8 @@ internal sealed class Template : IAsyncDisposable
             }
 
             // ReSharper disable once SuspiciousTypeConversion.Global
-            if (control is IInitializeAsync initializeAsync)
-                await initializeAsync.InitializeAsync(cancellationToken)
+            if (control is IInitializeControlAsync initializeAsync)
+                await initializeAsync.InitializeControlAsync(context, cancellationToken)
                     .ConfigureAwait(false);
 
             return control;

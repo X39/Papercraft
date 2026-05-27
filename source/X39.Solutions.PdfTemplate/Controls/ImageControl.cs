@@ -11,7 +11,7 @@ namespace X39.Solutions.PdfTemplate.Controls;
 /// A control that draws an image.
 /// </summary>
 [Control(Constants.ControlsNamespace)]
-public sealed class ImageControl : AlignableControl, IInitializeAsync, IDisposable
+public sealed class ImageControl : AlignableControl, IInitializeControlAsync, IDisposable
 {
     private readonly IResourceResolver _resourceResolver;
 
@@ -52,9 +52,9 @@ public sealed class ImageControl : AlignableControl, IInitializeAsync, IDisposab
     private SKBitmap? _bitmap;
 
     /// <inheritdoc />
-    public async Task InitializeAsync(CancellationToken cancellationToken = default)
+    public async Task InitializeControlAsync(object? context, CancellationToken cancellationToken = default)
     {
-        var image = await _resourceResolver.ResolveImageAsync(Source, cancellationToken)
+        var image = await _resourceResolver.ResolveImageAsync(Source, context, cancellationToken)
             .ConfigureAwait(false);
         _bitmap = SKBitmap.Decode(image);
     }

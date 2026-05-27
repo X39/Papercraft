@@ -9,7 +9,10 @@
 public class DefaultResourceResolver : IResourceResolver
 {
     /// <inheritdoc />
-    public ValueTask<byte[]> ResolveImageAsync(string source, CancellationToken cancellationToken = default)
+    public ValueTask<byte[]> ResolveImageAsync(
+        string source,
+        object? context,
+        CancellationToken cancellationToken = default)
     {
         if (source.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase))
         {

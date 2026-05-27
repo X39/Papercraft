@@ -39,7 +39,7 @@ public static class Util
         var controlStorage = new ControlStorage(serviceProvider.GetRequiredService<ControlExpressionCache>());
         controlStorage.AddDefaultControls();
         controlStorage.AddControl<MockControl>();
-        var t = await Template.CreateAsync(root, controlStorage, CultureInfo.InvariantCulture, default);
+        var t = await Template.CreateAsync(root, controlStorage, CultureInfo.InvariantCulture, null, default);
         return t.BodyControls.Cast<T>().First();
     }
 }

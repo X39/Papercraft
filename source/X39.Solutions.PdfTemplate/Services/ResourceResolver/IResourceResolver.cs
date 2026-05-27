@@ -11,11 +11,14 @@ public interface IResourceResolver
     /// <param name="source">
     ///     The source of the image.
     /// </param>
+    /// <param name="context">
+    ///     The consumer-defined <see cref="DocumentOptions.Context"/> for the current document generation request.
+    /// </param>
     /// <param name="cancellationToken">
     ///     The cancellation token to use.
     /// </param>
     /// <returns>
     ///     A <see cref="ValueTask"/> that resolves to the image data.
     /// </returns>
-    ValueTask<byte[]> ResolveImageAsync(string source, CancellationToken cancellationToken = default);
+    ValueTask<byte[]> ResolveImageAsync(string source, object? context, CancellationToken cancellationToken = default);
 }

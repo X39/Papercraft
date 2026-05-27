@@ -1020,6 +1020,35 @@ The default controls library only uses it for the `image` control.
 
 Its purpose is to allow fine control about how resources are resolved by the system.
 The default implementation provided will treat all input as base64 encoded images.
+`DocumentOptions.Context` is passed unchanged into the resolver, allowing custom
+resolvers to associate a resource lookup with the current print request.
+
+```csharp
+public sealed record PrintRequestContext(Guid RequestId);
+
+public sealed class MyResourceResolver : IResourceResolver
+{
+    public ValueTask<byte[]> ResolveImageAsync(
+        string source,
+        object? context,
+        CancellationToken cancellationToken = default)
+    {
+        var requestContext = context as PrintRequestContext;
+        // Use requestContext?.RequestId to route or audit this lookup.
+        return LoadImageAsync(source, requestContext, cancellationToken);
+    }
+}
+
+await generator.GeneratePdfAsync(
+    outputStream,
+    reader,
+    CultureInfo.InvariantCulture,
+    new DocumentOptions
+    {
+        Context = new PrintRequestContext(Guid.NewGuid()),
+    },
+    cancellationToken);
+```
 
 ## Building and Testing
 

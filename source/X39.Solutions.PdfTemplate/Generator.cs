@@ -218,7 +218,12 @@ public sealed class Generator : IDisposable, IAsyncDisposable, IAddControls, IAd
             rootNode = await templateReader.ReadAsync(reader, cancellationToken)
                 .ConfigureAwait(false);
 
-        await using var template = await Template.CreateAsync(rootNode, _controlStorage, cultureInfo, cancellationToken)
+        await using var template = await Template.CreateAsync(
+                rootNode,
+                _controlStorage,
+                cultureInfo,
+                options.Context,
+                cancellationToken)
             .ConfigureAwait(false);
         var originalPageSize = new Size(
             options.DotsPerMillimeter * options.PageWidthInMillimeters,
