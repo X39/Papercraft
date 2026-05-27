@@ -61,6 +61,8 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 ## Current Status
 
 The manual structure is now in place, and the introduction, first document, areas, template data, layout, styles, transformers, template-language, text-control, border-control, image-control, line-control, page-number-control, table-control, chart-controls and complete-examples chapters have verified starter examples or source-checked concept guidance.
+Text-control guidance now includes generated padding output and data insertion, line-control guidance includes
+header/table separators, and table-control guidance now calls out header rows.
 Template data now includes generated examples for simple variables, data-backed attributes and function calls,
 plus source-checked guidance for missing data.
 Template language now includes generated examples for conditional sections and switch-based alternatives, plus

@@ -33,6 +33,22 @@ public sealed class TextDocumentationSamples : DocumentationSampleBase
             """);
 
     [Fact]
+    public Task Text_Padding()
+        => RenderDocumentationSampleAsync(
+            "text-padding",
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <template>
+                <body>
+                    <border background="#f8fafc" color="#94a3b8" thickness="1pt" verticalAlignment="top">
+                        <text fontsize="10" padding="3mm">Padded text inside a visible box</text>
+                    </border>
+                    <text fontsize="10" padding="3mm">Plain text can also reserve space.</text>
+                </body>
+            </template>
+            """);
+
+    [Fact]
     public Task Text_StyleAndWeight()
         => RenderDocumentationSampleAsync(
             "text-style-and-weight",
