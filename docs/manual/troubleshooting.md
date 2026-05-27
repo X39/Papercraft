@@ -43,8 +43,9 @@ Style nodes are the special case documented later in the styles work.
 
 If the error says a control does not exist, check the element name first.
 Built-in controls are listed in [Controls](controls.md).
-Focused pages currently include [Text control](controls-text.md), [Border control](controls-border.md)
-and [Line control](controls-line.md).
+Focused pages currently include [Text control](controls-text.md), [Border control](controls-border.md),
+[Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md)
+and [Table control](controls-table.md).
 
 Common causes:
 
@@ -66,7 +67,10 @@ Check the focused control page for the supported attribute names:
 
 - [Text control](controls-text.md)
 - [Border control](controls-border.md)
+- [Image control](controls-image.md)
 - [Line control](controls-line.md)
+- [Page number control](controls-page-number.md)
+- [Table control](controls-table.md)
 
 For shared spacing, clipping and alignment attributes, see [Layout fundamentals](layout-fundamentals.md).
 
@@ -110,6 +114,7 @@ It does not load arbitrary file paths or internet URLs.
 
 If a template needs file, database, object storage or HTTP images, the application must provide a custom resolver.
 Ask the application team which image source format is supported for your templates.
+For the template-author reference, see [Image control](controls-image.md).
 
 ## Content Moves To Another Page
 
@@ -127,7 +132,7 @@ Start with [Layout fundamentals](layout-fundamentals.md):
 
 - Add dedicated missing-value and expression-error tests.
 - Add transformer-specific troubleshooting after the transformer reference examples are written.
-- Add image troubleshooting examples after the image control page exists.
+- Add image troubleshooting examples for bad source values and unsupported resolver input.
 - Add table overflow and row layout troubleshooting after the table control page exists.
 
 Previous: [Complete examples](complete-examples.md) | [Manual home](index.md) | Next: [Developer integration appendix](developer-integration.md)

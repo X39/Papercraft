@@ -122,7 +122,7 @@ public sealed class ImageControl : AlignableControl, IInitializeControlAsync, ID
     {
         if (_bitmap is null)
             return Size.Zero;
-        canvas.DrawBitmap(_bitmap, ArrangementInner - Arrangement);
+        canvas.DrawBitmap(_bitmap, new Rectangle(0, 0, ArrangementInner.Width, ArrangementInner.Height));
         return Size.Zero;
     }
 }

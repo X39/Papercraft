@@ -43,6 +43,14 @@ public partial class DeferredCanvasMock : IDeferredCanvas, IImmediateCanvas
         }
     }
 
+    private record struct DrawBitmapCall(Rectangle Rectangle)
+    {
+        public override string ToString()
+        {
+            return $"{nameof(DrawBitmapCall)} {{ {Rectangle} }}";
+        }
+    }
+
     private class State
     {
         public Point Translation { get; set; }
@@ -63,12 +71,14 @@ public partial class DeferredCanvasMock : IDeferredCanvas, IImmediateCanvas
     public int DrawLineCount => _drawLineCalls.Count;
     public int DrawTextCount => _drawTextCalls.Count;
     public int DrawRectCount => _drawRectCalls.Count;
+    public int DrawBitmapCount => _drawBitmapCalls.Count;
     public int ClipCount     => _clipCalls.Count;
 
     private readonly Stack<State>       _stateStack    = new(new State().MakeEnumerable());
     private readonly List<DrawLineCall> _drawLineCalls = new();
     private readonly List<DrawTextCall> _drawTextCalls = new();
     private readonly List<DrawRectCall> _drawRectCalls = new();
+    private readonly List<DrawBitmapCall> _drawBitmapCalls = new();
     private readonly List<Rectangle>    _clipCalls     = new();
     private readonly List<Rectangle>    _unclipCalls     = new();
 
@@ -137,9 +147,13 @@ public partial class DeferredCanvasMock : IDeferredCanvas, IImmediateCanvas
 
     public void DrawBitmap(byte[] bitmap, Rectangle rectangle)
     {
+        rectangle += Translation;
+        _drawBitmapCalls.Add(new DrawBitmapCall(rectangle));
     }
     public void DrawBitmap(SKBitmap bitmap, Rectangle rectangle)
     {
+        rectangle += Translation;
+        _drawBitmapCalls.Add(new DrawBitmapCall(rectangle));
     }
 
     public void   AddBreakPageHeight(float additionalPageHeight) {  }
@@ -223,6 +237,15 @@ public partial class DeferredCanvasMock
             var expected = new DrawRectCall(callExpected.rectangle, callExpected.color);
             Assert.Equal(expected, actual);
         }
+    }
+
+    [StackTraceHidden]
+    public void AssertDrawBitmap(Rectangle rectangle)
+    {
+        Assert.NotEmpty(_drawBitmapCalls);
+        var actual = _drawBitmapCalls.First();
+        var expected = new DrawBitmapCall(rectangle);
+        Assert.Equal(expected, actual);
     }
 
     [StackTraceHidden]

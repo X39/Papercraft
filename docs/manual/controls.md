@@ -3,7 +3,8 @@
 Previous: [Layout fundamentals](layout-fundamentals.md) | [Manual home](index.md) | Next: [Template language](template-language.md)
 
 Status: started. The focused [Text control](controls-text.md), [Border control](controls-border.md),
-[Line control](controls-line.md) and [Page number control](controls-page-number.md) pages now have verified examples.
+[Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md) and
+[Table control](controls-table.md) pages now have verified examples.
 
 ## What Is This?
 
@@ -38,9 +39,9 @@ The first complete controls reference will verify each attribute name against so
 | [`text`](controls-text.md) | Words, labels, headings and values. | Started with verified examples. |
 | [`border`](controls-border.md) | Boxes, backgrounds and border lines around content. | Started with verified examples. |
 | [`line`](controls-line.md) | Separators and simple rules. | Started with verified examples. |
-| `image` | Raster images loaded by the application. | Planned. |
+| [`image`](controls-image.md) | Raster images loaded by the application. | Started with a verified generated sample. |
 | [`pageNumber`](controls-page-number.md) | Current page and total page count text. | Started with a verified footer example. |
-| `table`, `tr`, `td`, `th` | Rows, columns and table cells. | Planned. |
+| [`table`, `tr`, `td`, `th`](controls-table.md) | Rows, columns and table cells. | Started with verified table examples. |
 | Chart controls | Line, bar and pie chart visuals. | Planned. |
 
 ## Planned Work
