@@ -46,19 +46,21 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 ## Manual Chapters
 
 1. [Introduction](introduction.md): what a template author controls and the basic vocabulary.
-2. [First document](first-document.md): template structure, page sections, areas and the first complete XML file.
-3. [Template data](template-data.md): variables, data-backed attributes, functions and data value formats.
-4. [Layout fundamentals](layout-fundamentals.md): available space, margin, padding, borders, alignment, lengths and colors.
-5. [Styles](styles.md): shared attributes with `template.style` and related style blocks.
-6. [Controls](controls.md): built-in XML controls such as `text`, `border`, `image`, `line`, `table`, `pageNumber` and charts. Focused pages now include [Control concepts](controls-concepts.md), [Text control](controls-text.md), [Border control](controls-border.md), [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md), [Table control](controls-table.md) and [Chart controls](controls-chart.md).
-7. [Template language](template-language.md): transformers such as `if`, `switch`, `for`, `foreach`, `alternate` and `var`.
-8. [Complete examples](complete-examples.md): full document examples such as invoices, reports, product sheets and dashboards. Started with verified invoice, report, product sheet and chart dashboard previews.
-9. [Troubleshooting](troubleshooting.md): common XML, data, image and layout problems.
-10. [Developer integration appendix](developer-integration.md): installation, service registration and extension points.
+2. [First document](first-document.md): template structure, page sections and the first complete XML file.
+3. [Areas](areas.md): fixed-position page rectangles, coordinates, clipping and when not to use areas.
+4. [Template data](template-data.md): variables, data-backed attributes, functions and data value formats.
+5. [Layout fundamentals](layout-fundamentals.md): available space, margin, padding, borders, alignment, lengths and colors.
+6. [Styles](styles.md): shared attributes with `template.style` and related style blocks.
+7. [Controls](controls.md): built-in XML controls such as `text`, `border`, `image`, `line`, `table`, `pageNumber` and charts. Focused pages now include [Control concepts](controls-concepts.md), [Text control](controls-text.md), [Border control](controls-border.md), [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md), [Table control](controls-table.md) and [Chart controls](controls-chart.md).
+8. [Transformers](transformers.md): the concept behind `@if`, `@switch`, `@foreach`, `@for`, `@var` and `@alternate`.
+9. [Template language](template-language.md): transformer starter syntax and task examples.
+10. [Complete examples](complete-examples.md): full document examples such as invoices, reports, product sheets and dashboards. Started with verified invoice, report, product sheet and chart dashboard previews.
+11. [Troubleshooting](troubleshooting.md): common XML, data, image and layout problems.
+12. [Developer integration appendix](developer-integration.md): installation, service registration and extension points.
 
 ## Current Status
 
-The manual structure is now in place, and the first document, template data, layout, styles, template-language, text-control, border-control, image-control, line-control, page-number-control, table-control, chart-controls and complete-examples chapters have verified starter examples.
+The manual structure is now in place, and the first document, areas, template data, layout, styles, transformers, template-language, text-control, border-control, image-control, line-control, page-number-control, table-control, chart-controls and complete-examples chapters have verified starter examples.
 The troubleshooting chapter now has source-checked starter entries.
 The developer appendix now contains setup and extension-point guidance for application developers.
 Most reference-heavy chapters are still planned work.

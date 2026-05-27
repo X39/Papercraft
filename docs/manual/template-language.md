@@ -1,6 +1,6 @@
 # Template Language
 
-Previous: [Controls](controls.md) | [Manual home](index.md) | Next: [Complete examples](complete-examples.md)
+Previous: [Transformers](transformers.md) | [Manual home](index.md) | Next: [Complete examples](complete-examples.md)
 
 Status: started. Starter transformer examples are checked against `IfTransformerTests`,
 `SwitchTransformerTests`, `ForTransformerTests`, `ForEachTransformerTests`, `VariableTransformerTests`
@@ -305,4 +305,4 @@ Use `repeat` when a second block should reuse the current value instead of advan
   verified.
 - Keep transformer examples small and focused on document-authoring tasks.
 
-Previous: [Controls](controls.md) | [Manual home](index.md) | Next: [Complete examples](complete-examples.md)
+Previous: [Transformers](transformers.md) | [Manual home](index.md) | Next: [Complete examples](complete-examples.md)

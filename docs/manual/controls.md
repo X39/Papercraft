@@ -1,6 +1,6 @@
 # Controls
 
-Previous: [Styles](styles.md) | [Manual home](index.md) | Next: [Template language](template-language.md)
+Previous: [Styles](styles.md) | [Manual home](index.md) | Next: [Transformers](transformers.md)
 
 Status: started. [Control concepts](controls-concepts.md) and the focused [Text control](controls-text.md), [Border control](controls-border.md),
 [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md),
@@ -56,4 +56,4 @@ The focused reference pages verify attribute names against source or tests.
 - Link shared layout attributes back to [Layout fundamentals](layout-fundamentals.md).
 - Link repeated shared attributes back to [Styles](styles.md).
 
-Previous: [Styles](styles.md) | [Manual home](index.md) | Next: [Template language](template-language.md)
+Previous: [Styles](styles.md) | [Manual home](index.md) | Next: [Transformers](transformers.md)

@@ -1,6 +1,6 @@
 # Template Data
 
-Previous: [First document](first-document.md) | [Manual home](index.md) | Next: [Layout fundamentals](layout-fundamentals.md)
+Previous: [Areas](areas.md) | [Manual home](index.md) | Next: [Layout fundamentals](layout-fundamentals.md)
 
 Status: started. The visual examples on this page are verified by `TemplateDataDocumentationSamples`.
 Simple variable replacement and dotted text behavior are checked against `GeneralExpressionTests` and the XML reader.
@@ -131,4 +131,4 @@ For new templates, prefer simple names such as `CustomerColor` so text and attri
 Read [Template language](template-language.md) when you need conditions or loops.
 Read [Layout fundamentals](layout-fundamentals.md) when a data value controls a color, length or spacing value.
 
-Previous: [First document](first-document.md) | [Manual home](index.md) | Next: [Layout fundamentals](layout-fundamentals.md)
+Previous: [Areas](areas.md) | [Manual home](index.md) | Next: [Layout fundamentals](layout-fundamentals.md)

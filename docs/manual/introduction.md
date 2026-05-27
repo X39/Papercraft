@@ -65,12 +65,13 @@ If a change breaks rendering, the most recent control, attribute or template-lan
 |------|---------|-----------|
 | Template | The XML document that describes the generated output. | [First document](first-document.md) |
 | Section | A top-level template part such as `body`, `header` or `footer`. | [First document](first-document.md) |
+| Area | A fixed-position rectangle that repeats on generated pages outside the body flow. | [Areas](areas.md) |
 | Control | An XML element that renders something, such as `text`, `border`, `table` or `image`. | [Controls](controls.md) |
 | Attribute | A setting on a control, such as `fontsize`, `margin`, `padding` or `color`. | [Layout fundamentals](layout-fundamentals.md) |
 | Template data | Values supplied by the application and read by the template. | [Template data](template-data.md) |
 | Variable | A named value used with expressions such as `@CustomerName`. | [Template data](template-data.md) |
 | Function | A reusable value or calculation exposed to the template, such as `@total()` when the application provides it. | [Template data](template-data.md) |
-| Transformer | A template-language block such as `@if`, `@foreach` or `@var` that rewrites XML before rendering. | [Template language](template-language.md) |
+| Transformer | A template-language block such as `@if`, `@foreach` or `@var` that rewrites XML before rendering. | [Transformers](transformers.md) |
 | Resource | External content used by a control, most commonly an image source. | [Controls](controls.md) |
 | Page setup | Document-level options such as page size and page margin. | [Developer integration appendix](developer-integration.md) |
 
