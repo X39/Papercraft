@@ -118,4 +118,42 @@ public sealed class TableDocumentationSamples : DocumentationSampleBase
                 </body>
             </template>
             """);
+
+    [Fact]
+    public Task Table_RepeatedDataRows()
+        => RenderDocumentationSampleAsync(
+            "table-repeated-data-rows",
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <template>
+                <body>
+                    <table>
+                        <th>
+                            <td width="2*">
+                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
+                                    <text fontsize="9" weight="bold">Task from data</text>
+                                </border>
+                            </td>
+                            <td width="1*">
+                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
+                                    <text fontsize="9" weight="bold" horizontalAlignment="right">Status</text>
+                                </border>
+                            </td>
+                        </th>
+                        @foreach TaskName in Tasks {
+                        @alternate on RowBackground with ["#ffffff", "#f1f5f9"] {
+                        <tr>
+                            <td><border background="@RowBackground" padding="1mm"><text fontsize="9">@TaskName</text></border></td>
+                            <td><border background="@RowBackground" padding="1mm"><text fontsize="9" horizontalAlignment="right">Ready</text></border></td>
+                        </tr>
+                        }
+                        }
+                    </table>
+                </body>
+            </template>
+            """,
+            configureGenerator: (generator) =>
+            {
+                generator.TemplateData.SetVariable("Tasks", new[] {"Draft", "Review", "Approve"});
+            });
 }

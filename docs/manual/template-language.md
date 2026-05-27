@@ -118,6 +118,7 @@ Use `@foreach` when the application supplies a list and the template should rend
 
 The application must supply `Lines` as a collection.
 The transformer creates a temporary variable named `Line` for each item.
+For a table-row example backed by generated output, see [Repeat rows from data](controls-table.md#repeat-rows-from-data).
 
 Add `with Index` when the template also needs a zero-based counter:
 
@@ -250,7 +251,7 @@ Use `repeat` when a second block should reuse the current value instead of advan
 
 ## Planned Work
 
-- Add task examples for optional sections and repeated table rows.
+- Add task examples for optional sections.
 - Add troubleshooting notes for expression errors and missing values.
 - Keep transformer examples small and focused on document-authoring tasks.
 
