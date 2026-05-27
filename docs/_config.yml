@@ -1,0 +1,14 @@
+title: X39.Solutions.PdfTemplate User Manual
+description: User-facing documentation for designing PDF documents with XML templates.
+theme: jekyll-theme-minimal
+show_downloads: false
+
+plugins:
+  - jekyll-relative-links
+
+relative_links:
+  enabled: true
+  collections: true
+
+include:
+  - manual

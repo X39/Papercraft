@@ -1248,13 +1248,12 @@ dotnet pack --configuration Release
 
 ## Documentation status
 
-The public API is documented in code, and this README currently serves as the main user-facing guide.
-Executable samples live in `test/X39.Solutions.PdfTemplate.Test/Samples`, including a README-style invoice sample.
+The repository now contains a GitHub Pages documentation site under [`docs`](docs/index.md).
+The site is intended to become the user-facing manual for template authors who design documents with XML.
 
-A dedicated documentation site is still missing.
-Contributions that improve end-user documentation, examples or a future documentation site are welcome.
-If you want to add a larger documentation system such as JetBrains Writerside, please open a discussion or pull request
-so the structure can be reviewed before it grows too large.
+This README still contains the current reference material until the manual migration is complete.
+The migration plan lives in [`docs/manual/work-plan.md`](docs/manual/work-plan.md), and executable samples live in
+`test/X39.Solutions.PdfTemplate.Test/Samples`, including a README-style invoice sample.
 
 ## Contributing
 
