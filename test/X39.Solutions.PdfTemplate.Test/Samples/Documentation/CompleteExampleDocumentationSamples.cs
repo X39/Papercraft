@@ -296,6 +296,102 @@ public sealed class CompleteExampleDocumentationSamples : DocumentationSampleBas
                 generator.TemplateData.SetVariable("LogoImage", CreateLogoDataUri());
             });
 
+    [Fact]
+    public Task CompleteExample_ChartDashboardPreview()
+        => RenderDocumentationSampleAsync(
+            "complete-chart-dashboard-preview",
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <template>
+                <template.style>
+                    <text fontsize="9" foreground="#0f172a"/>
+                </template.style>
+                <header>
+                    <text fontsize="18" weight="bold">Sales dashboard</text>
+                    <text foreground="#475569">Weekly order trend and channel mix</text>
+                    <line thickness="1pt" length="100%" color="#cbd5e1" margin="0 2mm 0 0"/>
+                </header>
+                <body>
+                    <table margin="0 0 0 4mm">
+                        <tr>
+                            <td width="1*">
+                                <border background="#ecfeff" padding="2mm" margin="0 0 1mm 0">
+                                    <text fontsize="8" foreground="#475569">Orders</text>
+                                    <text fontsize="16" weight="bold">326</text>
+                                </border>
+                            </td>
+                            <td width="1*">
+                                <border background="#f0fdf4" padding="2mm" margin="0 0 1mm 0">
+                                    <text fontsize="8" foreground="#475569">Revenue</text>
+                                    <text fontsize="16" weight="bold">48.2k</text>
+                                </border>
+                            </td>
+                            <td width="1*">
+                                <border background="#fefce8" padding="2mm">
+                                    <text fontsize="8" foreground="#475569">Open leads</text>
+                                    <text fontsize="16" weight="bold">41</text>
+                                </border>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <border background="#f8fafc" padding="2mm" margin="0 0 0 4mm" verticalAlignment="top">
+                        <text fontsize="8" foreground="#475569">Summary</text>
+                        <text>Orders rose through the week, with the web channel carrying the largest share.</text>
+                    </border>
+
+                    <chart margin="0 0 0 4mm">
+                        <lineChart height="45mm" title="Orders by day" line-color="#2563eb">
+                            <data x="1" y="42"/>
+                            <data x="2" y="46"/>
+                            <data x="3" y="51"/>
+                            <data x="4" y="58"/>
+                            <data x="5" y="63"/>
+                        </lineChart>
+                    </chart>
+
+                    <text fontsize="11" weight="bold" margin="0 1mm 0 1mm">Channel mix</text>
+                    <table>
+                        <th>
+                            <td width="2*">
+                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
+                                    <text weight="bold">Channel</text>
+                                </border>
+                            </td>
+                            <td width="1*">
+                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
+                                    <text weight="bold" horizontalAlignment="right">Share</text>
+                                </border>
+                            </td>
+                        </th>
+                        <tr>
+                            <td><border padding="1mm"><text>Web</text></border></td>
+                            <td><border padding="1mm"><text horizontalAlignment="right">52%</text></border></td>
+                        </tr>
+                        <tr>
+                            <td><border padding="1mm" background="#f8fafc"><text>Partners</text></border></td>
+                            <td><border padding="1mm" background="#f8fafc"><text horizontalAlignment="right">31%</text></border></td>
+                        </tr>
+                        <tr>
+                            <td><border padding="1mm"><text>Direct</text></border></td>
+                            <td><border padding="1mm"><text horizontalAlignment="right">17%</text></border></td>
+                        </tr>
+                    </table>
+                </body>
+                <footer>
+                    <line thickness="1pt" length="100%" color="#cbd5e1" margin="0 0 0 1mm"/>
+                    <pageNumber
+                        mode="CurrentTotal"
+                        prefix="Sales dashboard | Page "
+                        delimiter=" of "
+                        fontsize="8"
+                        foreground="#64748b"
+                        horizontalAlignment="right"/>
+                </footer>
+            </template>
+            """,
+            CompleteExampleDocumentOptions);
+
     private static string CreateLogoDataUri()
     {
         using var bitmap = new SKBitmap(160, 90);

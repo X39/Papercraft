@@ -4,8 +4,8 @@ Previous: [Complete examples](complete-examples.md) | [Manual home](index.md) | 
 
 Status: started. The first entries are checked against `XmlTemplateReader`, `Template`,
 `ControlRegistry`, `ControlActivationCache`, `ImageControl`, `DefaultResourceResolver`,
-`TroubleshootingExpressionTests`, `TroubleshootingTransformerTests`, `TroubleshootingImageTests`
-and the existing XML/control activation tests.
+`TableControl`, `TableRowControlBase`, `TableSample.LongTableRows`, `TroubleshootingExpressionTests`,
+`TroubleshootingTransformerTests`, `TroubleshootingImageTests` and the existing XML/control activation tests.
 
 ## What Is This?
 
@@ -197,8 +197,28 @@ Start with [Layout fundamentals](layout-fundamentals.md):
 - Use normal body content for flowing paragraphs and tables.
 - Use `areas` only for fixed-position content that should not affect the body flow.
 
+## A Table Breaks Or Overflows Unexpectedly
+
+Tables are laid out row by row.
+`TableControl` checks the remaining page height before each body row is rendered.
+When the next row is taller than the space left on the current page, the table advances to the next page and renders
+the table header again before the row.
+`TableSample.LongTableRows` exercises a long table with a header, repeated rows, header content and footer content.
+
+Common checks:
+
+- Keep table rows reasonably short. A row with several tall cells may move earlier than expected because the whole row height matters.
+- Put repeated column labels in `th` so they can appear again after a table page break.
+- Reduce padding, margins and border thickness inside `td` contents when only a few rows fit on each page.
+- Check whether the page header, page footer or document margin has left less body height than the table needs.
+- Split very large text blocks into more rows before placing them in a table.
+
+TODO: Verify and document the exact visible behavior when one table row is taller than a full available page.
+Source area: `TableControl.PreRender`, `TableControl.DoRender`, `TableRowControlBase.DoArrange` and a future focused
+table overflow test.
+
 ## Planned Work
 
-- Add table overflow and row layout troubleshooting after the table control page exists.
+- Add more source-backed troubleshooting entries as new recurring template-author issues are identified.
 
 Previous: [Complete examples](complete-examples.md) | [Manual home](index.md) | Next: [Developer integration appendix](developer-integration.md)
