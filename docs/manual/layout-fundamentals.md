@@ -7,6 +7,7 @@ Length, color, thickness and orientation formats are checked against source, `Le
 `ThicknessParsingTests`, `LineControlTests` and `BarChartTests`.
 Alignment behavior is checked against `AlignableControl`, `EHorizontalAlignment` and `EVerticalAlignment`.
 Shared clipping behavior is checked against `Control`, `BorderControlTests` and `TableCellControlTests`.
+Percentage length behavior is checked against `Length`, `ELengthUnit`, `LineControl` and `LineControlTests`.
 Flow, fixed-position and table page-break guidance is checked against `Generator`, `TableControl`,
 `TableRowControlBase`, `AreaSample` and `TableControlTest.RowTallerThanPageStartsAfterRepeatedHeaderAndIsNotSplit`.
 
@@ -70,6 +71,34 @@ Inside a fixed [area](areas.md), children receive the area rectangle as their av
 
 Percent lengths use the available width or height for the value being measured.
 For example, a horizontal `line` with `length="50%"` uses half of the available width.
+
+The parent control decides the available space.
+That means `50%` is not always half of the PDF page.
+In the body it is based on the current body width, after page margins and other reserved space.
+Inside a table cell, fixed area or padded border, it is based on the space inside that parent.
+
+For a horizontal line, the percentage is measured against available width.
+For a vertical line, the percentage is measured against available height.
+`Length.ToPixels` stores `50%` as `0.5` and multiplies it by the bounds supplied by the parent;
+`LineControl` passes the current available width or height to that calculation.
+
+```xml
+<template>
+    <body>
+        <line length="50%" thickness="1pt"/>
+        <table>
+            <tr>
+                <td width="30mm">
+                    <line length="50%" thickness="1pt"/>
+                </td>
+            </tr>
+        </table>
+    </body>
+</template>
+```
+
+The first line uses half of the body width.
+The second line uses half of the `30mm` table cell.
 
 ## Flow, Repetition And Fixed Placement
 

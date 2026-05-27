@@ -77,6 +77,58 @@ public sealed class TemplateLanguageDocumentationSamples : DocumentationSampleBa
             });
 
     [Fact]
+    public Task TemplateLanguage_ForeachChecklist()
+        => RenderDocumentationSampleAsync(
+            "template-language-foreach-checklist",
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <template>
+                <body>
+                    <text fontsize="14" weight="bold">Review checklist</text>
+                    @foreach TaskName in Tasks with Index {
+                    <border
+                        background="#f8fafc"
+                        color="#cbd5e1"
+                        thickness="1pt"
+                        padding="1mm"
+                        margin="0 1mm 0 0"
+                        verticalAlignment="top">
+                        <text fontsize="9">Item @Index: @TaskName</text>
+                    </border>
+                    }
+                </body>
+            </template>
+            """,
+            configureGenerator: (generator) =>
+            {
+                generator.TemplateData.SetVariable("Tasks", new[] {"Draft", "Review", "Approve"});
+            });
+
+    [Fact]
+    public Task TemplateLanguage_ForNumberedSteps()
+        => RenderDocumentationSampleAsync(
+            "template-language-for-numbered-steps",
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <template>
+                <body>
+                    <text fontsize="14" weight="bold">Build steps</text>
+                    @for Step from 1 to 4 {
+                    <border
+                        background="#ecfeff"
+                        color="#0891b2"
+                        thickness="1pt"
+                        padding="1mm"
+                        margin="0 1mm 0 0"
+                        verticalAlignment="top">
+                        <text fontsize="9">Step @Step</text>
+                    </border>
+                    }
+                </body>
+            </template>
+            """);
+
+    [Fact]
     public Task TemplateLanguage_TemporaryValue()
         => RenderDocumentationSampleAsync(
             "template-language-temporary-value",
@@ -104,4 +156,50 @@ public sealed class TemplateLanguageDocumentationSamples : DocumentationSampleBa
             {
                 generator.TemplateData.SetVariable("CustomerName", "Mira Lane");
             });
+
+    [Fact]
+    public Task TemplateLanguage_AlternatingValues()
+        => RenderDocumentationSampleAsync(
+            "template-language-alternating-values",
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <template>
+                <body>
+                    <text fontsize="14" weight="bold">Alternating rows</text>
+                    @alternate on RowBackground with ["#ffffff", "#f1f5f9"] {
+                    <border
+                        background="@RowBackground"
+                        color="#cbd5e1"
+                        thickness="1pt"
+                        padding="1mm"
+                        margin="0 1mm 0 0"
+                        verticalAlignment="top">
+                        <text fontsize="9">Draft</text>
+                    </border>
+                    }
+                    @alternate on RowBackground {
+                    <border
+                        background="@RowBackground"
+                        color="#cbd5e1"
+                        thickness="1pt"
+                        padding="1mm"
+                        margin="0 1mm 0 0"
+                        verticalAlignment="top">
+                        <text fontsize="9">Review</text>
+                    </border>
+                    }
+                    @alternate on RowBackground {
+                    <border
+                        background="@RowBackground"
+                        color="#cbd5e1"
+                        thickness="1pt"
+                        padding="1mm"
+                        margin="0 1mm 0 0"
+                        verticalAlignment="top">
+                        <text fontsize="9">Approve</text>
+                    </border>
+                    }
+                </body>
+            </template>
+            """);
 }

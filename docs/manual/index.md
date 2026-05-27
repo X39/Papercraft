@@ -66,12 +66,12 @@ padding and data insertion. Line-control guidance includes horizontal and vertic
 separators, and image-control guidance now calls out source and sizing tasks.
 Table-control guidance now calls out header rows.
 Table-control guidance now also links invoice line-item tables to the verified complete invoice example.
-Layout guidance now includes source-checked alignment guidance and a generated comparison of fixed and percentage
-length units.
+Layout guidance now includes source-checked alignment and percentage-available-space guidance plus a generated
+comparison of fixed and percentage length units.
 Template data now includes generated examples for simple variables, data-backed attributes and function calls,
 source-checked guidance for missing data, and a compact task chooser for common data and logic questions.
-Template language now includes generated examples for conditional sections and switch-based alternatives, plus
-source-checked optional-value guidance and a generated temporary-value example.
+Template language now includes generated examples for conditional sections, switch-based alternatives, list loops,
+numeric ranges, temporary values and alternating values, plus source-checked optional-value guidance.
 The troubleshooting chapter now has source-checked starter entries.
 It now includes a focused checklist for content that moves to another page unexpectedly.
 The developer appendix now contains setup and extension-point guidance for application developers.
