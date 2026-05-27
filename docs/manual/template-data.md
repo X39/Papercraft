@@ -96,10 +96,10 @@ Ask the application team which functions are available for your templates.
 
 ## Missing Or Unverified Data
 
+For missing simple variables, see [A value prints empty or does not change](troubleshooting.md#a-value-prints-empty-or-does-not-change).
+
 TODO: Verify nested property access such as `@Customer.Name` against `TemplateData`, `XmlTemplateReader` and property-access tests before documenting it as supported.
 The current verified documentation examples use simple variable names.
-
-TODO: Add dedicated troubleshooting tests for missing variable behavior in text and attributes before turning it into user-facing guidance.
 
 ## Next Steps
 

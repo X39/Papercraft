@@ -3,8 +3,8 @@
 Previous: [Complete examples](complete-examples.md) | [Manual home](index.md) | Next: [Developer integration appendix](developer-integration.md)
 
 Status: started. The first entries are checked against `XmlTemplateReader`, `Template`,
-`ControlRegistry`, `ControlActivationCache`, `ImageControl`, `DefaultResourceResolver`
-and the existing XML/control activation tests.
+`ControlRegistry`, `ControlActivationCache`, `ImageControl`, `DefaultResourceResolver`,
+`TroubleshootingExpressionTests`, `TroubleshootingTransformerTests` and the existing XML/control activation tests.
 
 ## What Is This?
 
@@ -90,9 +90,19 @@ Check the exact variable or function name with the application team.
 Template data names must match what the application supplies.
 The verified [Template data](template-data.md) examples currently cover simple variables and data-backed attributes.
 
-TODO: Add dedicated troubleshooting tests for missing variables in text and attributes before documenting exact
-missing-value output. Source areas: `TemplateData.GetVariable`, `XmlTemplateReader.TransformNodeAsync`
-and `XmlTemplateReader.TransformNodeTreeExpressionCandidateAsync`.
+If a text value still shows the `@` name, such as `@OrderNumber`, the XML reader did not find a matching variable.
+`TroubleshootingExpressionTests.MissingVariableInTextRemainsLiteral` verifies this behavior.
+
+If an attribute value starts with `@` and the variable is missing, the evaluated attribute value becomes empty before
+the control receives it. `TroubleshootingExpressionTests.MissingVariableInAttributeBecomesEmptyString` verifies this
+behavior. This can later make the control reject the attribute if an empty value is not valid for that attribute type.
+
+Common checks:
+
+- Compare the template name with the data name supplied by the application.
+- Check casing, spelling and underscores.
+- For attributes such as `color="@AccentColor"`, confirm that the supplied value is a valid value for that attribute.
+- Keep a visible fallback label in normal text when missing data would otherwise be hard to notice.
 
 ## A Function Or Transformer Fails
 
@@ -100,12 +110,59 @@ Function calls need a closing parenthesis.
 Transformer blocks such as `@if` and `@foreach` need opening and closing braces.
 The XML reader has dedicated exceptions for missing function brackets and missing transformer braces.
 
+`TroubleshootingExpressionTests` verifies the common function-expression cases:
+
+- An unknown function in text, such as `@formatTotal()`, is reported as a missing function.
+- An unknown function in an attribute, such as `color="@statusColor()"`, is reported as a failed expression evaluation.
+- A function call without a closing `)` is reported as a missing closing function bracket.
+
 Keep transformer blocks small while debugging.
 Remove unrelated content until only the failing condition or loop remains, then compare it with
 [Template language](template-language.md).
 
-TODO: Add focused troubleshooting examples after the transformer syntax examples are verified in
-[Template language](template-language.md).
+## Common Transformer Mistakes
+
+These checks are verified by the existing transformer tests and `TroubleshootingTransformerTests`.
+
+For `@if`:
+
+- Use `@else if`, not bare `else if`.
+- Put every `@else if` before the final `@else`.
+- Use only one `@else`.
+- When there is no comparison operator, the expression must evaluate to `true` or `false`.
+
+`IfTransformerTests.ElseIfAfterElseThrows`, `IfTransformerTests.DuplicateElseThrows` and
+`IfTransformerTests.IfTheory` cover these cases.
+
+For `@switch`:
+
+- Put only `@case` and `@default` clauses directly inside the `@switch` block.
+- Put `@default` last.
+- Use `@default` only once.
+- Give every `@case` a value or comparison.
+
+`SwitchTransformerTests.SwitchThrowsForDirectContent`, `SwitchTransformerTests.SwitchThrowsForDuplicateDefault`,
+`SwitchTransformerTests.SwitchThrowsForCaseAfterDefault` and `SwitchTransformerTests.SwitchThrowsForEmptyCase`
+cover these cases.
+
+For `@for`:
+
+- Use the form `@for Name from Start to End`.
+- Use `step` only when the loop should skip values.
+- Use a positive `step` when counting up and a negative `step` when counting down.
+
+`ForTransformerTests.ForLoopWithNumbers` verifies normal ranges.
+`TroubleshootingTransformerTests.ForLoopStepMustMoveTowardEnd` verifies the step-direction error.
+
+For `@foreach`:
+
+- The value after `in` must be a collection supplied by the application or returned by a function.
+- An empty collection renders no repeated content.
+- The optional `with IndexName` part creates a zero-based counter for the block.
+
+`ForEachTransformerTests.ForEachLoopWithVariableSourceAndIndex`,
+`ForEachTransformerTests.ForEachLoopWithEmptyVariableSource` and
+`TroubleshootingTransformerTests.ForEachSourceMustBeCollection` cover these cases.
 
 ## An Image Does Not Appear
 
@@ -131,8 +188,6 @@ Start with [Layout fundamentals](layout-fundamentals.md):
 
 ## Planned Work
 
-- Add dedicated missing-value and expression-error tests.
-- Add transformer-specific troubleshooting after the transformer reference examples are written.
 - Add image troubleshooting examples for bad source values and unsupported resolver input.
 - Add table overflow and row layout troubleshooting after the table control page exists.
 

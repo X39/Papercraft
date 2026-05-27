@@ -252,7 +252,6 @@ Use `repeat` when a second block should reuse the current value instead of advan
 ## Planned Work
 
 - Add task examples for optional sections.
-- Add troubleshooting notes for expression errors and missing values.
 - Keep transformer examples small and focused on document-authoring tasks.
 
 Previous: [Controls](controls.md) | [Manual home](index.md) | Next: [Complete examples](complete-examples.md)
