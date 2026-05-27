@@ -78,6 +78,26 @@ public sealed class LayoutDocumentationSamples : DocumentationSampleBase
             """);
 
     [Fact]
+    public Task Layout_LengthUnitComparison()
+        => RenderDocumentationSampleAsync(
+            "layout-length-unit-comparison",
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <template>
+                <body>
+                    <text fontsize="8">30mm fixed length</text>
+                    <line length="30mm" thickness="2pt" color="#2563eb" margin="0 0 0 1mm"/>
+                    <text fontsize="8">3cm fixed length</text>
+                    <line length="3cm" thickness="2pt" color="#16a34a" margin="0 0 0 1mm"/>
+                    <text fontsize="8">85pt fixed length</text>
+                    <line length="85pt" thickness="2pt" color="#f59e0b" margin="0 0 0 1mm"/>
+                    <text fontsize="8">50% of available width</text>
+                    <line length="50%" thickness="2pt" color="#dc2626"/>
+                </body>
+            </template>
+            """);
+
+    [Fact]
     public Task Layout_ClipOverflow()
         => RenderDocumentationSampleAsync(
             "layout-clip-overflow",

@@ -63,10 +63,11 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 The manual structure is now in place, and the introduction, first document, areas, template data, layout, styles, transformers, template-language, text-control, border-control, image-control, line-control, page-number-control, table-control, chart-controls and complete-examples chapters have verified starter examples or source-checked concept guidance.
 Text-control guidance now includes generated padding output and data insertion, line-control guidance includes
 header/table separators, and table-control guidance now calls out header rows.
+Layout guidance now includes a generated comparison of fixed and percentage length units.
 Template data now includes generated examples for simple variables, data-backed attributes and function calls,
 plus source-checked guidance for missing data.
 Template language now includes generated examples for conditional sections and switch-based alternatives, plus
-source-checked optional-value guidance.
+source-checked optional-value guidance and a generated temporary-value example.
 The troubleshooting chapter now has source-checked starter entries.
 The developer appendix now contains setup and extension-point guidance for application developers.
 Namespace and prefix behavior is now source-checked in the first-document, troubleshooting and developer appendix pages.

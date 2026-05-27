@@ -18,7 +18,7 @@ public sealed class TemplateLanguageDocumentationSamples : DocumentationSampleBa
                         color="#d97706"
                         thickness="1pt"
                         padding="2mm"
-                        margin="0 0 0 2mm"
+                        margin="0 2mm 0 0"
                         verticalAlignment="top">
                         <text fontsize="10">Payment is still due.</text>
                     </border>
@@ -74,5 +74,34 @@ public sealed class TemplateLanguageDocumentationSamples : DocumentationSampleBa
             configureGenerator: (generator) =>
             {
                 generator.TemplateData.SetVariable("Status", "pending");
+            });
+
+    [Fact]
+    public Task TemplateLanguage_TemporaryValue()
+        => RenderDocumentationSampleAsync(
+            "template-language-temporary-value",
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <template>
+                <body>
+                    <text fontsize="14" weight="bold">Customer summary</text>
+                    @var Label = "Bill to", Name = CustomerName {
+                    <border
+                        background="#f8fafc"
+                        color="#94a3b8"
+                        thickness="1pt"
+                        padding="2mm"
+                        margin="0 0 0 2mm"
+                        verticalAlignment="top">
+                        <text fontsize="9" weight="bold">@Label</text>
+                        <text fontsize="10">@Name</text>
+                    </border>
+                    }
+                </body>
+            </template>
+            """,
+            configureGenerator: (generator) =>
+            {
+                generator.TemplateData.SetVariable("CustomerName", "Mira Lane");
             });
 }
