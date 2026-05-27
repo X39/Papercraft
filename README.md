@@ -1,19 +1,24 @@
-***NOTE FOR [NuGet.org](https://www.nuget.org/packages/X39.Solutions.PdfTemplate):***
-*This readme contains comments in the XML which is not rendered by the NuGet markdown parser.
-Use [GitHub](https://github.com/X39/X39.Solutions.PdfTemplate) for best reading experience*
+***Note for [NuGet.org](https://www.nuget.org/packages/X39.Solutions.PdfTemplate):***
+*Some XML comments in this README are not rendered by the NuGet Markdown parser.
+For the best reading experience, use the [GitHub README](https://github.com/X39/X39.Solutions.PdfTemplate).*
 
 ![A sample output for reference](https://raw.githubusercontent.com/X39/X39.Solutions.PdfTemplate/master/.github/media/sample.png)
 
 <!-- TOC -->
 * [X39.Solutions.PdfTemplate](#x39solutionspdftemplate)
-  * [Semantic Versioning](#semantic-versioning)
   * [Getting Started](#getting-started)
+    * [Requirements](#requirements)
+    * [Install](#install)
+    * [Create a template](#create-a-template)
+    * [Generate a PDF](#generate-a-pdf)
+    * [Useful next steps](#useful-next-steps)
+  * [Core concepts](#core-concepts)
   * [Template structure](#template-structure)
     * [About `areas`](#about-areas)
   * [Integration](#integration)
     * [Functions](#functions)
     * [Variables](#variables)
-    * [End-User facing data types](#end-user-facing-data-types)
+    * [Template data types](#template-data-types)
       * [`Orientation`](#orientation)
       * [`Length`](#length)
       * [`Color`](#color)
@@ -60,53 +65,66 @@ Use [GitHub](https://github.com/X39/X39.Solutions.PdfTemplate) for best reading 
       * [`ITextService`](#itextservice)
       * [`IResourceResolver`](#iresourceresolver)
   * [Building and Testing](#building-and-testing)
-  * [Proper documentation for End-Users](#proper-documentation-for-end-users)
+  * [Documentation status](#documentation-status)
   * [Contributing](#contributing)
     * [Code of Conduct](#code-of-conduct)
     * [Contributors Agreement](#contributors-agreement)
     * [Additional controls](#additional-controls)
+  * [Semantic Versioning](#semantic-versioning)
   * [License](#license)
 <!-- TOC -->
 
 # X39.Solutions.PdfTemplate
 
-This library provides a way to generate PDF documents (and images) from XML templates.
-It uses SkiaSharp for rendering and supports a variety of controls for creating complex layouts.
-You can easily integrate .NET objects into your templates by using so-called "variables" (`@myVariable`)
-or pull data from a database as needed, by providing a custom function (`@myFunction()`).
-You may even create your own controls by deriving from the `Control` base class!
+X39.Solutions.PdfTemplate generates PDF documents and images from XML templates in .NET.
+It renders with SkiaSharp and provides built-in controls for text, borders, images, lines,
+tables, page numbers and charts.
 
-## Semantic Versioning
+Templates can use application data through variables such as `@customer.Name`, reusable
+logic through functions such as `@total()`, and preprocessing blocks such as `@if`,
+`@foreach` and `@var`.
+If the built-in controls are not enough, you can add your own controls, transformers,
+functions and resource resolvers.
 
-This library follows the principles of [Semantic Versioning](https://semver.org/). This means that version numbers and
-the way they change convey meaning about the underlying changes in the library. For example, if a minor version number
-changes (e.g., 1.1 to 1.2), this indicates that new features have been added in a backwards-compatible manner.
+Use this library when you want XML templates that can be edited outside your compiled
+application, but still need access to strongly typed .NET data and extension points.
 
 ## Getting Started
 
-To get started, install the [NuGet package](https://www.nuget.org/packages/X39.Solutions.PdfTemplate/) into your
-project:
+### Requirements
+
+- .NET 8.0 or later
+- A dependency injection container that can provide the services registered by
+  `AddPdfTemplateServices`
+- On Linux, the SkiaSharp native Linux assets package
+
+The package is marked trim-compatible and depends on SkiaSharp,
+`Microsoft.Extensions.DependencyInjection.Abstractions` and `X39.Util`.
+Issues are tracked in the GitHub repository at
+<https://github.com/X39/X39.Solutions.PdfTemplate/issues>.
+
+### Install
+
+Install the [NuGet package](https://www.nuget.org/packages/X39.Solutions.PdfTemplate/)
+into your project:
 
 ```shell
 dotnet add package X39.Solutions.PdfTemplate
 ```
 
-The package targets .NET 8.0, is marked trim-compatible, and depends on SkiaSharp,
-`Microsoft.Extensions.DependencyInjection.Abstractions` and `X39.Util`.
-This README is included in the NuGet package.
-Issues are tracked in the GitHub repository at <https://github.com/X39/X39.Solutions.PdfTemplate/issues>.
-
-If you are running linux, you also will have to add
-the [SkiaSharp linux assets](https://www.nuget.org/packages/SkiaSharp.NativeAssets.Linux):
+On Linux, also install the
+[SkiaSharp native Linux assets](https://www.nuget.org/packages/SkiaSharp.NativeAssets.Linux):
 
 ```shell
 dotnet add package SkiaSharp.NativeAssets.Linux
 ```
 
-Next, create an XML template. Here is a simple example:
+### Create a template
+
+Templates are XML documents. The root element name is flexible, but `template` is used
+throughout this README:
 
 ```xml
-
 <template>
     <body>
         <text>Hello, world!</text>
@@ -114,35 +132,41 @@ Next, create an XML template. Here is a simple example:
 </template>
 ```
 
-After registering the library with your dependency injection container at startup:
+### Generate a PDF
+
+Register the library services at startup:
 
 ```csharp
-// ...
 services.AddPdfTemplateServices();
-// ...
 ```
 
-You can use the following code to generate a PDF document from the template:
+Then resolve the registered services from your application `IServiceProvider`, create a
+generator, register the default controls and transformers, and render:
 
 ```csharp
+using System.Globalization;
+using System.Xml;
+using Microsoft.Extensions.DependencyInjection;
+using X39.Solutions.PdfTemplate;
+using X39.Solutions.PdfTemplate.Abstraction;
+using X39.Solutions.PdfTemplate.Services;
+
 // IServiceProvider serviceProvider
 // Stream xmlTemplateStream
-var paintCache             = serviceProvider.GetRequiredService<SkPaintCache>();
+var paintCache = serviceProvider.GetRequiredService<SkPaintCache>();
 var controlExpressionCache = serviceProvider.GetRequiredService<ControlExpressionCache>();
-var functions              = Enumerable.Empty<IFunction>();
-await using var generator = new Generator(
-    paintCache,
-    controlExpressionCache,
-    functions
-);
+var functions = Enumerable.Empty<IFunction>();
+
+await using var generator = new Generator(paintCache, controlExpressionCache, functions);
 generator.AddDefaults();
-using var reader    = XmlReader.Create(xmlTemplateStream);
+
+using var reader = XmlReader.Create(xmlTemplateStream);
 using var pdfStream = new MemoryStream();
+
 await generator.GeneratePdfAsync(pdfStream, reader, CultureInfo.CurrentUICulture);
+
 // pdfStream now contains the PDF
 ```
-
-This will generate a PDF document with the text "Hello, world!".
 
 `AddPdfTemplateServices` registers the supporting services used by `Generator`.
 It does not register `Generator` itself and does not discover custom `IFunction`
@@ -150,18 +174,38 @@ implementations automatically. Pass any custom functions to the `Generator`
 constructor, then call `generator.AddDefaults()` to register the built-in controls
 and transformers.
 
+### Useful next steps
+
+- Set template variables with `generator.TemplateData.SetVariable("Name", value)`.
+- Add custom functions by passing `IFunction` instances to the `Generator` constructor.
+- Add custom controls with `generator.AddControl<TControl>()`.
+- Configure document-level options such as margin through `DocumentOptions`.
+- Use the samples in `test/X39.Solutions.PdfTemplate.Test/Samples` as executable examples.
+
+## Core concepts
+
+| Concept | What it is used for |
+|---------|----------------------|
+| Template | XML document that describes the generated output. |
+| Control | XML element that measures, arranges and renders content, for example `text`, `table` or `image`. |
+| Variable | Value supplied by application code and read in a template with `@VariableName` or property access expressions. |
+| Function | Reusable .NET logic exposed to templates through calls such as `@myFunction()`. |
+| Transformer | Preprocessor block that can conditionally include, repeat or rewrite XML before rendering. |
+| Resource resolver | Service used by controls, currently mainly `image`, to load external resources. |
+
 ## Template structure
 
-A template is a "simple" XML file with some basic preprocessor.
-It has four base sections:
+A template is an XML document with a lightweight preprocessor.
+It can contain the following top-level sections:
 
 ```xml
-<!-- The root node name is ignored and can be modified to your hearts desire -->
+<!-- The root node name is ignored and can be changed to your preference. -->
 <template>
     <background>
         <!--
-           Background is rendered every page and can be used to eg. add fold lines.
-           All background contents are only rendering the first page
+           Background is rendered on every page and can be used to add fold lines,
+           watermarks or other page-wide content.
+           All background contents are measured against the first page
            (to clarify: the available space only accounts for the first page,
             it is rendered on all pages, but only ever the first page of
             the contents).
@@ -171,30 +215,28 @@ It has four base sections:
     </background>
     <header>
         <!--
-           Header Section is used to define a "header" that
-           may have up to 25% (- page margin/padding) of the height.
-           The header is repeated and rendered every page, always at top.
+           Header defines repeated content at the top of every page.
+           It may use up to 25% of the page height after margin and padding.
         -->
     </header>
     <body>
         <!--
-           Body section contains the actual document contents.
+           Body contains the main document contents.
            It is rendered across as many pages as required.
            Depending on the header/footer sections, the available size on the page
-           may be 100% or 50% (- page margin/padding).
+           may be 100% or 50%, minus page margin and padding.
         -->
     </body>
     <footer>
         <!--
-           Footer Section is used to define a "footer" that
-           may have up to 25% (- page margin/padding) of the height.
-           The footer is repeated and rendered every page, always at the bottom.
+           Footer defines repeated content at the bottom of every page.
+           It may use up to 25% of the page height after margin and padding.
         -->
     </footer>
     <foreground>
       <!--
-         Foreground is rendered every page and can be used to eg. add fold lines.
-         All foreground contents are only rendering the first page
+         Foreground is rendered on every page and can be used for overlays.
+         All foreground contents are measured against the first page
          (to clarify: the available space only accounts for the first page,
           it is rendered on all pages, but only ever the first page of
           the contents).
@@ -204,7 +246,7 @@ It has four base sections:
     </foreground>
     <areas>
       <area left="10cm" right="10cm" height="10cm" top="10cm">
-        <!-- See About areas -->
+        <!-- See "About areas". -->
       </area>
     </areas>
 </template>
@@ -226,8 +268,8 @@ For instance, `<text>` would then be written as `<prefix:text>`.
 
 ### About `areas`
 
-The `areas` section is a special section, rendering content at a designated area.
-The area is identified by a position provided on a separate node and ignore margin rules.
+The `areas` section renders content at a designated page position.
+Each area is identified by coordinates on an `area` node and ignores the normal margin rules.
 
 Areas are rendered above body but below foreground.
 
@@ -287,10 +329,10 @@ the `Generator` instance:
 generator.TemplateData.SetVariable("MyVariable", "Hello World!");
 ```
 
-### End-User facing data types
+### Template data types
 
 The library uses a variety of data types to represent values in the template.
-The following list gives an overview of end-user facing data types and their meaning.
+The following list gives an overview of the data types template authors will usually see.
 
 #### `Orientation`
 
@@ -435,13 +477,13 @@ You can now use the control in your XML templates (note the namespace import at 
 </template>
 ```
 
-**WARNING** The template has an implicit default namespace.
+**Warning:** The template has an implicit default namespace.
 If you change the default namespace (`xmlns="MyControls"`) instead of defining your own prefix,
-you will have to appropriately refer to default controls and the template layout itself via that namespace!
+you must reference the default controls and the template layout through that namespace as well.
 
 #### `text`
 
-The `text` control allows to render text. It can be used as follows:
+The `text` control renders text. It can be used as follows:
 
 ```xml
 
@@ -498,7 +540,7 @@ Usage:
 
 #### `image`
 
-The `image` control allows to render images.
+The `image` control renders images.
 
 It supports the following attributes:
 
@@ -572,7 +614,7 @@ Usage:
 
 #### `table`
 
-The `table` control allows to render tables.
+The `table` control renders tables.
 It is used in conjunction with the [`th`](#th), [`tr`](#tr) and [`td`](#td) controls.
 
 It has no table-specific attributes.
@@ -624,7 +666,7 @@ It has the following attributes:
 | Attribute    | Description                                                             | Values                                      | Default |
 |--------------|-------------------------------------------------------------------------|---------------------------------------------|---------|
 | `ColumnSpan` | The number of columns the cell spans.                                   | Any positive number                         | `1`     |
-| `Width`      | The width of the cell in either [`Length`](#length) or parts (eg. `1*). | Any [`Length`](#length) or parts (eg. `1*`) | `auto`  |
+| `Width`      | The width of the cell in either [`Length`](#length) or parts (for example `1*`). | Any [`Length`](#length) or parts (for example `1*`) | `auto`  |
 
 See [`table`](#table) for usage.
 
@@ -779,7 +821,7 @@ See [`chart`](#chart) for usage.
 ### Transformers
 
 Transformers are used to transform the XML template before it is rendered.
-This allows to expand a template and enrich it with data from csharp.
+This expands a template and enriches it with data from C#.
 
 #### Creating your own transformer
 
@@ -806,7 +848,7 @@ public class MyTransformer : ITransformer
 }
 ```
 
-afterwards, add the transformer to the `Generator` instance:
+Afterwards, add the transformer to the `Generator` instance:
 
 ```csharp
 generator.AddTransformer(new MyTransformer());
@@ -817,7 +859,7 @@ dependency injection.
 
 ##### Evaluating user data
 
-While building your transformer, you may have to evaluate data of a user to eg. resolve a function call.
+While building your transformer, you may have to evaluate user data, for example to resolve a function call.
 This can be done by utilizing the following function of the passed `ITemplateData` interface:
 
 ```csharp
@@ -854,7 +896,7 @@ The state is keyed by both type and name and lives for the lifetime of the `ITem
 
 #### `alternate`
 
-The `alternate` transformer allows to alternate between values, making it possible to eg. create a table with
+The `alternate` transformer alternates between values, making it possible to create a table with
 alternating row colors.
 It can be used as follows:
 
@@ -895,7 +937,7 @@ It can be used as follows:
 
 #### `var`
 
-The `var` transformer allows to introduce new variables in the XML template to eg. cache a result or
+The `var` transformer introduces new variables in the XML template to cache a result or
 to simply make access to a certain, commonly used value more easy on the user.
 It can be used as follows:
 
@@ -916,7 +958,7 @@ It can be used as follows:
 
 #### `if`
 
-The `if` transformer allows to conditionally include parts of the template.
+The `if` transformer conditionally includes parts of the template.
 There is no `else` clause, but you can use `@if` multiple times to achieve the same effect.
 It can be used as follows:
 
@@ -939,7 +981,7 @@ It can be used as follows:
 
 #### `for`
 
-The `for` transformer allows to repeat parts of the template.
+The `for` transformer repeats parts of the template.
 
 <!-- Regex: "\A\s*(?<variable>[a-zA-Z][a-zA-Z0-9_]*)\s+from\s+(?<from>.+?)\s+to\s+(?<to>.+?)(\s+step\s+(?<step>.+?))?\s*\z -->
 
@@ -965,7 +1007,7 @@ The `for` transformer allows to repeat parts of the template.
 
 #### `foreach`
 
-The `foreach` transformer allows to repeat parts of the template for each element in a list.
+The `foreach` transformer repeats parts of the template for each element in a list.
 
 ```csharp
 generator.TemplateData.SetVariable("MyList", new[] { "one", "two", "three" });
@@ -1169,19 +1211,15 @@ To create a local package, use:
 dotnet pack --configuration Release
 ```
 
-## Proper documentation for End-Users
+## Documentation status
 
-While the code is documented, a dedicated documentation site for end-users is still missing.
-The test project contains executable samples in `test/X39.Solutions.PdfTemplate.Test/Samples`,
-including a README-style invoice sample.
-There is also a `samples/WebAppSampleApi` project in the repository, but it is currently only a generic ASP.NET sample
-host and does not yet demonstrate the PDF template package.
-Dedicated end-user documentation is planned tho given that this is a spare-time project,
-it might take a while and does not have a high priority (on my list).
-Feel free to contribute to this project by adding documentation for end-users (e.g. using JetBrains Writerside or
-similar tools) and
-submitting a pull request. I will gladly review it and provide the necessary web-hosting in this repository (including a
-domain).
+The public API is documented in code, and this README currently serves as the main user-facing guide.
+Executable samples live in `test/X39.Solutions.PdfTemplate.Test/Samples`, including a README-style invoice sample.
+
+A dedicated documentation site is still missing.
+Contributions that improve end-user documentation, examples or a future documentation site are welcome.
+If you want to add a larger documentation system such as JetBrains Writerside, please open a discussion or pull request
+so the structure can be reviewed before it grows too large.
 
 ## Contributing
 
@@ -1224,8 +1262,8 @@ performance).
 It also shields me and every user of this project from any liability regarding your contribution by deflecting any
 potential liability caused by your contribution to you (e.g., if your contribution violates the rights of your
 employer).
-Feel free to discuss this agreement in the discussions section of this repository, i am open to changes here (as long as
-they do not open me or any other user of this project to any liability due to a **malicious contribution**).
+Feel free to discuss this agreement in the discussions section of this repository. I am open to changes here as long as
+they do not open me or any other user of this project to any liability due to a **malicious contribution**.
 
 ### Additional controls
 
@@ -1236,6 +1274,17 @@ list in this README.md.
 This way, the core library can stay as small as possible and users can decide which controls they want to use.
 Feel free to ask for help regarding publishing your control as a separate NuGet package in the discussions section of
 this repository.
+
+## Semantic Versioning
+
+This library follows the principles of [Semantic Versioning](https://semver.org/).
+Version changes are intended to communicate compatibility:
+
+| Change | Meaning |
+|--------|---------|
+| Patch | Backwards-compatible bug fixes or small internal changes. |
+| Minor | Backwards-compatible features or additions. |
+| Major | Breaking changes. |
 
 ## License
 
