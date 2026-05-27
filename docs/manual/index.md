@@ -50,7 +50,7 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 3. [Template data](template-data.md): variables, property access, functions and data value formats.
 4. [Layout fundamentals](layout-fundamentals.md): available space, margin, padding, borders, alignment, lengths and colors.
 5. [Styles](styles.md): shared attributes with `template.style` and related style blocks.
-6. [Controls](controls.md): built-in XML controls such as `text`, `border`, `image`, `line`, `table`, `pageNumber` and charts. Focused pages now include [Control concepts](controls-concepts.md), [Text control](controls-text.md), [Border control](controls-border.md), [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md) and [Table control](controls-table.md).
+6. [Controls](controls.md): built-in XML controls such as `text`, `border`, `image`, `line`, `table`, `pageNumber` and charts. Focused pages now include [Control concepts](controls-concepts.md), [Text control](controls-text.md), [Border control](controls-border.md), [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md), [Table control](controls-table.md) and [Chart controls](controls-chart.md).
 7. [Template language](template-language.md): transformers such as `if`, `switch`, `for`, `foreach`, `alternate` and `var`.
 8. [Complete examples](complete-examples.md): full document examples such as invoices, reports and product sheets. Started with verified invoice, report and product sheet previews.
 9. [Troubleshooting](troubleshooting.md): common XML, data, image and layout problems.
@@ -58,7 +58,7 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 
 ## Current Status
 
-The manual structure is now in place, and the first document, template data, layout, styles, template-language, text-control, border-control, image-control, line-control, page-number-control, table-control and complete-examples chapters have verified starter examples.
+The manual structure is now in place, and the first document, template data, layout, styles, template-language, text-control, border-control, image-control, line-control, page-number-control, table-control, chart-controls and complete-examples chapters have verified starter examples.
 The troubleshooting chapter now has source-checked starter entries.
 The developer appendix now contains setup and extension-point guidance for application developers.
 Most reference-heavy chapters are still planned work.
