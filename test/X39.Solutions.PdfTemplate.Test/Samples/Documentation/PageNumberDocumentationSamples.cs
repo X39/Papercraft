@@ -26,4 +26,37 @@ public sealed class PageNumberDocumentationSamples : DocumentationSampleBase
                 </footer>
             </template>
             """);
+
+    [Fact]
+    public Task PageNumber_FooterWithLabel()
+        => RenderDocumentationSampleAsync(
+            "page-number-footer-with-label",
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <template>
+                <body>
+                    <text fontsize="14" weight="bold">Statement summary</text>
+                    <text fontsize="10" foreground="#475569">The footer combines fixed text with the generated page number.</text>
+                </body>
+                <footer>
+                    <line thickness="1pt" length="100%" color="#cbd5e1" margin="0 0 1mm 0"/>
+                    <table>
+                        <tr>
+                            <td width="2*">
+                                <text fontsize="8" foreground="#475569">Prepared for internal review</text>
+                            </td>
+                            <td width="1*">
+                                <pageNumber
+                                    mode="CurrentTotal"
+                                    prefix="Page "
+                                    delimiter=" of "
+                                    fontsize="8"
+                                    foreground="#475569"
+                                    horizontalAlignment="right"/>
+                            </td>
+                        </tr>
+                    </table>
+                </footer>
+            </template>
+            """);
 }

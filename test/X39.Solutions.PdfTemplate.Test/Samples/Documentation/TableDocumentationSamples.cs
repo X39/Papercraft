@@ -45,6 +45,46 @@ public sealed class TableDocumentationSamples : DocumentationSampleBase
             """);
 
     [Fact]
+    public Task Table_TwoColumnLayout()
+        => RenderDocumentationSampleAsync(
+            "table-two-column-layout",
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <template>
+                <body>
+                    <table>
+                        <tr>
+                            <td width="1*">
+                                <border
+                                    thickness="1pt"
+                                    color="#cbd5e1"
+                                    background="#f8fafc"
+                                    padding="2mm"
+                                    verticalAlignment="top">
+                                    <text fontsize="9" weight="bold">Bill to</text>
+                                    <text fontsize="8">Mira Lane</text>
+                                    <text fontsize="8">42 Market Street</text>
+                                </border>
+                            </td>
+                            <td width="1*">
+                                <border
+                                    thickness="1pt"
+                                    color="#67e8f9"
+                                    background="#ecfeff"
+                                    padding="2mm"
+                                    verticalAlignment="top">
+                                    <text fontsize="9" weight="bold">Ship to</text>
+                                    <text fontsize="8">Warehouse North</text>
+                                    <text fontsize="8">Dock 3</text>
+                                </border>
+                            </td>
+                        </tr>
+                    </table>
+                </body>
+            </template>
+            """);
+
+    [Fact]
     public Task Table_ColumnWidths()
         => RenderDocumentationSampleAsync(
             "table-column-widths",
