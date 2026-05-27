@@ -58,6 +58,7 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 ## Current Status
 
 The manual structure is now in place, and the first document, template data, layout, text-control, border-control and line-control chapters have verified starter examples.
+The troubleshooting chapter now has source-checked starter entries.
 Most reference-heavy chapters are still planned work.
 Until a chapter says its examples are verified, the README and tests remain the source of truth for detailed behavior.
 
