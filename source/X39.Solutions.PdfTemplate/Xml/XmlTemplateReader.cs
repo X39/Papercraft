@@ -11,6 +11,11 @@ namespace X39.Solutions.PdfTemplate.Xml;
 /// </summary>
 public sealed class XmlTemplateReader : IDisposable
 {
+    private sealed record ParsedTransformerBlock(
+        string Name,
+        string RemainingLine,
+        IReadOnlyCollection<XmlNode> Nodes);
+
     /// <inheritdoc />
     public void Dispose()
     {
@@ -232,120 +237,38 @@ public sealed class XmlTemplateReader : IDisposable
                      { } transformer)
             {
                 // A transformer name was matched
-                var bracketIndex = text.IndexOf('{', endOfName);
-                if (bracketIndex == -1)
-                    throw new TransformationMissingOpeningBracketException(text, node);
+                var parsedBlock = ExtractTransformerBlock(
+                    nodeTree,
+                    node,
+                    nodeIndex,
+                    endOfName,
+                    text,
+                    name,
+                    builder
+                );
+                IReadOnlyCollection<TransformerChainClause> clauses = transformer is IChainedTransformer chainedTransformer
+                    ? ConsumeContinuationClauses(chainedTransformer, nodeTree, nodeIndex)
+                    : ArraySegment<TransformerChainClause>.Empty;
 
-                var transformerBody = text[(endOfName + 1)..bracketIndex];
-                var remainingText = text[(bracketIndex + 1)..];
-                if (builder.Length > 0
-                    && builder.ToString()
-                        .All(char.IsWhiteSpace))
-                    node.SetText(builder.ToString());
-                else
-                    nodeTree.RemoveChild(node);
-                if (remainingText.IsNotNullOrWhiteSpace())
-                {
-                    nodeTree.InsertChild(
-                        nodeIndex,
-                        new XmlNode(node.Line, node.Column, remainingText.TrimStart()) { Scope = node.Scope, }
-                    );
-                }
-
-                var nodesOfTransformer = new List<XmlNode>();
                 var currentNodeIndex = nodeIndex;
-                var curlyBracketCount = 1;
-                XmlNode? endNode = null;
-                for (; currentNodeIndex < nodeTree.Children.Count; currentNodeIndex++)
-                {
-                    var childNode = nodeTree[currentNodeIndex];
-                    if (!childNode.IsTextNode)
-                    {
-                        nodesOfTransformer.Add(childNode);
-                        continue;
-                    }
-
-                    var childText = childNode.Text
-                                    #pragma warning disable CA2201
-                                    ?? throw new NullReferenceException(
-                                        $"Failed to parse transformer expression '{text}' at L{childNode.Line}:C{childNode.Column}, text node text is null."
-                                    );
-                    #pragma warning restore CA2201
-
-                    for (var i = 0; i < childText.Length; i++)
-                    {
-                        var c = childText[i];
-                        switch (c)
-                        {
-                            case '{':
-                                curlyBracketCount++;
-                                break;
-                            case '}':
-                                curlyBracketCount--;
-                                break;
-                        }
-
-                        if (curlyBracketCount is not 0)
-                            continue;
-                        var leadingText = childText[..i];
-
-                        if (leadingText.IsNotNullOrWhiteSpace())
-                        {
-                            var tmpNode = new XmlNode(childNode.Line, childNode.Column, leadingText.TrimEnd())
-                            {
-                                Scope = node.Scope,
-                            };
-                            nodeTree.InsertChild(currentNodeIndex, tmpNode);
-                            nodesOfTransformer.Add(tmpNode);
-                            currentNodeIndex++;
-                        }
-
-                        var trailingText = childText[(i + 1)..];
-                        if (trailingText.IsNotNullOrWhiteSpace())
-                        {
-                            var tmpNode = new XmlNode(childNode.Line, childNode.Column, trailingText.TrimStart())
-                            {
-                                Scope = node.Scope,
-                            };
-                            nodeTree.InsertChild(currentNodeIndex + 1, tmpNode);
-                        }
-
-                        childNode.SetText("}");
-
-                        break;
-                    }
-
-                    if (curlyBracketCount > 0)
-                        nodesOfTransformer.Add(childNode);
-                    else
-                    {
-                        endNode = childNode;
-                        break;
-                    }
-                }
-
-                if (curlyBracketCount > 0)
-                    throw new TransformationMissingClosingBracketException(text, node);
-
-                if (endNode is null)
-                    throw new TransformationMissingEndNodeBracketException(text, node);
-
-                nodeTree.RemoveChild(endNode);
-                foreach (var xmlNode in nodesOfTransformer)
-                {
-                    nodeTree.RemoveChild(xmlNode);
-                }
-
                 try
                 {
-                    var transformedNodes = transformer.TransformAsync(
-                        _cultureInfo,
-                        _templateData,
-                        transformerBody,
-                        nodesOfTransformer.AsReadOnly(),
-                        cancellationToken
-                    );
-                    currentNodeIndex = nodeIndex;
+                    var transformedNodes = transformer is IChainedTransformer chained
+                        ? chained.TransformAsync(
+                            _cultureInfo,
+                            _templateData,
+                            parsedBlock.RemainingLine,
+                            parsedBlock.Nodes,
+                            clauses,
+                            cancellationToken
+                        )
+                        : transformer.TransformAsync(
+                            _cultureInfo,
+                            _templateData,
+                            parsedBlock.RemainingLine,
+                            parsedBlock.Nodes,
+                            cancellationToken
+                        );
                     await foreach (var transformedNode in transformedNodes.ConfigureAwait(false))
                     {
                         var scope = _templateData.PeekScope()
@@ -393,6 +316,300 @@ public sealed class XmlTemplateReader : IDisposable
             builder.Append(text[previousIndex..]);
         node.SetText(builder.ToString());
         return nodeIndex;
+    }
+
+    private static ParsedTransformerBlock ExtractTransformerBlock(
+        XmlNode nodeTree,
+        XmlNode node,
+        int nodeIndex,
+        int endOfName,
+        string text,
+        string name,
+        StringBuilder? leadingTextBuilder)
+    {
+        var bracketIndex = text.IndexOf('{', endOfName);
+        if (bracketIndex == -1)
+            throw new TransformationMissingOpeningBracketException(text, node);
+
+        var transformerBody = text[(endOfName + 1)..bracketIndex];
+        var remainingText = text[(bracketIndex + 1)..];
+        if (leadingTextBuilder is not null
+            && leadingTextBuilder.Length > 0
+            && leadingTextBuilder.ToString()
+                .All(char.IsWhiteSpace))
+            node.SetText(leadingTextBuilder.ToString());
+        else
+            nodeTree.RemoveChild(node);
+        if (remainingText.IsNotNullOrWhiteSpace())
+        {
+            nodeTree.InsertChild(
+                nodeIndex,
+                new XmlNode(node.Line, node.Column, remainingText.TrimStart()) { Scope = node.Scope, }
+            );
+        }
+
+        var nodesOfTransformer = new List<XmlNode>();
+        var currentNodeIndex = nodeIndex;
+        var curlyBracketCount = 1;
+        XmlNode? endNode = null;
+        for (; currentNodeIndex < nodeTree.Children.Count; currentNodeIndex++)
+        {
+            var childNode = nodeTree[currentNodeIndex];
+            if (!childNode.IsTextNode)
+            {
+                nodesOfTransformer.Add(childNode);
+                continue;
+            }
+
+            var childText = childNode.Text
+                            #pragma warning disable CA2201
+                            ?? throw new NullReferenceException(
+                                $"Failed to parse transformer expression '{text}' at L{childNode.Line}:C{childNode.Column}, text node text is null."
+                            );
+            #pragma warning restore CA2201
+
+            for (var i = 0; i < childText.Length; i++)
+            {
+                var c = childText[i];
+                switch (c)
+                {
+                    case '{':
+                        curlyBracketCount++;
+                        break;
+                    case '}':
+                        curlyBracketCount--;
+                        break;
+                }
+
+                if (curlyBracketCount is not 0)
+                    continue;
+                var leadingText = childText[..i];
+
+                if (leadingText.IsNotNullOrWhiteSpace())
+                {
+                    var tmpNode = new XmlNode(childNode.Line, childNode.Column, leadingText.TrimEnd())
+                    {
+                        Scope = node.Scope,
+                    };
+                    nodeTree.InsertChild(currentNodeIndex, tmpNode);
+                    nodesOfTransformer.Add(tmpNode);
+                    currentNodeIndex++;
+                }
+
+                var trailingText = childText[(i + 1)..];
+                if (trailingText.IsNotNullOrWhiteSpace())
+                {
+                    var tmpNode = new XmlNode(childNode.Line, childNode.Column, trailingText.TrimStart())
+                    {
+                        Scope = node.Scope,
+                    };
+                    nodeTree.InsertChild(currentNodeIndex + 1, tmpNode);
+                }
+
+                childNode.SetText("}");
+
+                break;
+            }
+
+            if (curlyBracketCount > 0)
+                nodesOfTransformer.Add(childNode);
+            else
+            {
+                endNode = childNode;
+                break;
+            }
+        }
+
+        if (curlyBracketCount > 0)
+            throw new TransformationMissingClosingBracketException(text, node);
+
+        if (endNode is null)
+            throw new TransformationMissingEndNodeBracketException(text, node);
+
+        nodeTree.RemoveChild(endNode);
+        foreach (var xmlNode in nodesOfTransformer)
+        {
+            nodeTree.RemoveChild(xmlNode);
+        }
+
+        return new ParsedTransformerBlock(name, transformerBody, nodesOfTransformer.AsReadOnly());
+    }
+
+    private static List<TransformerChainClause> ConsumeContinuationClauses(
+        IChainedTransformer transformer,
+        XmlNode nodeTree,
+        int nodeIndex)
+    {
+        var clauses = new List<TransformerChainClause>();
+        while (TryFindContinuationStart(transformer, nodeTree, nodeIndex, out var continuationIndex, out var name, out var endOfName))
+        {
+            var node = nodeTree[continuationIndex];
+            var text = node.Text
+                       #pragma warning disable CA2201
+                       ?? throw new NullReferenceException(
+                           $"Failed to parse transformer expression at L{node.Line}:C{node.Column}, text node text is null."
+                       );
+            #pragma warning restore CA2201
+            var block = ExtractContinuationBlock(nodeTree, node, continuationIndex, endOfName, text, name);
+            clauses.Add(new TransformerChainClause(block.Name, block.RemainingLine, block.Nodes));
+        }
+
+        return clauses;
+    }
+
+    private static ParsedTransformerBlock ExtractContinuationBlock(
+        XmlNode nodeTree,
+        XmlNode node,
+        int nodeIndex,
+        int endOfName,
+        string text,
+        string name)
+    {
+        var bracketIndex = text.IndexOf('{', endOfName);
+        if (bracketIndex == -1)
+            throw new TransformationMissingOpeningBracketException(text, node);
+
+        var transformerBody = text[(endOfName + 1)..bracketIndex];
+        var remainingText = text[(bracketIndex + 1)..];
+        nodeTree.RemoveChild(node);
+        if (remainingText.IsNotNullOrWhiteSpace())
+        {
+            nodeTree.InsertChild(
+                nodeIndex,
+                new XmlNode(node.Line, node.Column, remainingText.TrimStart()) { Scope = node.Scope, }
+            );
+        }
+
+        var nodesOfTransformer = new List<XmlNode>();
+        var currentNodeIndex = nodeIndex;
+        var curlyBracketCount = 1;
+        XmlNode? endNode = null;
+        for (; currentNodeIndex < nodeTree.Children.Count; currentNodeIndex++)
+        {
+            var childNode = nodeTree[currentNodeIndex];
+            if (!childNode.IsTextNode)
+            {
+                nodesOfTransformer.Add(childNode);
+                continue;
+            }
+
+            var childText = childNode.Text
+                            #pragma warning disable CA2201
+                            ?? throw new NullReferenceException(
+                                $"Failed to parse transformer expression '{text}' at L{childNode.Line}:C{childNode.Column}, text node text is null."
+                            );
+            #pragma warning restore CA2201
+
+            for (var i = 0; i < childText.Length; i++)
+            {
+                var c = childText[i];
+                switch (c)
+                {
+                    case '{':
+                        curlyBracketCount++;
+                        break;
+                    case '}':
+                        curlyBracketCount--;
+                        break;
+                }
+
+                if (curlyBracketCount is not 0)
+                    continue;
+                var leadingText = childText[..i];
+
+                if (leadingText.IsNotNullOrWhiteSpace())
+                {
+                    var tmpNode = new XmlNode(childNode.Line, childNode.Column, leadingText.TrimEnd())
+                    {
+                        Scope = node.Scope,
+                    };
+                    nodeTree.InsertChild(currentNodeIndex, tmpNode);
+                    nodesOfTransformer.Add(tmpNode);
+                    currentNodeIndex++;
+                }
+
+                var trailingText = childText[(i + 1)..];
+                if (trailingText.IsNotNullOrWhiteSpace())
+                {
+                    var tmpNode = new XmlNode(childNode.Line, childNode.Column, trailingText.TrimStart())
+                    {
+                        Scope = node.Scope,
+                    };
+                    nodeTree.InsertChild(currentNodeIndex + 1, tmpNode);
+                }
+
+                childNode.SetText("}");
+
+                break;
+            }
+
+            if (curlyBracketCount > 0)
+                nodesOfTransformer.Add(childNode);
+            else
+            {
+                endNode = childNode;
+                break;
+            }
+        }
+
+        if (curlyBracketCount > 0)
+            throw new TransformationMissingClosingBracketException(text, node);
+
+        if (endNode is null)
+            throw new TransformationMissingEndNodeBracketException(text, node);
+
+        nodeTree.RemoveChild(endNode);
+        foreach (var xmlNode in nodesOfTransformer)
+        {
+            nodeTree.RemoveChild(xmlNode);
+        }
+
+        return new ParsedTransformerBlock(name, transformerBody, nodesOfTransformer.AsReadOnly());
+    }
+
+    private static bool TryFindContinuationStart(
+        IChainedTransformer transformer,
+        XmlNode nodeTree,
+        int nodeIndex,
+        out int continuationIndex,
+        out string name,
+        out int endOfName)
+    {
+        for (var i = nodeIndex; i < nodeTree.Children.Count; i++)
+        {
+            var node = nodeTree[i];
+            if (!node.IsTextNode)
+                break;
+            var text = node.Text ?? string.Empty;
+            if (text.IsNullOrWhiteSpace())
+                continue;
+            var indexOfExpressionStart = text.IndexOf('@');
+            if (indexOfExpressionStart == -1 || text[..indexOfExpressionStart].IsNotNullOrWhiteSpace())
+                break;
+
+            endOfName = indexOfExpressionStart + 1;
+            while (text.Length > endOfName
+                   && (text[endOfName]
+                           .IsLetterOrDigit()
+                       || text[endOfName] == '-'
+                       || text[endOfName] == '_'))
+                endOfName++;
+
+            name = text[(indexOfExpressionStart + 1)..endOfName];
+            var continuationName = name;
+            if (transformer.ContinuationNames.Any((q) => q.Equals(continuationName, StringComparison.OrdinalIgnoreCase)))
+            {
+                continuationIndex = i;
+                return true;
+            }
+
+            break;
+        }
+
+        continuationIndex = -1;
+        name = string.Empty;
+        endOfName = -1;
+        return false;
     }
 
     private static void AppendValueToStringBuilder(object? functionResult, StringBuilder builder)

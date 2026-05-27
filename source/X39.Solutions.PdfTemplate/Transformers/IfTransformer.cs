@@ -7,15 +7,18 @@ using XmlNode = X39.Solutions.PdfTemplate.Xml.XmlNode;
 namespace X39.Solutions.PdfTemplate.Transformers;
 
 /// <summary>
-/// A transformer that repeats the given nodes for a given range.
+/// A transformer that conditionally includes the given nodes.
 /// </summary>
-public partial class IfTransformer : ITransformer
+public partial class IfTransformer : IChainedTransformer
 {
     [GeneratedRegex(@"\A\s*(?<leftExpression>.+?)(?:\s+(?<operator>[><=!]{1,3}|in)\s+(?<rightExpression>.+?))?\s*\z")]
     private static partial Regex ParseArguments();
 
     /// <inheritdoc />
     public string Name => "if";
+
+    /// <inheritdoc />
+    public IReadOnlyCollection<string> ContinuationNames { get; } = new[] { "else" };
 
     /// <inheritdoc />
     public async IAsyncEnumerable<XmlNode> TransformAsync(
@@ -25,7 +28,84 @@ public partial class IfTransformer : ITransformer
         IReadOnlyCollection<XmlNode> nodes,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        await foreach (var node in TransformAsync(
+                           cultureInfo,
+                           templateData,
+                           remainingLine,
+                           nodes,
+                           ArraySegment<TransformerChainClause>.Empty,
+                           cancellationToken
+                       )
+                       .ConfigureAwait(false))
+            yield return node;
+    }
+
+    /// <inheritdoc />
+    public async IAsyncEnumerable<XmlNode> TransformAsync(
+        CultureInfo cultureInfo,
+        ITemplateData templateData,
+        string remainingLine,
+        IReadOnlyCollection<XmlNode> nodes,
+        IReadOnlyCollection<TransformerChainClause> clauses,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
         using var scope = templateData.Scope("if");
+        var matched = await EvaluateConditionAsync(cultureInfo, templateData, remainingLine, cancellationToken)
+            .ConfigureAwait(false);
+        if (matched)
+        {
+            foreach (var node in nodes)
+                yield return node.DeepCopy();
+        }
+
+        var elseSeen = false;
+        foreach (var clause in clauses)
+        {
+            if (!clause.Name.Equals("else", StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("Only else clauses can follow an if transformer.", nameof(clauses));
+            if (elseSeen)
+                throw new ArgumentException("The else clause must be the last clause in an if transformer chain.", nameof(clauses));
+
+            var clauseText = clause.RemainingLine.Trim();
+            if (clauseText.Length is 0)
+            {
+                elseSeen = true;
+                if (matched)
+                    continue;
+                matched = true;
+                foreach (var node in clause.Nodes)
+                    yield return node.DeepCopy();
+                continue;
+            }
+
+            if (!clauseText.StartsWith("if", StringComparison.OrdinalIgnoreCase)
+                || clauseText.Length is 2
+                || !clauseText[2].IsWhiteSpace())
+                throw new ArgumentException(
+                    "An else clause must either be empty or use the form '@else if <expression>'.",
+                    nameof(clauses));
+
+            var condition = clauseText[2..].Trim();
+            if (condition.Length is 0)
+                throw new ArgumentException("An else-if clause must include an expression.", nameof(clauses));
+            if (matched)
+                continue;
+
+            matched = await EvaluateConditionAsync(cultureInfo, templateData, condition, cancellationToken)
+                .ConfigureAwait(false);
+            if (!matched)
+                continue;
+            foreach (var node in clause.Nodes)
+                yield return node.DeepCopy();
+        }
+    }
+
+    private static async Task<bool> EvaluateConditionAsync(
+        CultureInfo cultureInfo,
+        ITemplateData templateData,
+        string remainingLine,
+        CancellationToken cancellationToken)
+    {
         var match = ParseArguments().Match(remainingLine);
         if (!match.Success)
             throw new ArgumentException(
@@ -40,9 +120,7 @@ public partial class IfTransformer : ITransformer
         {
             if (leftExpression is bool flag)
             {
-                if (flag)
-                    foreach (var node in nodes)
-                        yield return node.DeepCopy();
+                return flag;
             }
             else
             {
@@ -50,8 +128,6 @@ public partial class IfTransformer : ITransformer
                     "The left expression could not be evaluated to a boolean but has to be if no operator is given.",
                     nameof(remainingLine));
             }
-
-            yield break;
         }
 
         var @operator = match.Groups["operator"].Value;
@@ -73,10 +149,7 @@ public partial class IfTransformer : ITransformer
                 "Invalid operator, only >, <, >=, <=, ==, !=, ===, !==, in are supported.",
                 nameof(remainingLine)),
         };
-        if (!result)
-            yield break;
-        foreach (var node in nodes)
-            yield return node.DeepCopy();
+        return result;
     }
 
     private static bool Similar(object? leftExpression, object? rightExpression)

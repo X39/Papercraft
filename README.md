@@ -951,7 +951,8 @@ It can be used as follows:
 #### `if`
 
 The `if` transformer conditionally includes parts of the template.
-There is no `else` clause, but you can use `@if` multiple times to achieve the same effect.
+It supports chained `@else if` and `@else` clauses.
+Continuation clauses must use the transformer-style `@else if` form; bare `else if` is not supported.
 It can be used as follows:
 
 ```xml
@@ -966,6 +967,21 @@ It can be used as follows:
         }
         @if true {
         <text>Always included</text>
+        }
+        @if false {
+        <text>Skipped</text>
+        }
+        @else {
+        <text>Included by else</text>
+        }
+        @if false {
+        <text>Skipped</text>
+        }
+        @else if true {
+        <text>Included by else-if</text>
+        }
+        @else {
+        <text>Skipped because else-if matched</text>
         }
     </body>
 </template>
