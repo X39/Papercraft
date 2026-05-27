@@ -6,7 +6,7 @@ Use this manual when you need to understand how a document is structured, which 
 
 ## Start here
 
-- [Manual outline](manual/index.md): the planned user manual structure.
+- [User manual](manual/index.md): the starting point for template authors.
 - [Documentation work plan](manual/work-plan.md): the task list for converting the current README into a complete manual.
 - [Current README](https://github.com/X39/X39.Solutions.PdfTemplate/blob/master/README.md): the source material that should be migrated, clarified and expanded.
 
