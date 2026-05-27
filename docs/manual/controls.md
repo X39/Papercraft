@@ -2,7 +2,8 @@
 
 Previous: [Layout fundamentals](layout-fundamentals.md) | [Manual home](index.md) | Next: [Template language](template-language.md)
 
-Status: started. The focused [Text control](controls-text.md) and [Line control](controls-line.md) pages now have verified examples.
+Status: started. The focused [Text control](controls-text.md), [Border control](controls-border.md)
+and [Line control](controls-line.md) pages now have verified examples.
 
 ## What Is This?
 
@@ -34,7 +35,7 @@ The first complete controls reference will verify each attribute name against so
 | Control | Use it for | Status |
 |---------|------------|--------|
 | [`text`](controls-text.md) | Words, labels, headings and values. | Started with verified examples. |
-| `border` | Boxes, backgrounds and border lines around content. | Planned. |
+| [`border`](controls-border.md) | Boxes, backgrounds and border lines around content. | Started with verified examples. |
 | [`line`](controls-line.md) | Separators and simple rules. | Started with verified examples. |
 | `image` | Raster images loaded by the application. | Planned. |
 | `pageNumber` | Current page and total page count text. | Planned. |

@@ -49,7 +49,7 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 2. [First document](first-document.md): template structure, page sections, areas and the first complete XML file.
 3. [Template data](template-data.md): variables, property access, functions and data value formats.
 4. [Layout fundamentals](layout-fundamentals.md): available space, margin, padding, borders, alignment, lengths and colors.
-5. [Controls](controls.md): built-in XML controls such as `text`, `border`, `image`, `line`, `table`, `pageNumber` and charts. Focused pages now include [Text control](controls-text.md) and [Line control](controls-line.md).
+5. [Controls](controls.md): built-in XML controls such as `text`, `border`, `image`, `line`, `table`, `pageNumber` and charts. Focused pages now include [Text control](controls-text.md), [Border control](controls-border.md) and [Line control](controls-line.md).
 6. [Template language](template-language.md): transformers such as `if`, `switch`, `for`, `foreach`, `alternate` and `var`.
 7. [Complete examples](complete-examples.md): full document examples such as invoices and reports.
 8. [Troubleshooting](troubleshooting.md): common XML, data, image and layout problems.
@@ -57,7 +57,7 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 
 ## Current Status
 
-The manual structure is now in place, and the first document, template data, layout, text-control and line-control chapters have verified starter examples.
+The manual structure is now in place, and the first document, template data, layout, text-control, border-control and line-control chapters have verified starter examples.
 Most reference-heavy chapters are still planned work.
 Until a chapter says its examples are verified, the README and tests remain the source of truth for detailed behavior.
 
