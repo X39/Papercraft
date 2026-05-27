@@ -52,7 +52,7 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 5. [Styles](styles.md): shared attributes with `template.style` and related style blocks.
 6. [Controls](controls.md): built-in XML controls such as `text`, `border`, `image`, `line`, `table`, `pageNumber` and charts. Focused pages now include [Control concepts](controls-concepts.md), [Text control](controls-text.md), [Border control](controls-border.md), [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md) and [Table control](controls-table.md).
 7. [Template language](template-language.md): transformers such as `if`, `switch`, `for`, `foreach`, `alternate` and `var`.
-8. [Complete examples](complete-examples.md): full document examples such as invoices and reports. Started with verified invoice and report previews.
+8. [Complete examples](complete-examples.md): full document examples such as invoices, reports and product sheets. Started with verified invoice, report and product sheet previews.
 9. [Troubleshooting](troubleshooting.md): common XML, data, image and layout problems.
 10. [Developer integration appendix](developer-integration.md): installation, service registration and extension points.
 

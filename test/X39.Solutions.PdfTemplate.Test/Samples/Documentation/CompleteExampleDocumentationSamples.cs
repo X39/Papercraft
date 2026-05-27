@@ -1,3 +1,4 @@
+using SkiaSharp;
 using X39.Solutions.PdfTemplate.Data;
 
 namespace X39.Solutions.PdfTemplate.Test.Samples.Documentation;
@@ -208,4 +209,109 @@ public sealed class CompleteExampleDocumentationSamples : DocumentationSampleBas
             </template>
             """,
             CompleteExampleDocumentOptions);
+
+    [Fact]
+    public Task CompleteExample_ProductSheetPreview()
+        => RenderDocumentationSampleAsync(
+            "complete-product-sheet-preview",
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <template>
+                <template.style>
+                    <text fontsize="9" foreground="#0f172a"/>
+                </template.style>
+                <header>
+                    <table>
+                        <tr>
+                            <td width="28mm">
+                                <image
+                                    source="@LogoImage"
+                                    width="24mm"
+                                    height="14mm"
+                                    horizontalAlignment="left"
+                                    verticalAlignment="top"/>
+                            </td>
+                            <td width="2*">
+                                <text fontsize="18" weight="bold">Product sheet</text>
+                                <text foreground="#475569">Compact sensor kit</text>
+                            </td>
+                        </tr>
+                    </table>
+                    <line thickness="1pt" length="100%" color="#cbd5e1" margin="0 2mm 0 0"/>
+                </header>
+                <body>
+                    <border background="#f8fafc" padding="2mm" margin="0 0 0 5mm" verticalAlignment="top">
+                        <text fontsize="8" foreground="#475569">Overview</text>
+                        <text>The kit combines a small gateway, two wireless sensors and a ready-to-print setup card.</text>
+                    </border>
+
+                    <text fontsize="11" weight="bold" margin="0 5mm 0 1mm">Package contents</text>
+                    <table>
+                        <th>
+                            <td width="2*">
+                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
+                                    <text weight="bold">Item</text>
+                                </border>
+                            </td>
+                            <td width="1*">
+                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
+                                    <text weight="bold" horizontalAlignment="right">Qty</text>
+                                </border>
+                            </td>
+                        </th>
+                        <tr>
+                            <td><border padding="1mm"><text>Gateway unit</text></border></td>
+                            <td><border padding="1mm"><text horizontalAlignment="right">1</text></border></td>
+                        </tr>
+                        <tr>
+                            <td><border padding="1mm" background="#f8fafc"><text>Wireless sensors</text></border></td>
+                            <td><border padding="1mm" background="#f8fafc"><text horizontalAlignment="right">2</text></border></td>
+                        </tr>
+                        <tr>
+                            <td><border padding="1mm"><text>Setup card</text></border></td>
+                            <td><border padding="1mm"><text horizontalAlignment="right">1</text></border></td>
+                        </tr>
+                    </table>
+
+                    <text fontsize="11" weight="bold" margin="0 5mm 0 1mm">Best fit</text>
+                    <border background="#eff6ff" padding="2mm" verticalAlignment="top">
+                        <text>Use this layout for datasheets, product inserts and branded one-page handouts.</text>
+                    </border>
+                </body>
+                <footer>
+                    <line thickness="1pt" length="100%" color="#cbd5e1" margin="0 0 0 1mm"/>
+                    <pageNumber
+                        mode="CurrentTotal"
+                        prefix="Product sheet | Page "
+                        delimiter=" of "
+                        fontsize="8"
+                        foreground="#64748b"
+                        horizontalAlignment="right"/>
+                </footer>
+            </template>
+            """,
+            CompleteExampleDocumentOptions,
+            (generator) =>
+            {
+                generator.TemplateData.SetVariable("LogoImage", CreateLogoDataUri());
+            });
+
+    private static string CreateLogoDataUri()
+    {
+        using var bitmap = new SKBitmap(160, 90);
+        using var canvas = new SKCanvas(bitmap);
+        canvas.Clear(new SKColor(219, 234, 254));
+
+        using var bluePaint = new SKPaint { Color = new SKColor(37, 99, 235), IsAntialias = true };
+        using var greenPaint = new SKPaint { Color = new SKColor(22, 163, 74), IsAntialias = true };
+        using var darkPaint = new SKPaint { Color = new SKColor(15, 23, 42), IsAntialias = true };
+
+        canvas.DrawRect(new SKRect(0, 0, 160, 22), darkPaint);
+        canvas.DrawCircle(44, 54, 22, bluePaint);
+        canvas.DrawRoundRect(new SKRect(78, 36, 138, 72), 8, 8, greenPaint);
+
+        using var image = SKImage.FromBitmap(bitmap);
+        using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+        return $"data:image/png;base64,{Convert.ToBase64String(data.ToArray())}";
+    }
 }
