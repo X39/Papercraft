@@ -1,3 +1,6 @@
+using System.Globalization;
+using X39.Solutions.PdfTemplate.Abstraction;
+
 namespace X39.Solutions.PdfTemplate.Test.Samples.Documentation;
 
 [Collection("Samples")]
@@ -48,4 +51,45 @@ public sealed class TemplateDataDocumentationSamples : DocumentationSampleBase
                 generator.TemplateData.SetVariable("AccentBorder", "#2f5597");
                 generator.TemplateData.SetVariable("AccentBackground", "#eaf2ff");
             });
+
+    [Fact]
+    public Task TemplateData_CallFunction()
+        => RenderDocumentationSampleAsync(
+            "template-data-call-function",
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <template>
+                <body>
+                    <text fontsize="14">Invoice status</text>
+                    <text>Status: @statusLabel(PaymentStatus)</text>
+                </body>
+            </template>
+            """,
+            configureGenerator: (generator) =>
+            {
+                generator.TemplateData.SetVariable("PaymentStatus", "paid");
+                generator.TemplateData.RegisterFunction(new StatusLabelFunction());
+            });
+
+    private sealed class StatusLabelFunction : IFunction
+    {
+        public string Name => "statusLabel";
+        public int Arguments => 1;
+        public bool IsVariadic => false;
+
+        public ValueTask<object?> ExecuteAsync(
+            CultureInfo cultureInfo,
+            object?[] arguments,
+            CancellationToken cancellationToken = default)
+        {
+            var status = Convert.ToString(arguments[0], cultureInfo);
+            var label = status?.ToLowerInvariant() switch
+            {
+                "paid" => "Paid in full",
+                "open" => "Open",
+                _ => "Needs review",
+            };
+            return ValueTask.FromResult<object?>(label);
+        }
+    }
 }

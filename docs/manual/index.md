@@ -61,6 +61,8 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 ## Current Status
 
 The manual structure is now in place, and the first document, areas, template data, layout, styles, transformers, template-language, text-control, border-control, image-control, line-control, page-number-control, table-control, chart-controls and complete-examples chapters have verified starter examples.
+Template data now includes generated examples for simple variables, data-backed attributes and function calls.
+Template language now includes generated examples for conditional sections and switch-based alternatives.
 The troubleshooting chapter now has source-checked starter entries.
 The developer appendix now contains setup and extension-point guidance for application developers.
 Most reference-heavy chapters are still planned work.
