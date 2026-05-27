@@ -39,6 +39,7 @@ You may even create your own controls by deriving from the `Control` base class!
     </PropertyGroup>
     <ItemGroup>
         <InternalsVisibleTo Include="X39.Solutions.PdfTemplate.Test"/>
+        <InternalsVisibleTo Include="X39.Solutions.PdfTemplate.Benchmark"/>
     </ItemGroup>
     <ItemGroup>
         <None Include="$(SolutionDir)\README.md" Pack="true" PackagePath="\"/>
