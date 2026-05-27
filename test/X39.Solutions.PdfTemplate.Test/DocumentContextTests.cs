@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using SkiaSharp;
 using X39.Solutions.PdfTemplate.Abstraction;
 using X39.Solutions.PdfTemplate.Attributes;
-using X39.Solutions.PdfTemplate.Controls;
 using X39.Solutions.PdfTemplate.Data;
 using X39.Solutions.PdfTemplate.Services.ResourceResolver;
 
@@ -18,8 +17,7 @@ public class DocumentContextTests
     {
         var resolver = new RecordingResourceResolver();
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddPdfTemplateServices();
-        serviceCollection.AddPdfTemplateControl<ImageControl>();
+        serviceCollection.AddPdfTemplateService();
         serviceCollection.AddSingleton<IResourceResolver>(resolver);
         await using var serviceProvider = serviceCollection.BuildServiceProvider();
         using var generator = serviceProvider.GetRequiredService<Generator>();
@@ -42,8 +40,7 @@ public class DocumentContextTests
     {
         var recorder = new InitializationContextRecorder();
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddPdfTemplateServices();
-        serviceCollection.AddPdfTemplateControl<ContextRecordingControl>();
+        serviceCollection.AddPdfTemplateService((builder) => builder.AddControl<ContextRecordingControl>());
         serviceCollection.AddSingleton(recorder);
         await using var serviceProvider = serviceCollection.BuildServiceProvider();
         using var generator = serviceProvider.GetRequiredService<Generator>();
@@ -64,8 +61,7 @@ public class DocumentContextTests
     public async Task DefaultImageResolverAcceptsNullContext()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddPdfTemplateServices();
-        serviceCollection.AddPdfTemplateControl<ImageControl>();
+        serviceCollection.AddPdfTemplateService();
         await using var serviceProvider = serviceCollection.BuildServiceProvider();
         using var generator = serviceProvider.GetRequiredService<Generator>();
         using var xmlReader = CreateReader($"""<image source="{Convert.ToBase64String(PngBytes)}" />""");

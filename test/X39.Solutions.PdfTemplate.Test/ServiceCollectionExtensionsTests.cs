@@ -15,11 +15,10 @@ namespace X39.Solutions.PdfTemplate.Test;
 public class ServiceCollectionExtensionsTests
 {
     [Fact]
-    public async Task AddPdfTemplateDefaultsRegistersBuiltInControls()
+    public async Task AddPdfTemplateServiceRegistersBuiltInControls()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddPdfTemplateServices();
-        serviceCollection.AddPdfTemplateDefaults();
+        serviceCollection.AddPdfTemplateService();
         await using var serviceProvider = serviceCollection.BuildServiceProvider();
         using var generator = serviceProvider.GetRequiredService<Generator>();
         using var xmlReader = CreateReader("""<text>hello</text>""");
@@ -30,14 +29,14 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public async Task AddPdfTemplateControlRegistersCustomControl()
+    public async Task AddPdfTemplateServiceCanBeCalledTwiceWithoutDuplicatingDefaults()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddPdfTemplateServices();
-        serviceCollection.AddPdfTemplateControl<CustomControl>();
+        serviceCollection.AddPdfTemplateService();
+        serviceCollection.AddPdfTemplateService();
         await using var serviceProvider = serviceCollection.BuildServiceProvider();
         using var generator = serviceProvider.GetRequiredService<Generator>();
-        using var xmlReader = CreateReader("""<custom />""");
+        using var xmlReader = CreateReader("""<text>hello</text>""");
 
         var bitmaps = await generator.GenerateBitmapsAsync(xmlReader, CultureInfo.InvariantCulture);
 
@@ -45,12 +44,16 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public async Task AddPdfTemplateTransformerRegistersCustomTransformer()
+    public async Task AddPdfTemplateServiceBuilderRegistersCustomServices()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddPdfTemplateServices();
-        serviceCollection.AddPdfTemplateControl<CustomControl>();
-        serviceCollection.AddPdfTemplateTransformer<CustomTransformer>();
+        serviceCollection.AddPdfTemplateService(
+            (builder) => builder
+                .ClearControls()
+                .ClearTransformers()
+                .AddControl<CustomControl>()
+                .AddTransformer<CustomTransformer>()
+                .AddFunction<CustomFunction>());
         await using var serviceProvider = serviceCollection.BuildServiceProvider();
         using var generator = serviceProvider.GetRequiredService<Generator>();
         using var xmlReader = CreateReader("""
@@ -62,13 +65,14 @@ public class ServiceCollectionExtensionsTests
         var bitmaps = await generator.GenerateBitmapsAsync(xmlReader, CultureInfo.InvariantCulture);
 
         Dispose(bitmaps);
+        Assert.Single(serviceProvider.GetServices<IFunction>().OfType<CustomFunction>());
     }
 
     [Fact]
-    public async Task MissingDefaultControlsFailDuringGeneration()
+    public async Task ClearControlsRemovesBuiltInControls()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddPdfTemplateServices();
+        serviceCollection.AddPdfTemplateService((builder) => builder.ClearControls());
         await using var serviceProvider = serviceCollection.BuildServiceProvider();
         using var generator = serviceProvider.GetRequiredService<Generator>();
         using var xmlReader = CreateReader("""<text>hello</text>""");
@@ -78,12 +82,33 @@ public class ServiceCollectionExtensionsTests
     }
 
     [Fact]
+    public void ReplaceControlReplacesBuiltInControlWithSameXmlName()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddPdfTemplateService((builder) => builder.ReplaceControl<ReplacementTextControl>());
+        using var serviceProvider = serviceCollection.BuildServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+
+        var control = scope.ServiceProvider.GetRequiredService<IControlFactory>()
+                           .Create(
+                               Constants.ControlsNamespace,
+                               "text",
+                               new Dictionary<string, string>(),
+                               null,
+                               CultureInfo.InvariantCulture);
+
+        Assert.IsType<ReplacementTextControl>(control);
+    }
+
+    [Fact]
     public void DuplicateControlNamesFailDeterministically()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddPdfTemplateServices();
-        serviceCollection.AddPdfTemplateControl<CustomControl>();
-        serviceCollection.AddPdfTemplateControl<DuplicateCustomControl>();
+        serviceCollection.AddPdfTemplateService(
+            (builder) => builder
+                .ClearControls()
+                .AddControl<CustomControl>()
+                .AddControl<DuplicateCustomControl>());
         using var serviceProvider = serviceCollection.BuildServiceProvider();
 
         var exception = Assert.Throws<InvalidOperationException>(
@@ -95,9 +120,11 @@ public class ServiceCollectionExtensionsTests
     public void DuplicateTransformerNamesFailDeterministically()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddPdfTemplateServices();
-        serviceCollection.AddPdfTemplateTransformer<CustomTransformer>();
-        serviceCollection.AddPdfTemplateTransformer<DuplicateCustomTransformer>();
+        serviceCollection.AddPdfTemplateService(
+            (builder) => builder
+                .ClearTransformers()
+                .AddTransformer<CustomTransformer>()
+                .AddTransformer<DuplicateCustomTransformer>());
         using var serviceProvider = serviceCollection.BuildServiceProvider();
 
         var exception = Assert.Throws<InvalidOperationException>(
@@ -109,8 +136,10 @@ public class ServiceCollectionExtensionsTests
     public async Task ConverterDependenciesResolveFromCurrentServiceProvider()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddPdfTemplateServices();
-        serviceCollection.AddPdfTemplateControl<ConverterControl>();
+        serviceCollection.AddPdfTemplateService(
+            (builder) => builder
+                .ClearControls()
+                .AddControl<ConverterControl>());
         serviceCollection.AddSingleton(new ConverterDependency("prefix-"));
         await using var serviceProvider = serviceCollection.BuildServiceProvider();
         using var scope = serviceProvider.CreateScope();
@@ -174,6 +203,29 @@ public class ServiceCollectionExtensionsTests
     [Control(Constants.ControlsNamespace, "custom")]
     private sealed class DuplicateCustomControl : CustomControl;
 
+    [Control(Constants.ControlsNamespace, "text")]
+    private sealed class ReplacementTextControl : IControl
+    {
+        public Size Measure(
+            float dpi,
+            in Size fullPageSize,
+            in Size framedPageSize,
+            in Size remainingSize,
+            CultureInfo cultureInfo)
+            => Size.Zero;
+
+        public Size Arrange(
+            float dpi,
+            in Size fullPageSize,
+            in Size framedPageSize,
+            in Size remainingSize,
+            CultureInfo cultureInfo)
+            => Size.Zero;
+
+        public Size Render(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
+            => Size.Zero;
+    }
+
     [Control(Constants.ControlsNamespace, "converter")]
     private sealed class ConverterControl : CustomControl
     {
@@ -194,6 +246,21 @@ public class ServiceCollectionExtensionsTests
 
         public string Convert(string value, string? format, CultureInfo cultureInfo)
             => _dependency.Prefix + value;
+    }
+
+    private sealed class CustomFunction : IFunction
+    {
+        public string Name => "customFunction";
+
+        public int Arguments => 0;
+
+        public bool IsVariadic => false;
+
+        public ValueTask<object?> ExecuteAsync(
+            CultureInfo cultureInfo,
+            object?[] arguments,
+            CancellationToken cancellationToken = default)
+            => ValueTask.FromResult<object?>("custom");
     }
 
     private class CustomTransformer : ITransformer

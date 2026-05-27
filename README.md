@@ -94,7 +94,7 @@ application, but still need access to strongly typed .NET data and extension poi
 
 - .NET 8.0 or later
 - A dependency injection container that can provide the services registered by
-  `AddPdfTemplateServices`
+  `AddPdfTemplateService`
 - On Linux, the SkiaSharp native Linux assets package
 
 The package is marked trim-compatible and depends on SkiaSharp,
@@ -136,8 +136,7 @@ throughout this README:
 Register the library services at startup:
 
 ```csharp
-services.AddPdfTemplateServices();
-services.AddPdfTemplateDefaults();
+services.AddPdfTemplateService();
 ```
 
 Then resolve the registered generator from your application `IServiceProvider` and render:
@@ -161,17 +160,16 @@ await generator.GeneratePdfAsync(pdfStream, reader, CultureInfo.CurrentUICulture
 // pdfStream now contains the PDF
 ```
 
-`AddPdfTemplateServices` registers the supporting services and `Generator`.
-`AddPdfTemplateDefaults` registers the built-in controls and transformers.
-Custom `IFunction` implementations are resolved from dependency injection, so register them as `IFunction`
-services before building the service provider.
+`AddPdfTemplateService` registers the supporting services, `Generator`, and the built-in controls and transformers.
+Custom controls, transformers and functions can be registered through the setup builder before building the service
+provider.
 
 ### Useful next steps
 
 - Set template variables with `generator.TemplateData.SetVariable("Name", value)`.
-- Add custom functions with `services.AddScoped<IFunction, MyFunction>()`.
-- Add custom controls with `services.AddPdfTemplateControl<TControl>()`.
-- Add custom transformers with `services.AddPdfTemplateTransformer<TTransformer>()`.
+- Add custom functions with `services.AddPdfTemplateService((builder) => builder.AddFunction<MyFunction>())`.
+- Add custom controls with `services.AddPdfTemplateService((builder) => builder.AddControl<TControl>())`.
+- Add custom transformers with `services.AddPdfTemplateService((builder) => builder.AddTransformer<TTransformer>())`.
 - Configure document-level options such as margin through `DocumentOptions`.
 - Use the samples in `test/X39.Solutions.PdfTemplate.Test/Samples` as executable examples.
 
@@ -314,7 +312,7 @@ public class MyFunction : IFunction
 ```
 
 ```csharp
-services.AddScoped<IFunction, MyFunction>();
+services.AddPdfTemplateService((builder) => builder.AddFunction<MyFunction>());
 ```
 
 ### Variables
@@ -460,7 +458,7 @@ public class MyControl : Control
 Later in your service registration, add the control:
 
 ```csharp
-services.AddPdfTemplateControl<MyControl>();
+services.AddPdfTemplateService((builder) => builder.AddControl<MyControl>());
 ```
 
 You can now use the control in your XML templates (note the namespace import at the top):
@@ -848,7 +846,7 @@ public class MyTransformer : ITransformer
 Afterwards, add the transformer to the service collection:
 
 ```csharp
-services.AddPdfTemplateTransformer<MyTransformer>();
+services.AddPdfTemplateService((builder) => builder.AddTransformer<MyTransformer>());
 ```
 
 ##### Evaluating user data
@@ -1069,7 +1067,8 @@ Implement `IControl` directly only when you need full control over the layout li
 `IControlFactory` creates control instances from template nodes.
 The default implementation resolves the registered control type, constructs a fresh control instance and applies XML
 parameters.
-Most consumers should register controls with `AddPdfTemplateControl<TControl>()` instead of replacing the factory.
+Most consumers should register controls with `AddPdfTemplateService((builder) => builder.AddControl<TControl>())`
+instead of replacing the factory.
 Replace it only when you need custom activation behavior such as diagnostics, pooling or another creation strategy.
 
 #### `IContentControl`
@@ -1124,7 +1123,7 @@ Use `ITemplateData.Scope` when introducing variables so changes stay limited to 
 
 `IPropertyAccessCache` is infrastructure for expression evaluation.
 It caches property-access delegates so repeated template expressions can read object properties efficiently.
-It is registered by `AddPdfTemplateServices` and is not a normal customization point.
+It is registered by `AddPdfTemplateService` and is not a normal customization point.
 Replace it only if you are changing expression-evaluation behavior at library-infrastructure level.
 
 #### `ITextService`

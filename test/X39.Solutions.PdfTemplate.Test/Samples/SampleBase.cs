@@ -13,9 +13,7 @@ public abstract class SampleBase : IAsyncDisposable
     public Generator CreateGenerator(params IFunction[] functions)
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddPdfTemplateServices();
-        serviceCollection.AddPdfTemplateDefaults();
-        serviceCollection.AddPdfTemplateControl<MockControl>();
+        serviceCollection.AddPdfTemplateService((builder) => builder.AddControl<MockControl>());
         foreach (var function in functions)
         {
             serviceCollection.AddSingleton<IFunction>(function);

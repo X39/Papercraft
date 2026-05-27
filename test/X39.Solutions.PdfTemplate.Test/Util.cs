@@ -27,9 +27,7 @@ public static class Util
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddPdfTemplateServices();
-        serviceCollection.AddPdfTemplateDefaults();
-        serviceCollection.AddPdfTemplateControl<Mock.MockControl>();
+        serviceCollection.AddPdfTemplateService((builder) => builder.AddControl<Mock.MockControl>());
         await using var serviceProvider = serviceCollection.BuildServiceProvider();
         using var scope = serviceProvider.CreateScope();
         ITemplateData templateData = new TemplateData();

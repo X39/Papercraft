@@ -5,6 +5,7 @@ using X39.Solutions.PdfTemplate.Services;
 using X39.Solutions.PdfTemplate.Services.PropertyAccessCache;
 using X39.Solutions.PdfTemplate.Services.ResourceResolver;
 using X39.Solutions.PdfTemplate.Services.TextService;
+using X39.Solutions.PdfTemplate.Transformers;
 
 namespace X39.Solutions.PdfTemplate;
 
@@ -18,6 +19,7 @@ public static class ServiceCollectionExtensions
     /// Adds the services required for the generator to the service collection.
     /// </summary>
     /// <param name="services">The service collection to add the services to.</param>
+    /// <returns>A builder for configuring PDF template services.</returns>
     /// <remarks>
     /// This method adds the following services:
     /// <list type="bullet">
@@ -36,7 +38,32 @@ public static class ServiceCollectionExtensions
     /// See <a href="https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection#service-registration-methods">MSDN Page</a>
     /// for more information about how to work with dependency injection in .NET.
     /// </remarks>
-    public static void AddPdfTemplateServices(this IServiceCollection services)
+    public static PdfTemplateServiceBuilder AddPdfTemplateService(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        var builder = new PdfTemplateServiceBuilder(services);
+        AddInfrastructure(services);
+        AddDefaults(builder);
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds and configures the services required for the generator to the service collection.
+    /// </summary>
+    /// <param name="services">The service collection to add the services to.</param>
+    /// <param name="configure">The builder configuration callback.</param>
+    /// <returns>A builder for configuring PDF template services.</returns>
+    public static PdfTemplateServiceBuilder AddPdfTemplateService(
+        this IServiceCollection services,
+        Action<PdfTemplateServiceBuilder> configure)
+    {
+        ArgumentNullException.ThrowIfNull(configure);
+        var builder = services.AddPdfTemplateService();
+        configure(builder);
+        return builder;
+    }
+
+    private static void AddInfrastructure(IServiceCollection services)
     {
         services.TryAddSingleton<SkPaintCache>();
         services.TryAddSingleton<ControlExpressionCache>();
@@ -49,32 +76,27 @@ public static class ServiceCollectionExtensions
         services.TryAddTransient<Generator>();
     }
 
-    /// <summary>
-    /// Adds a control to the service collection, making it available for use in templates.
-    /// </summary>
-    /// <param name="services">The service collection to add the control to.</param>
-    /// <typeparam name="TControl">The type of the control to add.</typeparam>
-    /// <returns>The <paramref name="services"/> passed to allow chaining.</returns>
-    public static IServiceCollection AddPdfTemplateControl<
-        [MeansImplicitUse(
-            ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature | ImplicitUseKindFlags.Assign)]
-        TControl>(this IServiceCollection services)
-        where TControl : IControl
+    private static void AddDefaults(PdfTemplateServiceBuilder builder)
     {
-        services.AddSingleton(ControlRegistry.CreateRegistration<TControl>());
-        return services;
-    }
+        builder.AddControl<Controls.BarChart>();
+        builder.AddControl<Controls.BorderControl>();
+        builder.AddControl<Controls.ChartControl>();
+        builder.AddControl<Controls.ChartDataControl>();
+        builder.AddControl<Controls.ImageControl>();
+        builder.AddControl<Controls.LineChart>();
+        builder.AddControl<Controls.LineControl>();
+        builder.AddControl<Controls.PageNumberControl>();
+        builder.AddControl<Controls.PieChart>();
+        builder.AddControl<Controls.TableCellControl>();
+        builder.AddControl<Controls.TableControl>();
+        builder.AddControl<Controls.TableHeaderControl>();
+        builder.AddControl<Controls.TableRowControl>();
+        builder.AddControl<Controls.TextControl>();
 
-    /// <summary>
-    /// Adds a transformer to the service collection, making it available for use in templates.
-    /// </summary>
-    /// <param name="services">The service collection to add the transformer to.</param>
-    /// <typeparam name="TTransformer">The type of the transformer to add.</typeparam>
-    /// <returns>The <paramref name="services"/> passed to allow chaining.</returns>
-    public static IServiceCollection AddPdfTemplateTransformer<TTransformer>(this IServiceCollection services)
-        where TTransformer : class, ITransformer
-    {
-        services.AddTransient<ITransformer, TTransformer>();
-        return services;
+        builder.AddTransformer<ForTransformer>();
+        builder.AddTransformer<IfTransformer>();
+        builder.AddTransformer<ForEachTransformer>();
+        builder.AddTransformer<AlternateTransformer>();
+        builder.AddTransformer<VariableTransformer>();
     }
 }
