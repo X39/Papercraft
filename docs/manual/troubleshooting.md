@@ -82,6 +82,7 @@ For example, `border` can contain other controls, while `text` and `line` render
 If the error says a control does not support child controls, move the child content into a container such as
 `border`, `table` or the document `body`.
 `Template.CreateControlAsync` verifies this while building controls from the parsed XML.
+For the control-authoring mental model, see [Control concepts](controls-concepts.md).
 
 ## A Value Prints Empty Or Does Not Change
 

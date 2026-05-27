@@ -2,7 +2,7 @@
 
 Previous: [Styles](styles.md) | [Manual home](index.md) | Next: [Template language](template-language.md)
 
-Status: started. The focused [Text control](controls-text.md), [Border control](controls-border.md),
+Status: started. [Control concepts](controls-concepts.md) and the focused [Text control](controls-text.md), [Border control](controls-border.md),
 [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md) and
 [Table control](controls-table.md) pages now have verified examples.
 
@@ -30,12 +30,14 @@ Choose the smallest control that matches the document part:
 - Use `pageNumber` for current page and total page count text.
 - Use `table`, `tr`, `td` and `th` for rows and columns.
 
-The first complete controls reference will verify each attribute name against source or tests.
+Read [Control concepts](controls-concepts.md) first if you are unsure whether a control can contain other controls.
+The focused reference pages verify attribute names against source or tests.
 
 ## Built-In Controls
 
 | Control | Use it for | Status |
 |---------|------------|--------|
+| [Control concepts](controls-concepts.md) | How controls, containers and child rules fit together. | Started with verified source checks and reused generated samples. |
 | [`text`](controls-text.md) | Words, labels, headings and values. | Started with verified examples. |
 | [`border`](controls-border.md) | Boxes, backgrounds and border lines around content. | Started with verified examples. |
 | [`line`](controls-line.md) | Separators and simple rules. | Started with verified examples. |
