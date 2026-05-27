@@ -8,6 +8,7 @@ using X39.Solutions.PdfTemplate.Abstraction;
 using X39.Solutions.PdfTemplate.Attributes;
 using X39.Solutions.PdfTemplate.Data;
 using X39.Solutions.PdfTemplate.Exceptions;
+using X39.Solutions.PdfTemplate.Transformers;
 using XmlNode = X39.Solutions.PdfTemplate.Xml.XmlNode;
 
 namespace X39.Solutions.PdfTemplate.Test;
@@ -26,6 +27,16 @@ public class ServiceCollectionExtensionsTests
         var bitmaps = await generator.GenerateBitmapsAsync(xmlReader, CultureInfo.InvariantCulture);
 
         Dispose(bitmaps);
+    }
+
+    [Fact]
+    public void AddPdfTemplateServiceRegistersSwitchTransformer()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddPdfTemplateService();
+        using var serviceProvider = serviceCollection.BuildServiceProvider();
+
+        Assert.Contains(serviceProvider.GetServices<ITransformer>(), (q) => q is SwitchTransformer);
     }
 
     [Fact]

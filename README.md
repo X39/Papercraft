@@ -46,6 +46,7 @@ For the best reading experience, use the [GitHub README](https://github.com/X39/
       * [`alternate`](#alternate)
       * [`var`](#var)
       * [`if`](#if)
+      * [`switch`](#switch)
       * [`for`](#for)
       * [`foreach`](#foreach)
     * [Interfaces](#interfaces)
@@ -982,6 +983,37 @@ It can be used as follows:
         }
         @else {
         <text>Skipped because else-if matched</text>
+        }
+    </body>
+</template>
+```
+
+#### `switch`
+
+The `switch` transformer includes the first matching `@case` clause, or the optional `@default` clause when no case
+matches.
+`@case` and `@default` are local clauses of `@switch`; they are not standalone transformers.
+Cases without an explicit operator use `==`.
+Cases also support `>`, `<`, `>=`, `<=`, `==`, `!=`, `===`, `!==` and `in`.
+The `@default` clause is optional and must be last.
+
+```xml
+
+<template>
+    <body>
+        @switch status {
+        @case "paid" {
+        <text>Paid</text>
+        }
+        @case == "pending" {
+        <text>Pending</text>
+        }
+        @case in allowedStatuses {
+        <text>Allowed status</text>
+        }
+        @default {
+        <text>Unknown status</text>
+        }
         }
     </body>
 </template>

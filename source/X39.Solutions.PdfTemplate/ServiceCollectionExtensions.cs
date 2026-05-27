@@ -95,6 +95,7 @@ public static class ServiceCollectionExtensions
 
         builder.AddTransformer<ForTransformer>();
         builder.AddTransformer<IfTransformer>();
+        builder.AddTransformer<SwitchTransformer>();
         builder.AddTransformer<ForEachTransformer>();
         builder.AddTransformer<AlternateTransformer>();
         builder.AddTransformer<VariableTransformer>();

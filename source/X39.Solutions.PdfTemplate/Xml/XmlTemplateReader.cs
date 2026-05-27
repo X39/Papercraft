@@ -253,22 +253,31 @@ public sealed class XmlTemplateReader : IDisposable
                 var currentNodeIndex = nodeIndex;
                 try
                 {
-                    var transformedNodes = transformer is IChainedTransformer chained
-                        ? chained.TransformAsync(
+                    var transformedNodes = transformer switch
+                    {
+                        INestedClauseTransformer nested => nested.TransformAsync(
+                            _cultureInfo,
+                            _templateData,
+                            parsedBlock.RemainingLine,
+                            ConsumeNestedClauses(nested, parsedBlock.Nodes),
+                            cancellationToken
+                        ),
+                        IChainedTransformer chained => chained.TransformAsync(
                             _cultureInfo,
                             _templateData,
                             parsedBlock.RemainingLine,
                             parsedBlock.Nodes,
                             clauses,
                             cancellationToken
-                        )
-                        : transformer.TransformAsync(
+                        ),
+                        _ => transformer.TransformAsync(
                             _cultureInfo,
                             _templateData,
                             parsedBlock.RemainingLine,
                             parsedBlock.Nodes,
                             cancellationToken
-                        );
+                        ),
+                    };
                     await foreach (var transformedNode in transformedNodes.ConfigureAwait(false))
                     {
                         var scope = _templateData.PeekScope()
@@ -451,6 +460,53 @@ public sealed class XmlTemplateReader : IDisposable
                        );
             #pragma warning restore CA2201
             var block = ExtractContinuationBlock(nodeTree, node, continuationIndex, endOfName, text, name);
+            clauses.Add(new TransformerChainClause(block.Name, block.RemainingLine, block.Nodes));
+        }
+
+        return clauses;
+    }
+
+    private static List<TransformerChainClause> ConsumeNestedClauses(
+        INestedClauseTransformer transformer,
+        IReadOnlyCollection<XmlNode> nodes)
+    {
+        var nodeTree = new XmlNode(-1, -1, string.Empty, string.Empty);
+        foreach (var node in nodes)
+        {
+            nodeTree.AddChild(node);
+        }
+
+        var clauses = new List<TransformerChainClause>();
+        while (nodeTree.Children.Count > 0)
+        {
+            var node = nodeTree[0];
+            if (!node.IsTextNode)
+                throw new ArgumentException("Nested transformer clauses cannot contain direct element content.");
+
+            var text = node.Text ?? string.Empty;
+            if (text.IsNullOrWhiteSpace())
+            {
+                nodeTree.RemoveChild(node);
+                continue;
+            }
+
+            var indexOfExpressionStart = text.IndexOf('@');
+            if (indexOfExpressionStart == -1 || text[..indexOfExpressionStart].IsNotNullOrWhiteSpace())
+                throw new ArgumentException("Nested transformer clauses cannot contain direct text content.");
+
+            var endOfName = indexOfExpressionStart + 1;
+            while (text.Length > endOfName
+                   && (text[endOfName]
+                           .IsLetterOrDigit()
+                       || text[endOfName] == '-'
+                       || text[endOfName] == '_'))
+                endOfName++;
+
+            var name = text[(indexOfExpressionStart + 1)..endOfName];
+            if (!transformer.ClauseNames.Any((q) => q.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                throw new ArgumentException($"Nested transformer clause '{name}' is not supported by '{transformer.Name}'.");
+
+            var block = ExtractContinuationBlock(nodeTree, node, 0, endOfName, text, name);
             clauses.Add(new TransformerChainClause(block.Name, block.RemainingLine, block.Nodes));
         }
 
