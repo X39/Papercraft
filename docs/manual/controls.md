@@ -31,7 +31,8 @@ The first complete controls reference will verify each attribute name against so
 
 ## Planned Work
 
-- Decide whether reference-heavy controls should be split into one file per control.
+- Keep this page as the controls landing page, then split detailed built-in control references into focused pages as they are written.
+- Use the reference split described in the [documentation style guide](style-guide.md).
 - Add purpose, allowed children, attributes, examples and common mistakes for each built-in control.
 - Add generated samples for each visual control.
 - Link shared layout attributes back to [Layout fundamentals](layout-fundamentals.md).

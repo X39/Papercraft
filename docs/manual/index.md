@@ -60,3 +60,6 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 The manual structure is now in place, but most chapters are still planned work.
 Pages marked as planned are placeholders for future focused documentation passes.
 Until a chapter says its examples are verified, the README and tests remain the source of truth for detailed behavior.
+
+Documentation contributors should follow the [documentation style guide](style-guide.md) and the
+[documentation roadmap](work-plan.md) before expanding chapters.
