@@ -19,7 +19,8 @@ supplying new data, loading images from a custom location, or registering a cust
 Start with the package and service registration.
 The examples on this page are checked against the README and these implementation sources:
 `ServiceCollectionExtensions`, `PdfTemplateServiceBuilder`, `Generator`, `DocumentOptions`,
-`IFunction`, `ITransformer`, `IControl`, `ITemplateData` and `IResourceResolver`.
+`IFunction`, `ITransformer`, `IControl`, `ITemplateData`, `IResourceResolver`, `IDrawableCanvas`,
+`IDeferredCanvas`, `IImmediateCanvas`, `IPropertyAccessCache`, `ITextService` and `IParameterConverter`.
 
 ## Install
 
@@ -337,6 +338,19 @@ Source-checked registration notes:
 - Functions added with `AddFunction<TFunction>()` are scoped by default, and the builder accepts another `ServiceLifetime`.
 - Control registration stores control metadata; a fresh control instance is created for template nodes through the control factory.
 - `DocumentOptions.Context` is opaque to the library and is passed unchanged to resource resolvers and async control initialization.
+
+## Advanced Infrastructure Interfaces
+
+These interfaces are public because controls and extension points use them.
+Most applications should not replace them directly.
+
+| Interface | Use |
+|-----------|-----|
+| `IDrawableCanvas` | Low-level drawing surface used by controls. Custom controls may call it through the deferred canvas. |
+| `IDeferredCanvas` | Canvas passed to `IControl.Render`; it records drawing work until page-specific values are available. |
+| `IImmediateCanvas` | Canvas exposed inside deferred drawing for page-specific information such as the current page and total pages. |
+| `ITextService` | Shared text measurement and drawing service used by text-based controls. Replacing it changes text behavior globally. |
+| `IPropertyAccessCache` | Expression-evaluation infrastructure that caches property access. It is not a normal application extension point. |
 
 ## When Template Authors Need Developer Help
 

@@ -7,14 +7,17 @@ Use this manual when you need to understand how a document is structured, which 
 ## Start here
 
 - [User manual](manual/index.md): the starting point for template authors.
-- [Documentation work plan](manual/work-plan.md): the task list for converting the current README into a complete manual.
-- [Current README](https://github.com/X39/X39.Solutions.PdfTemplate/blob/master/README.md): the source material that should be migrated, clarified and expanded.
+- [Documentation work plan](manual/work-plan.md): the task list for maintaining and expanding the manual.
+- [Repository README](https://github.com/X39/X39.Solutions.PdfTemplate/blob/master/README.md): the short project overview for GitHub and NuGet.
 
 ## Current status
 
-This GitHub Pages site is intentionally small. It establishes the documentation location, rendering setup and migration plan before the full user manual is written.
+The GitHub Pages manual now contains the migrated template-author guidance, focused control pages,
+complete examples, troubleshooting notes and the developer integration appendix.
+The README has been reduced to a short project entry point that links back to this manual.
 
-Until the manual chapters are completed, the README remains the authoritative technical reference.
+Future documentation work should follow the work plan, add generated samples before new visual examples,
+and keep source or test references for behavior that is not already verified in the manual.
 
 ## Documentation goals
 

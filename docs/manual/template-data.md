@@ -10,6 +10,8 @@ Attribute expression behavior, including missing attribute values, is checked ag
 Function-call syntax is checked against `FunctionCallTests`.
 Optional-value conditions are checked against `IfTransformerTests`.
 List and choice patterns are checked against `ForEachTransformerTests` and `SwitchTransformerTests`.
+Built-in diagnostic function names are checked against `Generator`, `AllTemplateDataFunctions`
+and `AllTemplateDataVariables`.
 
 ## What Is This?
 
@@ -185,6 +187,11 @@ It assumes the application supplies a function named `statusLabel` and a variabl
 Inside the parentheses, write the variable name without a leading `@`.
 `FunctionCallTests.CanCallNestedVariable` verifies this argument pattern.
 String, number and boolean literal arguments are also verified by `FunctionCallTests.CanCallNonNestedFunction`.
+
+Two diagnostic functions are registered for every generator: `allFunctions()` and `allVariables()`.
+They expose the currently registered function names and variable names.
+Use them only while checking a data contract with the application team; production templates should use the specific
+variables and functions documented for that document type.
 
 ## Expressions In Transformer Lines
 

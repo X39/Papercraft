@@ -67,8 +67,9 @@ Template language now includes generated examples for conditional sections and s
 source-checked optional-value guidance.
 The troubleshooting chapter now has source-checked starter entries.
 The developer appendix now contains setup and extension-point guidance for application developers.
-Remaining reference work is mostly edge-case guidance, future supported data patterns and README cleanup.
-Until a chapter says its examples are verified, the README and tests remain the source of truth for detailed behavior.
+The README is now a short project overview that links back to this manual.
+Remaining reference work is mostly edge-case guidance and future supported data patterns.
+Until a chapter says its examples are verified, the tests and source remain the source of truth for detailed behavior.
 
 Documentation contributors should follow the [documentation style guide](style-guide.md) and the
 [documentation roadmap](work-plan.md) before expanding chapters.
