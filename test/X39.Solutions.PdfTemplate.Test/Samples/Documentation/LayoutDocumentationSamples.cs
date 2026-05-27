@@ -76,4 +76,38 @@ public sealed class LayoutDocumentationSamples : DocumentationSampleBase
                 </body>
             </template>
             """);
+
+    [Fact]
+    public Task Layout_ClipOverflow()
+        => RenderDocumentationSampleAsync(
+            "layout-clip-overflow",
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <template>
+                <body>
+                    <text fontsize="8" weight="bold">Default clip</text>
+                    <table margin="0 0 2mm 0">
+                        <tr>
+                            <td width="22mm" padding="1mm">
+                                <line length="45mm" thickness="3pt" color="#2563eb"/>
+                            </td>
+                            <td width="1*" padding="1mm">
+                                <text fontsize="8" foreground="#475569">Next cell</text>
+                            </td>
+                        </tr>
+                    </table>
+                    <text fontsize="8" weight="bold">clip="false"</text>
+                    <table>
+                        <tr>
+                            <td width="22mm" padding="1mm" clip="false">
+                                <line length="45mm" thickness="3pt" color="#dc2626"/>
+                            </td>
+                            <td width="1*" padding="1mm">
+                                <text fontsize="8" foreground="#475569">Next cell</text>
+                            </td>
+                        </tr>
+                    </table>
+                </body>
+            </template>
+            """);
 }

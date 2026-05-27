@@ -313,18 +313,30 @@ and to controls that implement `IInitializeControlAsync`.
 
 ## Extension Point Map
 
-| Interface or type | Use when |
-|-------------------|----------|
-| `Generator` | The application needs to render a template to PDF or bitmaps. |
-| `ITemplateData` | The application supplies variables, registers functions or evaluates expressions inside custom extensions. |
-| `IFunction` | The template needs a reusable calculated value. |
-| `IControl` | The application must render a new XML element. |
-| `IContentControl` | A custom control must contain child controls. |
-| `IInitializeControlAsync` | A control needs async setup or request context before rendering. |
-| `ITransformer` | XML nodes must be conditionally rewritten, removed or repeated before rendering. |
-| `IResourceResolver` | Image sources must be resolved from application-specific storage. |
-| `IParameterConverter<T>` | A custom control attribute needs custom parsing. |
-| `IControlFactory` | Advanced activation behavior is needed. Most applications should use `AddControl<TControl>()` instead. |
+Choose the smallest extension point that solves the template author's request.
+Most requests fit one of these rows:
+
+| Interface or type | Use when | How it is wired |
+|-------------------|----------|-----------------|
+| `Generator` | The application needs to render a template to PDF or bitmaps. | Resolve it from dependency injection for each render. |
+| `ITemplateData` | The application supplies variables, registers functions or evaluates expressions inside custom extensions. | Use `generator.TemplateData` before rendering; custom transformers and functions receive it through their APIs. |
+| `IFunction` | The template needs a reusable calculated value. | Implement `Name`, argument metadata and `ExecuteAsync`, then register with `AddFunction<TFunction>()`. |
+| `IControl` | The application must render a new XML element. | Add `[Control(...)]`, implement measure/arrange/render behavior and register with `AddControl<TControl>()`. |
+| `IContentControl` | A custom control must contain child controls. | Implement `CanAdd` and child storage, or derive from an existing content-control base. |
+| `IInitializeControlAsync` | A control needs async setup or request context before rendering. | Implement it on the control; `DocumentOptions.Context` is passed to `InitializeControlAsync`. |
+| `ITransformer` | XML nodes must be conditionally rewritten, removed or repeated before controls are created. | Implement `Name` and `TransformAsync`, then register with `AddTransformer<TTransformer>()`. |
+| `IResourceResolver` | Image sources must be resolved from application-specific storage. | Register an `IResourceResolver` implementation after `AddPdfTemplateService`. |
+| `IParameterConverter<T>` | A custom control attribute needs custom parsing. | Set the converter on the control property with `ParameterAttribute.Converter`. |
+| `IControlFactory` | Advanced activation behavior is needed. | Replace the DI service only for unusual activation needs; most applications should use `AddControl<TControl>()`. |
+
+Source-checked registration notes:
+
+- `Generator` is registered as transient.
+- `ITemplateData`, `IResourceResolver` and `IControlFactory` are registered as scoped services.
+- Built-in transformer registrations are transient; custom transformers added with `AddTransformer<TTransformer>()` use the same path.
+- Functions added with `AddFunction<TFunction>()` are scoped by default, and the builder accepts another `ServiceLifetime`.
+- Control registration stores control metadata; a fresh control instance is created for template nodes through the control factory.
+- `DocumentOptions.Context` is opaque to the library and is passed unchanged to resource resolvers and async control initialization.
 
 ## When Template Authors Need Developer Help
 
