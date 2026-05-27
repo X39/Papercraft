@@ -113,6 +113,48 @@ Use `thickness` on `border` when you want the border line itself to be visible.
 If a `border` should fit near its content instead of stretching through the available vertical space,
 set `verticalAlignment="top"`.
 
+### Separate Two Controls
+
+Put `margin` on the control that needs outside space.
+In the starter sample above, the inner border uses `margin="3mm 0"` so there is space before and after the box:
+
+```xml
+<border margin="3mm 0" padding="2mm" thickness="1pt">
+    <text fontsize="9">Margin separates this box from nearby content.</text>
+</border>
+```
+
+Use this when headings, rows, boxes or separator lines are too close to the controls around them.
+
+### Keep Content Away From An Edge
+
+Put `padding` on the container that owns the inside edge.
+For example, a border with `padding="2mm"` keeps its child text away from the border line:
+
+```xml
+<border padding="2mm" thickness="1pt">
+    <text fontsize="9">Padding keeps this text away from the border.</text>
+</border>
+```
+
+Use this for callout boxes, table cells and backgrounds behind text.
+If the gap should be outside the box instead, use `margin`.
+
+### Draw A Visible Border
+
+Use `thickness`, `color` and optional `background` on `border`.
+One thickness value applies to every side:
+
+```xml
+<border thickness="1pt" color="#94a3b8" background="#f8fafc" padding="2mm">
+    <text fontsize="9">A visible box.</text>
+</border>
+```
+
+For a one-sided rule, use the four-value order `left top right bottom`,
+such as `thickness="0 0 0 1pt"` for a bottom border.
+The focused [Border control](controls-border.md#draw-only-a-bottom-border) page has a generated bottom-rule example.
+
 ## Clipping And Overflow
 
 Most controls support `clip`.

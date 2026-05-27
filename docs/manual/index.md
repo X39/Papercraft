@@ -65,7 +65,7 @@ Text-control guidance now includes generated padding output and data insertion, 
 header/table separators, and table-control guidance now calls out header rows.
 Layout guidance now includes a generated comparison of fixed and percentage length units.
 Template data now includes generated examples for simple variables, data-backed attributes and function calls,
-plus source-checked guidance for missing data.
+source-checked guidance for missing data, and a compact task chooser for common data and logic questions.
 Template language now includes generated examples for conditional sections and switch-based alternatives, plus
 source-checked optional-value guidance and a generated temporary-value example.
 The troubleshooting chapter now has source-checked starter entries.
