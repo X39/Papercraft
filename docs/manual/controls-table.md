@@ -199,6 +199,43 @@ The table controls position the cell; the text control positions the text inside
 
 This pattern is used in `TableDocumentationSamples.Table_BasicRowsAndColumns`.
 
+## Create An Invoice Line-Item Table
+
+Use one `th` row for the column labels and one `tr` row for each line item.
+Put visible padding, background color and bottom rules inside each `td`, usually with `border`.
+Right-align quantities, prices and totals with the `text` control.
+
+This compact pattern is used in `TableDocumentationSamples.Table_BasicRowsAndColumns`.
+The full invoice preview uses the same structure in
+`CompleteExampleDocumentationSamples.CompleteExample_InvoicePreview`.
+
+```xml
+<table>
+    <th>
+        <td width="2*">
+            <border thickness="0 0 0 1pt"><text weight="bold">Description</text></border>
+        </td>
+        <td width="1*">
+            <border thickness="0 0 0 1pt"><text weight="bold" horizontalAlignment="right">Qty</text></border>
+        </td>
+        <td width="1*">
+            <border thickness="0 0 0 1pt"><text weight="bold" horizontalAlignment="right">Amount</text></border>
+        </td>
+    </th>
+    <tr>
+        <td><border padding="1mm"><text>Design package</text></border></td>
+        <td><border padding="1mm"><text horizontalAlignment="right">2</text></border></td>
+        <td><border padding="1mm"><text horizontalAlignment="right">690.00</text></border></td>
+    </tr>
+</table>
+```
+
+For a full document shape, see the generated [Invoice example](complete-examples.md#invoice-example).
+If invoice rows come from application data, start with [Repeat rows from data](#repeat-rows-from-data) when each row
+can be represented by one simple value.
+Multi-field invoice row objects are not documented as a supported template-author pattern yet; ask the application
+team for prepared simple values or helper functions until a supported nested-data pattern exists.
+
 ## Alternate Row Colors
 
 Use `@alternate` to rotate through background colors.
