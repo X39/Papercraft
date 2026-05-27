@@ -4,10 +4,24 @@ on:
   workflow_dispatch:
     inputs:
       filter:
-        description: BenchmarkDotNet filter. Use * for all benchmarks.
+        description: BenchmarkDotNet filter. Used for custom runs and as an optional extra filter for category runs.
         required: true
         default: "*"
         type: string
+      category:
+        description: Benchmark category preset.
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - activation
+          - controls
+          - transformers
+          - parsing
+          - templateCreation
+          - generation
+          - custom
       job:
         description: BenchmarkDotNet job. Use Default for a full default run.
         required: true
@@ -58,7 +72,38 @@ jobs:
 
       - name: Run BenchmarkDotNet
         run: |
-          args=(--filter "${{ inputs.filter }}")
+          args=()
+
+          case "${{ inputs.category }}" in
+            all)
+              args+=(--filter "${{ inputs.filter }}")
+              ;;
+            activation)
+              args+=(--anyCategories Activation)
+              ;;
+            controls)
+              args+=(--anyCategories Controls)
+              ;;
+            transformers)
+              args+=(--anyCategories Transformers)
+              ;;
+            parsing)
+              args+=(--anyCategories Parsing)
+              ;;
+            templateCreation)
+              args+=(--anyCategories TemplateCreation)
+              ;;
+            generation)
+              args+=(--anyCategories Generation)
+              ;;
+            custom)
+              args+=(--filter "${{ inputs.filter }}")
+              ;;
+          esac
+
+          if [ "${{ inputs.category }}" != "all" ] && [ "${{ inputs.category }}" != "custom" ] && [ "${{ inputs.filter }}" != "*" ]; then
+            args+=(--filter "${{ inputs.filter }}")
+          fi
 
           if [ "${{ inputs.job }}" != "Default" ]; then
             args+=(--job "${{ inputs.job }}")

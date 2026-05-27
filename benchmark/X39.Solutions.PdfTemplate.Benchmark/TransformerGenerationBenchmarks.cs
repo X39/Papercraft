@@ -5,8 +5,8 @@ using X39.Solutions.PdfTemplate.Data;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 
-[BenchmarkCategory(BenchmarkCategories.Generation)]
-public class GenerationBenchmarks
+[BenchmarkCategory(BenchmarkCategories.Generation, BenchmarkCategories.Transformers)]
+public class TransformerGenerationBenchmarks
 {
     private ServiceProvider _serviceProvider = null!;
     private Generator _generator = null!;
@@ -20,12 +20,15 @@ public class GenerationBenchmarks
         _documentOptions = new DocumentOptions
         {
             DotsPerInch = 72,
-            Margin = new Thickness(new Length(1, ELengthUnit.Centimeters)),
+            PageWidthInMillimeters = 120,
+            PageHeightInMillimeters = 160,
+            Margin = new Thickness(new Length(0.4F, ELengthUnit.Centimeters)),
             Modified = new DateTime(2026, 5, 27, 0, 0, 0, DateTimeKind.Utc),
             Producer = "X39.Solutions.PdfTemplate.Benchmark",
         };
 
-        GenerateRepresentativeInvoiceBitmaps().GetAwaiter().GetResult();
+        GenerateExpandedTemplateBitmaps().GetAwaiter().GetResult();
+        GenerateTransformedTemplateBitmaps().GetAwaiter().GetResult();
     }
 
     [GlobalCleanup]
@@ -35,10 +38,21 @@ public class GenerationBenchmarks
         _serviceProvider.Dispose();
     }
 
-    [Benchmark]
-    public async Task<int> GenerateRepresentativeInvoiceBitmaps()
+    [Benchmark(Baseline = true)]
+    public Task<int> GenerateExpandedTemplateBitmaps()
     {
-        using var reader = BenchmarkTemplates.CreateXmlReader(BenchmarkTemplates.RepresentativeGenerationTemplate);
+        return GenerateAsync(BenchmarkTemplates.TransformerHeavyExpandedGenerationTemplate);
+    }
+
+    [Benchmark]
+    public Task<int> GenerateTransformedTemplateBitmaps()
+    {
+        return GenerateAsync(BenchmarkTemplates.TransformerHeavyGenerationTemplate);
+    }
+
+    private async Task<int> GenerateAsync(byte[] template)
+    {
+        using var reader = BenchmarkTemplates.CreateXmlReader(template);
         var bitmaps = await _generator.GenerateBitmapsAsync(
                 reader,
                 BenchmarkServices.Culture,

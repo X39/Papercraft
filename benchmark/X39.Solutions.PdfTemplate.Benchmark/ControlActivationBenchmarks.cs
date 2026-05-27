@@ -5,7 +5,7 @@ using X39.Solutions.PdfTemplate.Services;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 
-[BenchmarkCategory("Activation")]
+[BenchmarkCategory(BenchmarkCategories.Activation)]
 public class ControlActivationBenchmarks
 {
     private static readonly object[] NoArguments = Array.Empty<object>();

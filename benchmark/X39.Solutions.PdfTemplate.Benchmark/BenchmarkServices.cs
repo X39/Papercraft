@@ -2,6 +2,7 @@ using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using X39.Solutions.PdfTemplate;
 using X39.Solutions.PdfTemplate.Abstraction;
+using X39.Solutions.PdfTemplate.Controls;
 using X39.Solutions.PdfTemplate.Services;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
@@ -30,6 +31,25 @@ internal static class BenchmarkServices
     };
 
     public const string ContentText = "Deterministic content parameter text.";
+    public const string TinyPngDataUri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=";
+
+    public static readonly string[] BuiltInControlNames =
+    [
+        "barChart",
+        "border",
+        "chart",
+        "data",
+        "image",
+        "lineChart",
+        "line",
+        "pageNumber",
+        "pieChart",
+        "td",
+        "table",
+        "th",
+        "tr",
+        "text",
+    ];
 
     public static ServiceProvider CreateServiceProvider()
     {
@@ -61,8 +81,190 @@ internal static class BenchmarkServices
         cache.CreateControl(serviceProvider, typeof(BenchmarkContainerControl), EmptyParameters, null, Culture);
     }
 
+    public static void WarmDefaultControlCache(IServiceProvider serviceProvider, ControlExpressionCache cache)
+    {
+        foreach (var controlName in BuiltInControlNames)
+        {
+            cache.CreateControl(
+                serviceProvider,
+                GetBuiltInControlType(controlName),
+                GetBuiltInControlParameters(controlName),
+                GetBuiltInControlContent(controlName),
+                Culture);
+        }
+    }
+
     public static Generator CreateDefaultGenerator(ServiceProvider serviceProvider)
     {
         return serviceProvider.GetRequiredService<Generator>();
+    }
+
+    public static Type GetBuiltInControlType(string controlName)
+        => controlName switch
+        {
+            "barChart"   => typeof(BarChart),
+            "border"     => typeof(BorderControl),
+            "chart"      => typeof(ChartControl),
+            "data"       => typeof(ChartDataControl),
+            "image"      => typeof(ImageControl),
+            "lineChart"  => typeof(LineChart),
+            "line"       => typeof(LineControl),
+            "pageNumber" => typeof(PageNumberControl),
+            "pieChart"   => typeof(PieChart),
+            "td"         => typeof(TableCellControl),
+            "table"      => typeof(TableControl),
+            "th"         => typeof(TableHeaderControl),
+            "tr"         => typeof(TableRowControl),
+            "text"       => typeof(TextControl),
+            _            => throw new ArgumentOutOfRangeException(nameof(controlName), controlName, null),
+        };
+
+    public static IReadOnlyDictionary<string, string> GetBuiltInControlParameters(string controlName)
+        => controlName switch
+        {
+            "barChart" => Merge(
+                CommonAlignmentParameters,
+                ChartParameters,
+                new Dictionary<string, string>
+                {
+                    ["ORIENTATION"] = "Vertical",
+                    ["BAR-WIDTH"]   = "8px",
+                    ["BAR-SPACING"] = "20%",
+                    ["BAR-COLOR"]   = "#4472C4",
+                }),
+            "border" => Merge(
+                CommonAlignmentParameters,
+                new Dictionary<string, string>
+                {
+                    ["THICKNESS"]  = "1px",
+                    ["COLOR"]      = "#202020",
+                    ["BACKGROUND"] = "#F5F7FA",
+                }),
+            "chart" => CommonAlignmentParameters,
+            "data" => new Dictionary<string, string>
+            {
+                ["X"]       = "1",
+                ["Y"]       = "42",
+                ["X-LABEL"] = "X",
+                ["Y-LABEL"] = "Y",
+                ["COLOR"]   = "#70AD47",
+                ["LABEL"]   = "Point",
+            },
+            "image" => Merge(
+                CommonAlignmentParameters,
+                new Dictionary<string, string>
+                {
+                    ["SOURCE"] = TinyPngDataUri,
+                    ["WIDTH"]  = "16px",
+                    ["HEIGHT"] = "16px",
+                }),
+            "lineChart" => Merge(
+                CommonAlignmentParameters,
+                ChartParameters,
+                new Dictionary<string, string>
+                {
+                    ["LINE-THICKNESS"] = "2px",
+                    ["LINE-COLOR"]     = "#4472C4",
+                    ["SHOW-POINTS"]    = "true",
+                    ["POINT-SIZE"]     = "4",
+                }),
+            "line" => Merge(
+                CommonAlignmentParameters,
+                new Dictionary<string, string>
+                {
+                    ["THICKNESS"]   = "1px",
+                    ["LENGTH"]      = "100%",
+                    ["ORIENTATION"] = "Horizontal",
+                    ["COLOR"]       = "#336699",
+                }),
+            "pageNumber" => Merge(
+                CommonTextParameters,
+                new Dictionary<string, string>
+                {
+                    ["PREFIX"]    = "Page ",
+                    ["DELIMITER"] = " of ",
+                    ["MODE"]      = "CurrentTotal",
+                    ["SUFFIX"]    = "",
+                }),
+            "pieChart" => Merge(
+                CommonAlignmentParameters,
+                ChartParameters,
+                new Dictionary<string, string>
+                {
+                    ["START-ANGLE"]      = "0",
+                    ["INNER-RADIUS"]     = "35%",
+                    ["SHOW-PERCENTAGES"] = "true",
+                    ["SHOW-LABELS"]      = "true",
+                }),
+            "td" => Merge(
+                CommonAlignmentParameters,
+                new Dictionary<string, string>
+                {
+                    ["WIDTH"]      = "25%",
+                    ["COLUMNSPAN"] = "1",
+                }),
+            "table" => CommonAlignmentParameters,
+            "th"    => CommonAlignmentParameters,
+            "tr"    => CommonAlignmentParameters,
+            "text"  => CommonTextParameters,
+            _       => throw new ArgumentOutOfRangeException(nameof(controlName), controlName, null),
+        };
+
+    public static string? GetBuiltInControlContent(string controlName)
+        => controlName == "text" ? ContentText : null;
+
+    private static readonly IReadOnlyDictionary<string, string> CommonAlignmentParameters =
+        new Dictionary<string, string>
+        {
+            ["MARGIN"]              = "0px",
+            ["PADDING"]             = "1px",
+            ["CLIP"]                = "true",
+            ["HORIZONTALALIGNMENT"] = "Stretch",
+            ["VERTICALALIGNMENT"]   = "Top",
+        };
+
+    private static readonly IReadOnlyDictionary<string, string> CommonTextParameters = Merge(
+        CommonAlignmentParameters,
+        new Dictionary<string, string>
+        {
+            ["FOREGROUND"]      = "#202020",
+            ["FONTSIZE"]        = "11",
+            ["LINEHEIGHT"]      = "1.2",
+            ["SCALE"]           = "1",
+            ["ROTATION"]        = "0",
+            ["STROKETHICKNESS"] = "0",
+            ["WEIGHT"]          = "Normal",
+            ["STYLE"]           = "Normal",
+            ["FONTFAMILY"]      = "Arial",
+        });
+
+    private static readonly IReadOnlyDictionary<string, string> ChartParameters =
+        new Dictionary<string, string>
+        {
+            ["WIDTH"]        = "100%",
+            ["HEIGHT"]       = "140px",
+            ["TITLE"]        = "Benchmark chart",
+            ["SHOW-GRID"]    = "true",
+            ["GRID-COLOR"]   = "#CCCCCC",
+            ["AXIS-COLOR"]   = "#202020",
+            ["SHOW-X-AXIS"]  = "true",
+            ["SHOW-Y-AXIS"]  = "true",
+            ["X-AXIS-LABEL"] = "X",
+            ["Y-AXIS-LABEL"] = "Y",
+        };
+
+    private static IReadOnlyDictionary<string, string> Merge(
+        params IReadOnlyDictionary<string, string>[] dictionaries)
+    {
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var dictionary in dictionaries)
+        {
+            foreach (var (key, value) in dictionary)
+            {
+                result[key] = value;
+            }
+        }
+
+        return result;
     }
 }

@@ -4,7 +4,7 @@ using X39.Solutions.PdfTemplate.Xml;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 
-[BenchmarkCategory("Parsing")]
+[BenchmarkCategory(BenchmarkCategories.Parsing)]
 public class ParsingBenchmarks
 {
     private readonly TemplateData _templateData = new();

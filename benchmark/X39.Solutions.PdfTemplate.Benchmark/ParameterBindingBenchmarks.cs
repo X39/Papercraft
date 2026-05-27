@@ -4,7 +4,7 @@ using X39.Solutions.PdfTemplate.Services;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 
-[BenchmarkCategory("ParameterBinding")]
+[BenchmarkCategory(BenchmarkCategories.Activation, BenchmarkCategories.Controls)]
 public class ParameterBindingBenchmarks
 {
     private ServiceProvider _serviceProvider = null!;

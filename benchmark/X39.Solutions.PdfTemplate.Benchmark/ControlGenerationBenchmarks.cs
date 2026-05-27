@@ -5,12 +5,18 @@ using X39.Solutions.PdfTemplate.Data;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 
-[BenchmarkCategory(BenchmarkCategories.Generation)]
-public class GenerationBenchmarks
+[BenchmarkCategory(BenchmarkCategories.Generation, BenchmarkCategories.Controls)]
+public class ControlGenerationBenchmarks
 {
     private ServiceProvider _serviceProvider = null!;
     private Generator _generator = null!;
     private DocumentOptions _documentOptions;
+    private byte[] _template = null!;
+
+    [ParamsSource(nameof(Cases))]
+    public string Case { get; set; } = "Text";
+
+    public IEnumerable<string> Cases => BenchmarkTemplates.ControlGenerationCases;
 
     [GlobalSetup]
     public void GlobalSetup()
@@ -20,12 +26,15 @@ public class GenerationBenchmarks
         _documentOptions = new DocumentOptions
         {
             DotsPerInch = 72,
-            Margin = new Thickness(new Length(1, ELengthUnit.Centimeters)),
+            PageWidthInMillimeters = 120,
+            PageHeightInMillimeters = 160,
+            Margin = new Thickness(new Length(0.4F, ELengthUnit.Centimeters)),
             Modified = new DateTime(2026, 5, 27, 0, 0, 0, DateTimeKind.Utc),
             Producer = "X39.Solutions.PdfTemplate.Benchmark",
         };
+        _template = BenchmarkTemplates.GetControlGenerationTemplate(Case);
 
-        GenerateRepresentativeInvoiceBitmaps().GetAwaiter().GetResult();
+        GenerateControlCaseBitmaps().GetAwaiter().GetResult();
     }
 
     [GlobalCleanup]
@@ -36,9 +45,9 @@ public class GenerationBenchmarks
     }
 
     [Benchmark]
-    public async Task<int> GenerateRepresentativeInvoiceBitmaps()
+    public async Task<int> GenerateControlCaseBitmaps()
     {
-        using var reader = BenchmarkTemplates.CreateXmlReader(BenchmarkTemplates.RepresentativeGenerationTemplate);
+        using var reader = BenchmarkTemplates.CreateXmlReader(_template);
         var bitmaps = await _generator.GenerateBitmapsAsync(
                 reader,
                 BenchmarkServices.Culture,

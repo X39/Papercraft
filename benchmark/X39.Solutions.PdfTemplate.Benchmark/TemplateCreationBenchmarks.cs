@@ -7,7 +7,7 @@ using X39.Solutions.PdfTemplate.Xml;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 
-[BenchmarkCategory("TemplateCreation")]
+[BenchmarkCategory(BenchmarkCategories.TemplateCreation)]
 public class TemplateCreationBenchmarks
 {
     private ServiceProvider _serviceProvider = null!;
