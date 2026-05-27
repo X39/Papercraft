@@ -5,8 +5,8 @@ Previous: [Complete examples](complete-examples.md) | [Manual home](index.md) | 
 Status: started. The first entries are checked against `XmlTemplateReader`, `Template`,
 `ControlRegistry`, `ControlActivationCache`, `ImageControl`, `DefaultResourceResolver`,
 `TableControl`, `TableRowControlBase`, `TableSample.LongTableRows`, `GeneralExpressionTests`,
-`TroubleshootingExpressionTests`, `TroubleshootingTransformerTests`, `TroubleshootingImageTests` and the existing
-XML/control activation tests.
+`TableControlTest.RowTallerThanPageStartsAfterRepeatedHeaderAndIsNotSplit`, `TroubleshootingExpressionTests`,
+`TroubleshootingTransformerTests`, `TroubleshootingImageTests` and the existing XML/control activation tests.
 
 ## What Is This?
 
@@ -218,9 +218,14 @@ Common checks:
 - Check whether the page header, page footer or document margin has left less body height than the table needs.
 - Split very large text blocks into more rows before placing them in a table.
 
-TODO: Verify and document the exact visible behavior when one table row is taller than a full available page.
-Source area: `TableControl.PreRender`, `TableControl.DoRender`, `TableRowControlBase.DoArrange` and a future focused
-table overflow test.
+If one body row is taller than a full available page, the table does not split that row into smaller row fragments.
+The row is still moved to a fresh page when it does not fit in the remaining space. If the table has a `th` header,
+the header is rendered again before the oversized row. The row then keeps its arranged height, so it can continue
+past one page of body space instead of behaving like normal flowing body text.
+`TableControlTest.RowTallerThanPageStartsAfterRepeatedHeaderAndIsNotSplit` verifies this against
+`TableControl.PreRender`, `TableControl.DoRender` and `TableRowControlBase.DoArrange`.
+
+For long readable content, split the content into several rows or move it out of the table into normal body content.
 
 ## Planned Work
 

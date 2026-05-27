@@ -54,7 +54,7 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 7. [Controls](controls.md): built-in XML controls such as `text`, `border`, `image`, `line`, `table`, `pageNumber` and charts. Focused pages now include [Control concepts](controls-concepts.md), [Text control](controls-text.md), [Border control](controls-border.md), [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md), [Table control](controls-table.md) and [Chart controls](controls-chart.md).
 8. [Transformers](transformers.md): the concept behind `@if`, `@switch`, `@foreach`, `@for`, `@var` and `@alternate`.
 9. [Template language](template-language.md): transformer starter syntax and task examples.
-10. [Complete examples](complete-examples.md): full document examples such as invoices, reports, product sheets and dashboards. Started with verified invoice, report, product sheet and chart dashboard previews.
+10. [Complete examples](complete-examples.md): full document examples such as invoices, reports, table-heavy sheets, product sheets and dashboards. Includes verified invoice, report, table-heavy, product sheet and chart dashboard previews.
 11. [Troubleshooting](troubleshooting.md): common XML, data, image and layout problems.
 12. [Developer integration appendix](developer-integration.md): installation, service registration and extension points.
 

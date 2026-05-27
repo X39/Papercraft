@@ -275,4 +275,35 @@ public class TableControlTest
         mockCanvas.AssertClip(14, new Rectangle(50, 75, 25,  50)); // td
         mockCanvas.AssertClip(15, new Rectangle(75, 75, 25,  50)); // td
     }
+
+    [Fact]
+    public async Task RowTallerThanPageStartsAfterRepeatedHeaderAndIsNotSplit()
+    {
+        var control = await $$"""
+                                <table>
+                                    <th>
+                                        <td><mock width="100px" height="10px"/></td>
+                                    </th>
+                                    <tr>
+                                        <td><mock width="100px" height="120px"/></td>
+                                    </tr>
+                                </table>
+                              """.ToControl<TableControl>();
+        var pageSize   = new Size(100, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        var arrangedSize = control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        var additionalRenderSize = control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+        mockCanvas.AssertState();
+
+        Assert.Equal(new Size(100, 130), arrangedSize);
+        Assert.Equal(new Size(0, 100), additionalRenderSize);
+        mockCanvas.AssertClip(0, new Rectangle(0, 0, 100, 320)); // table, including the skipped page space
+        mockCanvas.AssertClip(1, new Rectangle(0, 0, 100, 10)); // initial table header
+        mockCanvas.AssertClip(2, new Rectangle(0, 0, 100, 10)); // initial header cell
+        mockCanvas.AssertClip(3, new Rectangle(0, 100, 100, 10)); // repeated header on the next page
+        mockCanvas.AssertClip(4, new Rectangle(0, 100, 100, 10)); // repeated header cell
+        mockCanvas.AssertClip(5, new Rectangle(0, 110, 100, 120)); // oversized row remains one row
+        mockCanvas.AssertClip(6, new Rectangle(0, 110, 100, 120)); // oversized row cell
+    }
 }
