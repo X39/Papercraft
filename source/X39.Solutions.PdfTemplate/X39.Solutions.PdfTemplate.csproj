@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
@@ -43,8 +43,8 @@ You may even create your own controls by deriving from the `Control` base class!
     </ItemGroup>
     <ItemGroup>
         <None Include="$(SolutionDir)\README.md" Pack="true" PackagePath="\"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0"/>
-        <PackageReference Include="SkiaSharp" Version="2.88.7"/>
-        <PackageReference Include="X39.Util" Version="1.0.0.40"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+        <PackageReference Include="SkiaSharp" Version="3.119.4" />
+        <PackageReference Include="X39.Util" Version="1.0.0.56" />
     </ItemGroup>
 </Project>
