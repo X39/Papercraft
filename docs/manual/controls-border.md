@@ -2,7 +2,7 @@
 
 [Controls](controls.md) | [Manual home](index.md)
 
-Status: started. The visual examples on this page are verified by
+Status: complete for current supported behavior. The visual examples on this page are verified by
 `BasicDocumentationSamples.Border_WithBackground` and `BorderDocumentationSamples.Border_BottomRule`.
 Attributes and child behavior are checked against `BorderControl`, `BorderControlTests`
 and [Layout fundamentals](layout-fundamentals.md).

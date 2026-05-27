@@ -2,7 +2,7 @@
 
 Previous: [Template data](template-data.md) | [Manual home](index.md) | Next: [Styles](styles.md)
 
-Status: started. The visual examples on this page are verified by `LayoutDocumentationSamples`.
+Status: complete for current supported behavior. The visual examples on this page are verified by `LayoutDocumentationSamples`.
 Length, color, thickness and orientation formats are checked against source, `LengthTests`, `ColorTests`,
 `ThicknessParsingTests`, `LineControlTests` and `BarChartTests`.
 Alignment behavior is checked against `AlignableControl`, `EHorizontalAlignment` and `EVerticalAlignment`.

@@ -2,7 +2,7 @@
 
 Previous: [Areas](areas.md) | [Manual home](index.md) | Next: [Layout fundamentals](layout-fundamentals.md)
 
-Status: started. The visual examples on this page are verified by `TemplateDataDocumentationSamples`.
+Status: complete for current supported behavior. The visual examples on this page are verified by `TemplateDataDocumentationSamples`.
 Simple variable replacement, missing text values and dotted text behavior are checked against
 `GeneralExpressionTests`, `TroubleshootingExpressionTests` and `XmlTemplateReader`.
 Attribute expression behavior, including missing attribute values, is checked against `XmlTemplateReader`,

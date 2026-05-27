@@ -2,7 +2,7 @@
 
 [Controls](controls.md) | [Manual home](index.md)
 
-Status: started. The examples on this page reuse generated assets from `BasicDocumentationSamples`.
+Status: complete for current supported behavior. The examples on this page reuse generated assets from `BasicDocumentationSamples`.
 Container and child-rule behavior is checked against `IContentControl`, `Template.CreateControlAsync`,
 `TextBaseControl`, `BorderControl`, `TableControl` and `TableRowControlBase`.
 

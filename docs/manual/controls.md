@@ -2,7 +2,7 @@
 
 Previous: [Styles](styles.md) | [Manual home](index.md) | Next: [Transformers](transformers.md)
 
-Status: started. [Control concepts](controls-concepts.md) and the focused [Text control](controls-text.md), [Border control](controls-border.md),
+Status: complete for current supported behavior. [Control concepts](controls-concepts.md) and the focused [Text control](controls-text.md), [Border control](controls-border.md),
 [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md),
 [Table control](controls-table.md) and [Chart controls](controls-chart.md) pages now have verified examples and shared
 layout cross-links.
@@ -39,20 +39,19 @@ The focused reference pages verify attribute names against source or tests.
 
 | Control | Use it for | Status |
 |---------|------------|--------|
-| [Control concepts](controls-concepts.md) | How controls, containers and child rules fit together. | Started with verified source checks and reused generated samples. |
-| [`text`](controls-text.md) | Words, labels, headings and values. | Started with verified examples. |
-| [`border`](controls-border.md) | Boxes, backgrounds and border lines around content. | Started with verified examples. |
-| [`line`](controls-line.md) | Separators and simple rules. | Started with verified horizontal, vertical and header-rule examples. |
-| [`image`](controls-image.md) | Raster images loaded by the application. | Started with verified source and sizing guidance. |
-| [`pageNumber`](controls-page-number.md) | Current page and total page count text. | Started with a verified footer example. |
-| [`table`, `tr`, `td`, `th`](controls-table.md) | Rows, columns and table cells. | Started with verified table examples. |
-| [`chart`, `lineChart`, `barChart`, `pieChart`, `data`](controls-chart.md) | Line, bar and pie chart visuals. | Started with verified chart examples. |
+| [Control concepts](controls-concepts.md) | How controls, containers and child rules fit together. | Verified with source checks and reused generated samples. |
+| [`text`](controls-text.md) | Words, labels, headings and values. | Verified examples. |
+| [`border`](controls-border.md) | Boxes, backgrounds and border lines around content. | Verified examples. |
+| [`line`](controls-line.md) | Separators and simple rules. | Verified horizontal, vertical and header-rule examples. |
+| [`image`](controls-image.md) | Raster images loaded by the application. | Verified source and sizing guidance. |
+| [`pageNumber`](controls-page-number.md) | Current page and total page count text. | Verified footer example. |
+| [`table`, `tr`, `td`, `th`](controls-table.md) | Rows, columns and table cells. | Verified table examples. |
+| [`chart`, `lineChart`, `barChart`, `pieChart`, `data`](controls-chart.md) | Line, bar and pie chart visuals. | Verified chart examples. |
 
-## Planned Work
+## Future Maintenance
 
-- Keep this page as the controls landing page, then split detailed built-in control references into focused pages as they are written.
-- Use the reference split described in the [documentation style guide](style-guide.md).
-- Tighten purpose, allowed children, attributes, examples and common mistakes as each focused page matures.
+- Keep this page as the controls landing page and use the reference split described in the
+  [documentation style guide](style-guide.md) for future controls.
 - Keep generated samples current as visual control pages expand.
 - Keep shared layout attributes linked back to [Layout fundamentals](layout-fundamentals.md).
 - Link repeated shared attributes back to [Styles](styles.md).

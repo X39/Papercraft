@@ -2,7 +2,7 @@
 
 [Manual home](index.md) | Next: [First document](first-document.md)
 
-Status: started. The beginner workflow and document/page mental model are in place; deeper concept pages are still planned.
+Status: complete for current supported behavior. The beginner workflow and document/page mental model are in place.
 
 ## What Is This?
 

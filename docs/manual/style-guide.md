@@ -2,7 +2,7 @@
 
 [Manual home](index.md) | [Documentation roadmap](work-plan.md)
 
-Status: started.
+Status: current.
 
 ## What Is This?
 

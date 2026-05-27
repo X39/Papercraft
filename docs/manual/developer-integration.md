@@ -2,7 +2,7 @@
 
 Previous: [Troubleshooting](troubleshooting.md) | [Manual home](index.md)
 
-Status: started. Application setup and extension-point orientation have been migrated from the README.
+Status: complete for current supported behavior. Application setup and extension-point orientation have been migrated from the README.
 
 ## What Is This?
 

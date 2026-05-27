@@ -60,25 +60,15 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 
 ## Current Status
 
-The manual structure is now in place, and the introduction, first document, areas, template data, layout, styles, transformers, template-language, text-control, border-control, image-control, line-control, page-number-control, table-control, chart-controls and complete-examples chapters have verified starter examples or source-checked concept guidance.
-Text-control guidance now includes generated examples for plain text, size/color, alignment, bold/italic styling,
-padding and data insertion. Line-control guidance includes horizontal and vertical line tasks plus header/table
-separators, and image-control guidance now calls out source and sizing tasks.
-Table-control guidance now calls out header rows.
-Table-control guidance now also links invoice line-item tables to the verified complete invoice example.
-Layout guidance now includes source-checked alignment and percentage-available-space guidance plus a generated
-comparison of fixed and percentage length units.
-Template data now includes generated examples for simple variables, data-backed attributes and function calls,
-source-checked guidance for missing data, and a compact task chooser for common data and logic questions.
-Template language now includes generated examples for conditional sections, switch-based alternatives, list loops,
-numeric ranges, temporary values and alternating values, plus source-checked optional-value guidance.
-The troubleshooting chapter now has source-checked starter entries.
-It now includes a focused checklist for content that moves to another page unexpectedly.
-The developer appendix now contains setup and extension-point guidance for application developers.
-Namespace and prefix behavior is now source-checked in the first-document, troubleshooting and developer appendix pages.
-The README is now a short project overview that links back to this manual.
-Remaining reference work is mostly edge-case guidance and future supported data patterns.
-Until a chapter says its examples are verified, the tests and source remain the source of truth for detailed behavior.
+The current manual is complete for the product behavior documented today.
+Core chapters have the required concept structure, source-checked guidance and generated samples where the output is
+visual.
+
+Known product limits are documented in the relevant chapters:
+nested object/property access is not a template-author feature, line and bar chart label attributes are not a verified
+visible render path, and unsupported attributes are rejected rather than treated as free-form labels.
+Future roadmap items are tracked as product-support follow-ups in the [documentation roadmap](work-plan.md), not as
+current manual blockers.
 
 Documentation contributors should follow the [documentation style guide](style-guide.md) and the
 [documentation roadmap](work-plan.md) before expanding chapters.

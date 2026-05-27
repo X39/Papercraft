@@ -2,7 +2,7 @@
 
 [Controls](controls.md) | [Manual home](index.md)
 
-Status: started. The visual examples on this page are verified by
+Status: complete for current supported behavior. The visual examples on this page are verified by
 `BasicDocumentationSamples.Line_HorizontalSeparator`, `LineDocumentationSamples.Line_HeaderRule`
 and `LineDocumentationSamples.Line_VerticalDivider`.
 Attributes and layout behavior are checked against `LineControl`, `LineControlTests`, `LineSample`

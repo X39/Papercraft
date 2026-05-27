@@ -2,7 +2,7 @@
 
 Previous: [Layout fundamentals](layout-fundamentals.md) | [Manual home](index.md) | Next: [Controls](controls.md)
 
-Status: started. The visual example on this page is verified by `StyleDocumentationSamples`.
+Status: complete for current supported behavior. The visual example on this page is verified by `StyleDocumentationSamples`.
 Style ordering, nested style overrides and empty style definitions are checked against `XmlTemplateReaderTests`
 and `LineSample`.
 

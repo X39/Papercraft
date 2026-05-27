@@ -2,7 +2,7 @@
 
 Previous: [First document](first-document.md) | [Manual home](index.md) | Next: [Template data](template-data.md)
 
-Status: started. Area structure and positioning behavior are checked against `Template`,
+Status: complete for current supported behavior. Area structure and positioning behavior are checked against `Template`,
 `Generator`, `AreaSample` and `FirstDocumentDocumentationSamples.FirstDocument_FixedArea`.
 The visual example on this page reuses the generated `first-document-fixed-area` sample.
 

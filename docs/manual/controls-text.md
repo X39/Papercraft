@@ -2,7 +2,7 @@
 
 [Controls](controls.md) | [Manual home](index.md)
 
-Status: started. The visual examples on this page are verified by `BasicDocumentationSamples.Text_Basic`,
+Status: complete for current supported behavior. The visual examples on this page are verified by `BasicDocumentationSamples.Text_Basic`,
 `TextDocumentationSamples` and `TemplateDataDocumentationSamples.TemplateData_InsertVariable`.
 Text-specific attributes are checked against `TextControl`, `TextBaseControl`, `TextStyle`,
 `FontWeightConverter` and `TextSample.NamedFontWeights`.

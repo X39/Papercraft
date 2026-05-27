@@ -2,7 +2,7 @@
 
 [Controls](controls.md) | [Manual home](index.md)
 
-Status: started. The visual example on this page is verified by `ImageDocumentationSamples.Image_FromTemplateData`.
+Status: complete for current supported behavior. The visual example on this page is verified by `ImageDocumentationSamples.Image_FromTemplateData`.
 Image source, sizing and resolver behavior are checked against `ImageControl`, `DefaultResourceResolver`,
 `DocumentContextTests` and `ImageControlTests`.
 

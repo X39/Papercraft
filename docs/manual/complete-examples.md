@@ -2,7 +2,7 @@
 
 Previous: [Template language](template-language.md) | [Manual home](index.md) | Next: [Troubleshooting](troubleshooting.md)
 
-Status: done. The invoice, report, table-heavy, product sheet and chart dashboard previews on this page are verified by
+Status: complete for current supported behavior. The invoice, report, table-heavy, product sheet and chart dashboard previews on this page are verified by
 `CompleteExampleDocumentationSamples`.
 
 ## What Is This?
@@ -615,7 +615,7 @@ This example combines smaller topics from [First document](first-document.md), [
 [Line control](controls-line.md), [Table control](controls-table.md), [Chart controls](controls-chart.md) and
 [Page number control](controls-page-number.md).
 
-## Planned Work
+## Future Examples
 
 - Add more complete examples when recurring document types are identified.
 

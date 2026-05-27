@@ -2,7 +2,7 @@
 
 [Controls](controls.md) | [Manual home](index.md)
 
-Status: started. The visual examples on this page are verified by `ChartDocumentationSamples`.
+Status: complete for current supported behavior. The visual examples on this page are verified by `ChartDocumentationSamples`.
 Attributes and child rules are checked against `ChartControl`, `ChartBaseControl`, `LineChart`,
 `BarChart`, `PieChart`, `ChartDataControl` and the chart control tests.
 

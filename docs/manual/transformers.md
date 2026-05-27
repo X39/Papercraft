@@ -2,7 +2,7 @@
 
 Previous: [Controls](controls.md) | [Manual home](index.md) | Next: [Template language](template-language.md)
 
-Status: started. Built-in transformer names, block syntax and common mistakes are checked against
+Status: complete for current supported behavior. Built-in transformer names, block syntax and common mistakes are checked against
 `XmlTemplateReader`, `IfTransformer`, `SwitchTransformer`, `ForTransformer`, `ForEachTransformer`,
 `VariableTransformer`, `AlternateTransformer` and the transformer tests under `ExpressionTests`.
 

@@ -2,7 +2,7 @@
 
 [Controls](controls.md) | [Manual home](index.md)
 
-Status: started. The visual examples on this page are verified by `TableDocumentationSamples`.
+Status: complete for current supported behavior. The visual examples on this page are verified by `TableDocumentationSamples`.
 Table structure and attributes are checked against `TableControl`, `TableHeaderControl`, `TableRowControl`,
 `TableCellControl`, `TableRowControlBase`, `ColumnLength` and the table control tests.
 

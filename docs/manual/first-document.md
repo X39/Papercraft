@@ -2,7 +2,7 @@
 
 Previous: [Introduction](introduction.md) | [Manual home](index.md) | Next: [Areas](areas.md)
 
-Status: started. The starter walkthrough and visual examples on this page are verified by
+Status: complete for current supported behavior. The starter walkthrough and visual examples on this page are verified by
 `FirstDocumentDocumentationSamples`. No-namespace, custom default namespace and prefix behavior are checked against
 `XmlTemplateReaderTests`, `XmlTemplateReader.ReadXmlNode`, `Template.CreateAsync` and `Constants.ControlsNamespace`.
 

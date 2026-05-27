@@ -2,7 +2,7 @@
 
 Previous: [Complete examples](complete-examples.md) | [Manual home](index.md) | Next: [Developer integration appendix](developer-integration.md)
 
-Status: started. The first entries are checked against `XmlTemplateReader`, `Template`, `Generator`,
+Status: complete for current supported behavior. The entries are checked against `XmlTemplateReader`, `Template`, `Generator`,
 `ControlRegistry`, `ControlActivationCache`, `ImageControl`, `DefaultResourceResolver`,
 `TableControl`, `TableRowControlBase`, `TableSample.LongTableRows`, `GeneralExpressionTests`,
 `TableControlTest.RowTallerThanPageStartsAfterRepeatedHeaderAndIsNotSplit`, `TroubleshootingExpressionTests`,
@@ -28,7 +28,7 @@ Start from the symptom:
 - Missing visible content may be a data, control or layout problem.
 - Unexpected page breaks usually need layout and available-space checks.
 
-Each troubleshooting entry will link back to the concept or reference page that explains the underlying behavior.
+Each troubleshooting entry links back to the concept or reference page that explains the underlying behavior.
 
 ## The XML Does Not Load
 
@@ -93,6 +93,10 @@ Attributes are not free-form labels.
 Each control accepts only the parameters implemented for that control.
 `ControlActivationCacheTests.CreateControl_ThrowsForUnknownParameter` verifies that unknown parameters are rejected
 and that the error can list available parameters.
+
+If an attribute seems to be accepted but has no visible effect, check the focused control page for that attribute.
+The current manual documents source-backed exceptions where they are known, such as `columnSpan="0"` on table cells.
+Do not treat ignored attributes as a general fallback behavior; unsupported attribute names are rejected.
 
 Check the focused control page for the supported attribute names:
 
@@ -323,8 +327,9 @@ past one page of body space instead of behaving like normal flowing body text.
 
 For long readable content, split the content into several rows or move it out of the table into normal body content.
 
-## Planned Work
+## Future Product-Support Follow-Ups
 
 - Add more source-backed troubleshooting entries as new recurring template-author issues are identified.
+- Add a broader ignored-attribute troubleshooting example only after a recurring, source-backed case exists.
 
 Previous: [Complete examples](complete-examples.md) | [Manual home](index.md) | Next: [Developer integration appendix](developer-integration.md)

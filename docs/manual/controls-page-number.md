@@ -2,7 +2,7 @@
 
 [Controls](controls.md) | [Manual home](index.md)
 
-Status: started. The visual example on this page is verified by
+Status: complete for current supported behavior. The visual example on this page is verified by
 `PageNumberDocumentationSamples.PageNumber_Footer` and
 `PageNumberDocumentationSamples.PageNumber_FooterWithLabel`.
 Attributes are checked against `PageNumberControl`, `TextBaseControl`, `AlignableControl`
