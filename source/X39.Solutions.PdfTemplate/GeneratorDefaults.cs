@@ -23,19 +23,20 @@ public static class GeneratorDefaults
 
     internal static T AddDefaultControls<T>(this T self) where T : IAddControls
     {
-        self.AddControl<Controls.LineControl>();
-        self.AddControl<Controls.TextControl>();
-        self.AddControl<Controls.TableControl>();
-        self.AddControl<Controls.TableCellControl>();
-        self.AddControl<Controls.TableHeaderControl>();
-        self.AddControl<Controls.TableRowControl>();
+        self.AddControl<Controls.BarChart>();
         self.AddControl<Controls.BorderControl>();
-        self.AddControl<Controls.PageNumberControl>();
         self.AddControl<Controls.ChartControl>();
         self.AddControl<Controls.ChartDataControl>();
+        self.AddControl<Controls.ImageControl>();
         self.AddControl<Controls.LineChart>();
-        self.AddControl<Controls.BarChart>();
+        self.AddControl<Controls.LineControl>();
+        self.AddControl<Controls.PageNumberControl>();
         self.AddControl<Controls.PieChart>();
+        self.AddControl<Controls.TableCellControl>();
+        self.AddControl<Controls.TableControl>();
+        self.AddControl<Controls.TableHeaderControl>();
+        self.AddControl<Controls.TableRowControl>();
+        self.AddControl<Controls.TextControl>();
         return self;
     }
 
