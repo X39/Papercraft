@@ -42,8 +42,8 @@ The focused reference pages verify attribute names against source or tests.
 | [Control concepts](controls-concepts.md) | How controls, containers and child rules fit together. | Started with verified source checks and reused generated samples. |
 | [`text`](controls-text.md) | Words, labels, headings and values. | Started with verified examples. |
 | [`border`](controls-border.md) | Boxes, backgrounds and border lines around content. | Started with verified examples. |
-| [`line`](controls-line.md) | Separators and simple rules. | Started with verified examples. |
-| [`image`](controls-image.md) | Raster images loaded by the application. | Started with a verified generated sample. |
+| [`line`](controls-line.md) | Separators and simple rules. | Started with verified horizontal, vertical and header-rule examples. |
+| [`image`](controls-image.md) | Raster images loaded by the application. | Started with verified source and sizing guidance. |
 | [`pageNumber`](controls-page-number.md) | Current page and total page count text. | Started with a verified footer example. |
 | [`table`, `tr`, `td`, `th`](controls-table.md) | Rows, columns and table cells. | Started with verified table examples. |
 | [`chart`, `lineChart`, `barChart`, `pieChart`, `data`](controls-chart.md) | Line, bar and pie chart visuals. | Started with verified chart examples. |
