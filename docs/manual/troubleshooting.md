@@ -4,7 +4,8 @@ Previous: [Complete examples](complete-examples.md) | [Manual home](index.md) | 
 
 Status: started. The first entries are checked against `XmlTemplateReader`, `Template`,
 `ControlRegistry`, `ControlActivationCache`, `ImageControl`, `DefaultResourceResolver`,
-`TroubleshootingExpressionTests`, `TroubleshootingTransformerTests` and the existing XML/control activation tests.
+`TroubleshootingExpressionTests`, `TroubleshootingTransformerTests`, `TroubleshootingImageTests`
+and the existing XML/control activation tests.
 
 ## What Is This?
 
@@ -45,7 +46,7 @@ If the error says a control does not exist, check the element name first.
 Built-in controls are listed in [Controls](controls.md).
 Focused pages currently include [Text control](controls-text.md), [Border control](controls-border.md),
 [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md)
-and [Table control](controls-table.md).
+and [Table control](controls-table.md), plus [Chart controls](controls-chart.md).
 
 Common causes:
 
@@ -71,6 +72,7 @@ Check the focused control page for the supported attribute names:
 - [Line control](controls-line.md)
 - [Page number control](controls-page-number.md)
 - [Table control](controls-table.md)
+- [Chart controls](controls-chart.md)
 
 For shared spacing, clipping and alignment attributes, see [Layout fundamentals](layout-fundamentals.md).
 
@@ -174,6 +176,15 @@ If a template needs file, database, object storage or HTTP images, the applicati
 Ask the application team which image source format is supported for your templates.
 For the template-author reference, see [Image control](controls-image.md).
 
+Common checks:
+
+- If `source` looks like `https://example.com/logo.png` or `C:\Images\logo.png`, the default resolver rejects it.
+- If `source` starts with `data:image/`, it must include the comma and base64 payload, such as `data:image/png;base64,...`.
+- If `source` is plain base64, it still must decode to real image bytes. Base64 text that is not an image fails during image initialization.
+- If `source="@LogoImage"` is used, confirm that the application supplies the image value in the format its resolver expects.
+
+These cases are verified by `TroubleshootingImageTests`.
+
 ## Content Moves To Another Page
 
 Content in `body` flows through the available page space and can continue on later pages.
@@ -188,7 +199,6 @@ Start with [Layout fundamentals](layout-fundamentals.md):
 
 ## Planned Work
 
-- Add image troubleshooting examples for bad source values and unsupported resolver input.
 - Add table overflow and row layout troubleshooting after the table control page exists.
 
 Previous: [Complete examples](complete-examples.md) | [Manual home](index.md) | Next: [Developer integration appendix](developer-integration.md)
