@@ -52,7 +52,7 @@ Work in small steps:
 2. Put normal document content in `body`.
 3. Add optional sections only when needed: `header`, `footer`, `background`, `foreground` or `areas`.
 4. Add one control at a time, such as `text`, `border`, `line`, `image`, `table` or `pageNumber`.
-5. Replace changing text with template data expressions such as `@Customer.Name`.
+5. Replace changing text with template data expressions such as `@CustomerName`.
 6. Use template-language blocks only when XML needs to be conditional or repeated.
 7. Generate a preview, check the output, then make the next small change.
 
@@ -68,7 +68,7 @@ If a change breaks rendering, the most recent control, attribute or template-lan
 | Control | An XML element that renders something, such as `text`, `border`, `table` or `image`. | [Controls](controls.md) |
 | Attribute | A setting on a control, such as `fontsize`, `margin`, `padding` or `color`. | [Layout fundamentals](layout-fundamentals.md) |
 | Template data | Values supplied by the application and read by the template. | [Template data](template-data.md) |
-| Variable | A named value used with expressions such as `@Customer.Name`. | [Template data](template-data.md) |
+| Variable | A named value used with expressions such as `@CustomerName`. | [Template data](template-data.md) |
 | Function | A reusable value or calculation exposed to the template, such as `@total()` when the application provides it. | [Template data](template-data.md) |
 | Transformer | A template-language block such as `@if`, `@foreach` or `@var` that rewrites XML before rendering. | [Template language](template-language.md) |
 | Resource | External content used by a control, most commonly an image source. | [Controls](controls.md) |

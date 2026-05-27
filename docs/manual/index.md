@@ -12,7 +12,7 @@ X39.Solutions.PdfTemplate turns XML templates into PDF documents and images.
 A template author writes document parts as XML elements such as `text`, `border`, `table`,
 `image`, `line`, `pageNumber` and chart controls.
 
-Templates can also read values supplied by the application, such as `@Customer.Name`,
+Templates can also read values supplied by the application, such as `@CustomerName`,
 and can use template-language blocks such as `@if` and `@foreach` to include or repeat content.
 
 ## When Should I Use This?
@@ -57,8 +57,8 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 
 ## Current Status
 
-The manual structure is now in place, but most chapters are still planned work.
-Pages marked as planned are placeholders for future focused documentation passes.
+The manual structure is now in place, and the first document, template data and layout chapters have verified starter examples.
+Most reference-heavy chapters are still planned work.
 Until a chapter says its examples are verified, the README and tests remain the source of truth for detailed behavior.
 
 Documentation contributors should follow the [documentation style guide](style-guide.md) and the

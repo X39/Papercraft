@@ -19,6 +19,7 @@ public abstract class DocumentationSampleBase : SampleBase
         string sampleName,
         string xml,
         DocumentOptions? documentOptions = null,
+        Action<Generator>? configureGenerator = null,
         CancellationToken cancellationToken = default)
     {
         var outputDirectory = GetSampleOutputDirectory();
@@ -26,6 +27,7 @@ public abstract class DocumentationSampleBase : SampleBase
         DeleteStaleSampleFiles(outputDirectory, sampleName);
 
         using var generator = CreateGenerator();
+        configureGenerator?.Invoke(generator);
         await using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         using var xmlReader = XmlReader.Create(xmlStream);
 
