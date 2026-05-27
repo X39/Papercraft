@@ -69,6 +69,7 @@ source-checked guidance for missing data, and a compact task chooser for common 
 Template language now includes generated examples for conditional sections and switch-based alternatives, plus
 source-checked optional-value guidance and a generated temporary-value example.
 The troubleshooting chapter now has source-checked starter entries.
+It now includes a focused checklist for content that moves to another page unexpectedly.
 The developer appendix now contains setup and extension-point guidance for application developers.
 Namespace and prefix behavior is now source-checked in the first-document, troubleshooting and developer appendix pages.
 The README is now a short project overview that links back to this manual.

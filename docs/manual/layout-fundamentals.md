@@ -95,6 +95,8 @@ For normal growing content, keep the XML in `body` so it can continue on later p
 
 Body page breaks are based on arranged height.
 Large margins, padding, borders, headers and footers all reduce how much visible body content fits on one page.
+When content appears on a later page unexpectedly, first check the body space left after those values are applied.
+The symptom checklist is in [Content moves to another page](troubleshooting.md#content-moves-to-another-page).
 
 Tables add one extra rule: table body rows are kept as whole rows.
 When the next row is taller than the remaining page height, the table advances to the next page before drawing that

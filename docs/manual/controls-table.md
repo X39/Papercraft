@@ -324,6 +324,8 @@ after a page break.
 - Putting `text` directly inside `table` or `tr`. Put visible content inside a `td`.
 - Forgetting that `th` is a table header row in this template language, not a header cell.
 - Using table layout for a single highlighted box. Use `border` for that.
+- Expecting a long row to split across pages. A table row is kept together; see
+  [A table breaks or overflows unexpectedly](troubleshooting.md#a-table-breaks-or-overflows-unexpectedly).
 - Making one large table example before checking the smaller row, width and alignment pieces.
 
 [Controls](controls.md) | [Manual home](index.md)

@@ -2,7 +2,7 @@
 
 Previous: [Complete examples](complete-examples.md) | [Manual home](index.md) | Next: [Developer integration appendix](developer-integration.md)
 
-Status: started. The first entries are checked against `XmlTemplateReader`, `Template`,
+Status: started. The first entries are checked against `XmlTemplateReader`, `Template`, `Generator`,
 `ControlRegistry`, `ControlActivationCache`, `ImageControl`, `DefaultResourceResolver`,
 `TableControl`, `TableRowControlBase`, `TableSample.LongTableRows`, `GeneralExpressionTests`,
 `TableControlTest.RowTallerThanPageStartsAfterRepeatedHeaderAndIsNotSplit`, `TroubleshootingExpressionTests`,
@@ -266,15 +266,37 @@ For the chart authoring reference, see [Chart controls](controls-chart.md).
 
 ## Content Moves To Another Page
 
-Content in `body` flows through the available page space and can continue on later pages.
-Headers, footers, page margins, padding, borders and fixed areas all reduce or change the space available to content.
+Content in `body` is allowed to continue on later pages.
+This is normal when the arranged body content is taller than the body space on one page.
+Headers, footers and page margins reduce that body space before the body is drawn.
 
-Start with [Layout fundamentals](layout-fundamentals.md):
+Use this section when the page break is surprising.
+Start with [Page breaks](layout-fundamentals.md#page-breaks), then check which rule applies.
+
+### Check Available Body Space
 
 - Reduce large `margin`, `padding` and `thickness` values.
 - Check whether a header or footer leaves less body space than expected.
+- Check page margin in the application or document setup. Page margin is not a `body` attribute.
+- Check whether a stretched container is taller than intended. If a `border` should stay near its content, try
+  `verticalAlignment="top"`.
+
+### Check Where The Content Lives
+
 - Use normal body content for flowing paragraphs and tables.
+- Use `background` and `foreground` for repeated page-wide marks that should not reserve body space.
 - Use `areas` only for fixed-position content that should not affect the body flow.
+  Area content is clipped to the area rectangle and does not push body content to a later page.
+
+### Check Tables Separately
+
+Tables have one extra page-break rule.
+Table body rows are kept together, so a row can move to the next page even when part of the row might have fit in the
+remaining space.
+If the table has a `th` header, the header is rendered again before the moved row.
+
+For table-specific checks, see
+[A table breaks or overflows unexpectedly](#a-table-breaks-or-overflows-unexpectedly).
 
 ## A Table Breaks Or Overflows Unexpectedly
 
