@@ -112,7 +112,8 @@ Common checks:
 - For attributes such as `color="@AccentColor"`, confirm that the supplied value is a valid value for that attribute.
 - Keep a visible fallback label in normal text when missing data would otherwise be hard to notice.
 
-For supported naming patterns, optional-value flags and nested-data guidance, see [Template data](template-data.md).
+For supported naming patterns, missing-data behavior, optional-value flags and nested-data guidance, see
+[Template data](template-data.md#when-data-is-missing).
 
 ## A Function Or Transformer Fails
 

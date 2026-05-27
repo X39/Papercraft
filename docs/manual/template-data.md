@@ -3,8 +3,10 @@
 Previous: [Areas](areas.md) | [Manual home](index.md) | Next: [Layout fundamentals](layout-fundamentals.md)
 
 Status: started. The visual examples on this page are verified by `TemplateDataDocumentationSamples`.
-Simple variable replacement and dotted text behavior are checked against `GeneralExpressionTests` and `XmlTemplateReader`.
-Attribute expression behavior is checked against `XmlTemplateReader` and `GeneralExpressionTests`.
+Simple variable replacement, missing text values and dotted text behavior are checked against
+`GeneralExpressionTests`, `TroubleshootingExpressionTests` and `XmlTemplateReader`.
+Attribute expression behavior, including missing attribute values, is checked against `XmlTemplateReader`,
+`TroubleshootingExpressionTests` and `GeneralExpressionTests`.
 Function-call syntax is checked against `FunctionCallTests`.
 Optional-value conditions are checked against `IfTransformerTests`.
 List and choice patterns are checked against `ForEachTransformerTests` and `SwitchTransformerTests`.
@@ -83,6 +85,44 @@ For example, `Order @OrderNumber` is easier for the template reader to recognize
 to the previous word.
 `GeneralExpressionTests.VariableReplacements` verifies that text variables are recognized at the start of text or
 after whitespace, while values such as email addresses are left alone.
+
+## When Data Is Missing
+
+Missing data behaves differently in text and attributes.
+Design templates so optional values are intentional and easy to notice.
+
+In normal text, a missing variable remains visible as the original `@Name` text:
+
+```xml
+<template>
+    <body>
+        <text>Order @MissingOrderNumber is still pending</text>
+    </body>
+</template>
+```
+
+`TroubleshootingExpressionTests.MissingVariableInTextRemainsLiteral` verifies this behavior.
+If the generated document still shows `@OrderNumber`, the application did not supply a matching value for that name.
+
+In an attribute that starts with `@`, a missing variable becomes an empty attribute value before the control reads it:
+
+```xml
+<template>
+    <body>
+        <text color="@MissingColor">Color uses template data</text>
+    </body>
+</template>
+```
+
+`TroubleshootingExpressionTests.MissingVariableInAttributeBecomesEmptyString` verifies this behavior.
+The control may reject the empty value later if that attribute needs a valid color, length, number or Boolean.
+
+Do not use a missing or optional text value as an automatic fallback rule.
+Ask the application team for one of these instead:
+
+- A complete display value, such as `OrderNumberLabel`, that already includes the fallback text.
+- A Boolean flag, such as `HasOrderNumber`, for `@if`.
+- A helper function, such as `hasOrderNumber()`, when the application owns the check.
 
 ## Data In Attributes
 

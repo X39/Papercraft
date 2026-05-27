@@ -124,6 +124,8 @@ Leave out the `@else` block when the section should simply disappear.
 
 Use an application-supplied Boolean when a section should appear only if an optional value exists.
 Do not use the text value itself as a truthy check.
+For the underlying missing-data behavior in text and attributes, see
+[When data is missing](template-data.md#when-data-is-missing).
 
 ```xml
 <template>

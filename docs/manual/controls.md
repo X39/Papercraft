@@ -4,7 +4,8 @@ Previous: [Styles](styles.md) | [Manual home](index.md) | Next: [Transformers](t
 
 Status: started. [Control concepts](controls-concepts.md) and the focused [Text control](controls-text.md), [Border control](controls-border.md),
 [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md),
-[Table control](controls-table.md) and [Chart controls](controls-chart.md) pages now have verified examples.
+[Table control](controls-table.md) and [Chart controls](controls-chart.md) pages now have verified examples and shared
+layout cross-links.
 
 ## What Is This?
 
@@ -53,7 +54,7 @@ The focused reference pages verify attribute names against source or tests.
 - Use the reference split described in the [documentation style guide](style-guide.md).
 - Tighten purpose, allowed children, attributes, examples and common mistakes as each focused page matures.
 - Keep generated samples current as visual control pages expand.
-- Link shared layout attributes back to [Layout fundamentals](layout-fundamentals.md).
+- Keep shared layout attributes linked back to [Layout fundamentals](layout-fundamentals.md).
 - Link repeated shared attributes back to [Styles](styles.md).
 
 Previous: [Styles](styles.md) | [Manual home](index.md) | Next: [Transformers](transformers.md)
