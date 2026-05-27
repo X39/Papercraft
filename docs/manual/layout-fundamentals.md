@@ -6,6 +6,8 @@ Status: started. The visual examples on this page are verified by `LayoutDocumen
 Length, color, thickness and orientation formats are checked against source, `LengthTests`, `ColorTests`,
 `ThicknessParsingTests`, `LineControlTests` and `BarChartTests`.
 Shared clipping behavior is checked against `Control`, `BorderControlTests` and `TableCellControlTests`.
+Flow, fixed-position and table page-break guidance is checked against `Generator`, `TableControl`,
+`TableRowControlBase`, `AreaSample` and `TableControlTest.RowTallerThanPageStartsAfterRepeatedHeaderAndIsNotSplit`.
 
 ## What Is This?
 
@@ -67,6 +69,40 @@ Inside a fixed [area](areas.md), children receive the area rectangle as their av
 
 Percent lengths use the available width or height for the value being measured.
 For example, a horizontal `line` with `length="50%"` uses half of the available width.
+
+## Flow, Repetition And Fixed Placement
+
+Most document content should go in `body`.
+Body content flows from top to bottom, and the generator creates more pages when the arranged body content is taller
+than one body page.
+Headers and footers are repeated on each generated page and reduce the height left for body content.
+
+Use this table when deciding where content belongs:
+
+| Need | Start with | Layout effect |
+|------|------------|---------------|
+| Main paragraphs, tables and document rows. | `body` | Flows through the available body pages. |
+| Repeated top content. | `header` | Repeats on each page and reduces body height. |
+| Repeated bottom content. | `footer` | Repeats on each page and reduces body height. |
+| Page-wide background marks. | `background` | Repeats on each page and does not reserve body space. |
+| Page-wide overlay marks. | `foreground` | Repeats on each page above normal content and does not reserve body space. |
+| Fixed-position marks. | `areas` | Repeats at page coordinates and does not join the body flow. |
+
+Use [Areas](areas.md) only when the position matters more than the document flow.
+For normal growing content, keep the XML in `body` so it can continue on later pages.
+
+## Page Breaks
+
+Body page breaks are based on arranged height.
+Large margins, padding, borders, headers and footers all reduce how much visible body content fits on one page.
+
+Tables add one extra rule: table body rows are kept as whole rows.
+When the next row is taller than the remaining page height, the table advances to the next page before drawing that
+row.
+If the table has a `th` header, that header is repeated before the row.
+A single oversized row is not split into smaller row fragments.
+This behavior is documented further in
+[A table breaks or overflows unexpectedly](troubleshooting.md#a-table-breaks-or-overflows-unexpectedly).
 
 ## Margin, Padding And Border
 
@@ -253,6 +289,8 @@ Only use two or four values when the sides really need to differ.
 - Using `padding` when you meant outside space. Use `margin` to separate one control from the next.
 - Forgetting that page margin is document setup, not a `body` XML attribute. See [First document](first-document.md).
 - Expecting page margin to move fixed areas. Area coordinates are measured from the page edge; see [Areas](areas.md).
+- Using fixed areas for content that should continue onto later pages. Put flowing content in `body`.
+- Expecting a table row to split across pages. Keep rows short or split large content into several rows.
 - Using percentages without checking the parent space. Percentages change when the available area changes.
 - Letting a container stretch when it should fit content. Add `verticalAlignment="top"` to a `border` when needed.
 - Turning off `clip` to hide a layout problem. Use `clip="false"` only for deliberate overlap.
