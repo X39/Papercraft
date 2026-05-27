@@ -106,10 +106,13 @@ Common checks:
 - Check casing, spelling and underscores.
 - Do not use `@Customer.Name` for nested object fields. In text, the dot stops the variable name, so this is read as
   `@Customer` followed by `.Name`. `GeneralExpressionTests.DottedTextExpressionReadsOnlyNameBeforeDot` verifies this.
+- Do not use a text value as an `@if` condition. Ask for a Boolean flag such as `HasOrderNumber`, or a Boolean
+  function supplied by the application. `IfTransformerTests.IfConditionWithoutOperatorRejectsNonBooleanVariable`
+  verifies that `@if OrderNumber` is not a supported existence check.
 - For attributes such as `color="@AccentColor"`, confirm that the supplied value is a valid value for that attribute.
 - Keep a visible fallback label in normal text when missing data would otherwise be hard to notice.
 
-For supported naming patterns and nested-data guidance, see [Template data](template-data.md#nested-data).
+For supported naming patterns, optional-value flags and nested-data guidance, see [Template data](template-data.md).
 
 ## A Function Or Transformer Fails
 

@@ -54,6 +54,79 @@ public class IfTransformerTests
     }
 
     [Fact]
+    public async Task IfConditionUsesBooleanVariable()
+    {
+        const string ns = Constants.ControlsNamespace;
+        const string template = $$"""
+                                  <?xml version="1.0" encoding="utf-8"?>
+                                  <styleMustBeEmptyTagTest xmlns="{{ns}}" someAttribute="asd">
+                                     @if HasPurchaseOrder {
+                                         <text>Purchase order is available</text>
+                                     }
+                                  </styleMustBeEmptyTagTest>
+                                  """;
+        var data = new TemplateData();
+        data.SetVariable("HasPurchaseOrder", true);
+        var templateReader = new XmlTemplateReader(
+            default, CultureInfo.InvariantCulture,
+            data,
+            new[] {new IfTransformer()});
+        using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
+        using var xmlReader = XmlReader.Create(xmlStream);
+        var nodeInformation = await templateReader.ReadAsync(xmlReader);
+        Assert.Single(nodeInformation.Children);
+        Assert.Equal("Purchase order is available", nodeInformation.Children.ElementAt(0).TextContent);
+    }
+
+    [Fact]
+    public async Task IfConditionUsesBooleanFunction()
+    {
+        const string ns = Constants.ControlsNamespace;
+        const string template = $$"""
+                                  <?xml version="1.0" encoding="utf-8"?>
+                                  <styleMustBeEmptyTagTest xmlns="{{ns}}" someAttribute="asd">
+                                     @if hasPurchaseOrder() {
+                                         <text>Purchase order is available</text>
+                                     }
+                                  </styleMustBeEmptyTagTest>
+                                  """;
+        var data = new TemplateData();
+        data.RegisterFunction(new DummyValueFunction("hasPurchaseOrder", true, Type.EmptyTypes));
+        var templateReader = new XmlTemplateReader(
+            default, CultureInfo.InvariantCulture,
+            data,
+            new[] {new IfTransformer()});
+        using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
+        using var xmlReader = XmlReader.Create(xmlStream);
+        var nodeInformation = await templateReader.ReadAsync(xmlReader);
+        Assert.Single(nodeInformation.Children);
+        Assert.Equal("Purchase order is available", nodeInformation.Children.ElementAt(0).TextContent);
+    }
+
+    [Fact]
+    public async Task IfConditionWithoutOperatorRejectsNonBooleanVariable()
+    {
+        const string ns = Constants.ControlsNamespace;
+        const string template = $$"""
+                                  <?xml version="1.0" encoding="utf-8"?>
+                                  <styleMustBeEmptyTagTest xmlns="{{ns}}" someAttribute="asd">
+                                     @if PurchaseOrder {
+                                         <text>Purchase order is available</text>
+                                     }
+                                  </styleMustBeEmptyTagTest>
+                                  """;
+        var data = new TemplateData();
+        data.SetVariable("PurchaseOrder", "PO-1007");
+        var templateReader = new XmlTemplateReader(
+            default, CultureInfo.InvariantCulture,
+            data,
+            new[] {new IfTransformer()});
+        using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
+        using var xmlReader = XmlReader.Create(xmlStream);
+        await Assert.ThrowsAsync<ArgumentException>(() => templateReader.ReadAsync(xmlReader));
+    }
+
+    [Fact]
     public async Task IfElseUsesIfBranchWhenTrue()
     {
         const string ns = Constants.ControlsNamespace;

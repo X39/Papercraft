@@ -5,6 +5,7 @@ Previous: [Areas](areas.md) | [Manual home](index.md) | Next: [Layout fundamenta
 Status: started. The visual examples on this page are verified by `TemplateDataDocumentationSamples`.
 Simple variable replacement and dotted text behavior are checked against `GeneralExpressionTests` and the XML reader.
 Function-call syntax is checked against `FunctionCallTests`.
+Optional-value conditions are checked against `IfTransformerTests`.
 
 ## What Is This?
 
@@ -115,6 +116,33 @@ It assumes the application supplies a function named `statusLabel` and a variabl
 Inside the parentheses, write the variable name without a leading `@`.
 `FunctionCallTests.CanCallNestedVariable` verifies this argument pattern.
 String, number and boolean literal arguments are also verified by `FunctionCallTests.CanCallNonNestedFunction`.
+
+## Optional Values
+
+When a value may be blank or unavailable, ask the application team for an explicit flag or function.
+This keeps the template readable and avoids guessing how missing data should behave.
+
+Use this pattern when the section should disappear unless the application says the value is present:
+
+```xml
+<template>
+    <body>
+        @if HasPurchaseOrder {
+            <text>Purchase order: @PurchaseOrder</text>
+        }
+    </body>
+</template>
+```
+
+`HasPurchaseOrder` must be a Boolean value.
+`PurchaseOrder` is the text value to print.
+This pattern is verified by `IfTransformerTests.IfConditionUsesBooleanVariable`.
+
+Do not write `@if PurchaseOrder` to mean "show this when PurchaseOrder has text".
+`IfTransformerTests.IfConditionWithoutOperatorRejectsNonBooleanVariable` verifies that an `@if` expression without a
+comparison operator must evaluate to a Boolean, not a text value.
+For the template-language view of this task, see
+[Show optional values with @if](template-language.md#show-optional-values-with-if).
 
 ## Nested Data
 
