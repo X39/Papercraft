@@ -3,7 +3,7 @@
 Previous: [First document](first-document.md) | [Manual home](index.md) | Next: [Layout fundamentals](layout-fundamentals.md)
 
 Status: started. The visual examples on this page are verified by `TemplateDataDocumentationSamples`.
-Simple variable replacement is checked against `GeneralExpressionTests` and the XML reader.
+Simple variable replacement and dotted text behavior are checked against `GeneralExpressionTests` and the XML reader.
 Function-call syntax is checked against `FunctionCallTests`.
 
 ## What Is This?
@@ -51,6 +51,9 @@ Use clear names that describe the value, such as `CustomerName`, `InvoiceNumber`
 The verified text examples use simple variable names.
 Prefer letters, numbers and underscores for new variable names.
 Hyphens are accepted by the parser, but they can make punctuation near a variable harder to read.
+Avoid dots in variable names for text content.
+`GeneralExpressionTests.DottedTextExpressionReadsOnlyNameBeforeDot` verifies that `@Customer.Name` in text reads
+`Customer` and leaves `.Name` as normal text.
 
 When a variable appears in the middle of a sentence, put whitespace before the `@`.
 For example, `Order @OrderNumber` is easier for the template reader to recognize than attaching the variable directly
@@ -94,12 +97,34 @@ Use a function when a value needs to be calculated or formatted by the applicati
 The exact function names and arguments depend on the application that generates the PDF.
 Ask the application team which functions are available for your templates.
 
-## Missing Or Unverified Data
+## Nested Data
 
 For missing simple variables, see [A value prints empty or does not change](troubleshooting.md#a-value-prints-empty-or-does-not-change).
 
-TODO: Verify nested property access such as `@Customer.Name` against `TemplateData`, `XmlTemplateReader` and property-access tests before documenting it as supported.
-The current verified documentation examples use simple variable names.
+The current XML reader does not provide template-author property access such as `@Customer.Name` in text.
+Use simple values supplied by the application instead:
+
+```xml
+<template>
+    <body>
+        <text>@CustomerName</text>
+        <text>@CustomerStreet</text>
+        <text>@CustomerCity</text>
+    </body>
+</template>
+```
+
+This follows the simple-variable behavior verified by
+`TemplateDataDocumentationSamples.TemplateData_InsertVariable` and `GeneralExpressionTests.VariableReplacements`.
+
+If the application has nested customer or invoice objects, ask the application team to expose the fields you need as
+simple variables, or to provide a function that returns a ready-to-print value.
+`GeneralExpressionTests.DottedTextExpressionDoesNotUseExactDottedVariableName` verifies that a variable named
+`Customer.Name` is not read by text replacement.
+`GeneralExpressionTests.DottedAttributeExpressionUsesExactVariableName` verifies the narrower attribute behavior:
+an attribute such as `color="@Customer.Color"` is evaluated as the exact variable name `Customer.Color`, not as a
+property lookup on `Customer`.
+For new templates, prefer simple names such as `CustomerColor` so text and attributes follow the same naming pattern.
 
 ## Next Steps
 

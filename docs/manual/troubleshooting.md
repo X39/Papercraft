@@ -4,8 +4,9 @@ Previous: [Complete examples](complete-examples.md) | [Manual home](index.md) | 
 
 Status: started. The first entries are checked against `XmlTemplateReader`, `Template`,
 `ControlRegistry`, `ControlActivationCache`, `ImageControl`, `DefaultResourceResolver`,
-`TableControl`, `TableRowControlBase`, `TableSample.LongTableRows`, `TroubleshootingExpressionTests`,
-`TroubleshootingTransformerTests`, `TroubleshootingImageTests` and the existing XML/control activation tests.
+`TableControl`, `TableRowControlBase`, `TableSample.LongTableRows`, `GeneralExpressionTests`,
+`TroubleshootingExpressionTests`, `TroubleshootingTransformerTests`, `TroubleshootingImageTests` and the existing
+XML/control activation tests.
 
 ## What Is This?
 
@@ -103,8 +104,12 @@ Common checks:
 
 - Compare the template name with the data name supplied by the application.
 - Check casing, spelling and underscores.
+- Do not use `@Customer.Name` for nested object fields. In text, the dot stops the variable name, so this is read as
+  `@Customer` followed by `.Name`. `GeneralExpressionTests.DottedTextExpressionReadsOnlyNameBeforeDot` verifies this.
 - For attributes such as `color="@AccentColor"`, confirm that the supplied value is a valid value for that attribute.
 - Keep a visible fallback label in normal text when missing data would otherwise be hard to notice.
+
+For supported naming patterns and nested-data guidance, see [Template data](template-data.md#nested-data).
 
 ## A Function Or Transformer Fails
 

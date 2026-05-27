@@ -47,7 +47,7 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 
 1. [Introduction](introduction.md): what a template author controls and the basic vocabulary.
 2. [First document](first-document.md): template structure, page sections, areas and the first complete XML file.
-3. [Template data](template-data.md): variables, property access, functions and data value formats.
+3. [Template data](template-data.md): variables, data-backed attributes, functions and data value formats.
 4. [Layout fundamentals](layout-fundamentals.md): available space, margin, padding, borders, alignment, lengths and colors.
 5. [Styles](styles.md): shared attributes with `template.style` and related style blocks.
 6. [Controls](controls.md): built-in XML controls such as `text`, `border`, `image`, `line`, `table`, `pageNumber` and charts. Focused pages now include [Control concepts](controls-concepts.md), [Text control](controls-text.md), [Border control](controls-border.md), [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md), [Table control](controls-table.md) and [Chart controls](controls-chart.md).

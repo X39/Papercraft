@@ -69,6 +69,7 @@ Common examples:
 
 Set `orientation="vertical"` when the line should run from top to bottom.
 The supported orientation values are `Horizontal` and `Vertical`; attribute binding accepts values case-insensitively.
+For the shared value reference, see [Orientation values](layout-fundamentals.md#orientation-values).
 
 Vertical lines are often easier to place inside a fixed area or a table cell than directly in the normal body flow.
 For fixed-position content, see [First document](first-document.md#use-fixed-areas).

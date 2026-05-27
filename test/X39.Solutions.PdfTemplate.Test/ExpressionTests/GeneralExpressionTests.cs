@@ -58,6 +58,60 @@ public class GeneralExpressionTests
     }
 
     [Fact]
+    public async Task DottedTextExpressionReadsOnlyNameBeforeDot()
+    {
+        var data = new TemplateData();
+        data.SetVariable("Customer", "Mira");
+
+        var nodeInformation = await ReadAsync(
+            """
+            <template>
+                <text>@Customer.Name</text>
+            </template>
+            """,
+            data);
+
+        var text = Assert.Single(nodeInformation.Children);
+        Assert.Equal("Mira.Name", text.TextContent);
+    }
+
+    [Fact]
+    public async Task DottedTextExpressionDoesNotUseExactDottedVariableName()
+    {
+        var data = new TemplateData();
+        data.SetVariable("Customer.Name", "Mira");
+
+        var nodeInformation = await ReadAsync(
+            """
+            <template>
+                <text>@Customer.Name</text>
+            </template>
+            """,
+            data);
+
+        var text = Assert.Single(nodeInformation.Children);
+        Assert.Equal("@Customer.Name", text.TextContent);
+    }
+
+    [Fact]
+    public async Task DottedAttributeExpressionUsesExactVariableName()
+    {
+        var data = new TemplateData();
+        data.SetVariable("Customer.Color", "#112233");
+
+        var nodeInformation = await ReadAsync(
+            """
+            <template>
+                <text color="@Customer.Color">Accent</text>
+            </template>
+            """,
+            data);
+
+        var text = Assert.Single(nodeInformation.Children);
+        Assert.Equal("#112233", text["color"]);
+    }
+
+    [Fact]
     public async Task ChainedFunctionCalls()
     {
         var template = $$"""
@@ -115,5 +169,17 @@ public class GeneralExpressionTests
         var nodeInformation = await templateReader.ReadAsync(xmlReader);
 
         Assert.Equal("foobarbaz - foobarbaz - foobarbaz", nodeInformation.TextContent);
+    }
+
+    private static async Task<XmlNodeInformation> ReadAsync(string template, TemplateData data)
+    {
+        var templateReader = new XmlTemplateReader(
+            default,
+            CultureInfo.InvariantCulture,
+            data,
+            Array.Empty<ITransformer>());
+        using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
+        using var xmlReader = XmlReader.Create(xmlStream);
+        return await templateReader.ReadAsync(xmlReader);
     }
 }
