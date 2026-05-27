@@ -1,0 +1,84 @@
+name: Benchmark reports
+
+on:
+  workflow_dispatch:
+    inputs:
+      filter:
+        description: BenchmarkDotNet filter. Use * for all benchmarks.
+        required: true
+        default: "*"
+        type: string
+      job:
+        description: BenchmarkDotNet job. Use Default for a full default run.
+        required: true
+        default: Short
+        type: choice
+        options:
+          - Short
+          - Medium
+          - Long
+          - Dry
+          - Default
+      warmup_count:
+        description: Optional warmup count override. Leave empty to use the selected job default.
+        required: false
+        default: ""
+        type: string
+      iteration_count:
+        description: Optional iteration count override. Leave empty to use the selected job default.
+        required: false
+        default: ""
+        type: string
+
+jobs:
+  benchmark:
+    name: Run benchmarks
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install R for BenchmarkDotNet plots
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y r-base
+
+      - name: Restore dependencies
+        run: dotnet restore X39.Solutions.PdfTemplate.sln
+
+      - name: Build Release
+        run: dotnet build X39.Solutions.PdfTemplate.sln -c Release --no-restore
+
+      - name: Run BenchmarkDotNet
+        run: |
+          args=(--filter "${{ inputs.filter }}")
+
+          if [ "${{ inputs.job }}" != "Default" ]; then
+            args+=(--job "${{ inputs.job }}")
+          fi
+
+          if [ -n "${{ inputs.warmup_count }}" ]; then
+            args+=(--warmupCount "${{ inputs.warmup_count }}")
+          fi
+
+          if [ -n "${{ inputs.iteration_count }}" ]; then
+            args+=(--iterationCount "${{ inputs.iteration_count }}")
+          fi
+
+          dotnet run -c Release --project benchmark/X39.Solutions.PdfTemplate.Benchmark/X39.Solutions.PdfTemplate.Benchmark.csproj -- "${args[@]}"
+
+      - name: Upload BenchmarkDotNet artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmarkdotnet-artifacts-${{ github.run_number }}
+          path: BenchmarkDotNet.Artifacts/**
+          if-no-files-found: warn
+          retention-days: 30

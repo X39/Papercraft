@@ -24,6 +24,22 @@ dotnet run -c Release --project benchmark/X39.Solutions.PdfTemplate.Benchmark/X3
 
 BenchmarkDotNet writes reports under `BenchmarkDotNet.Artifacts/`, which is ignored by git.
 
+## Reports and graphs
+
+BenchmarkDotNet writes HTML, Markdown, CSV, and raw measurement reports to `BenchmarkDotNet.Artifacts/results/`.
+This benchmark project also enables BenchmarkDotNet's R plot exporter when `Rscript` is available on `PATH`.
+Install R locally before running the benchmarks if you want PNG plot files in the same artifact folder.
+
+The repository includes a manually triggered GitHub Actions workflow for report generation:
+
+1. Open the repository's Actions tab.
+2. Select `Benchmark reports`.
+3. Choose a benchmark filter and job size.
+4. Run the workflow and download the `benchmarkdotnet-artifacts-*` artifact when it completes.
+
+The workflow installs R, runs the benchmarks in `Release`, and uploads the generated `BenchmarkDotNet.Artifacts` folder.
+The default workflow inputs use the `Short` BenchmarkDotNet job so the run is practical in CI; choose `Default` and leave the count overrides empty for a fuller run.
+
 ## Benchmark groups
 
 - `ControlActivationBenchmarks` compares the current `ControlExpressionCache.CreateControl` path with `ActivatorUtilities.CreateInstance` and cached `ActivatorUtilities.CreateFactory` prototypes. It covers no-dependency and constructor-injected controls, plus cold first-use expression-cache cases.

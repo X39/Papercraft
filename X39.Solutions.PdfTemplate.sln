@@ -35,6 +35,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{41BE3C
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmark", "benchmark", "{09EED85C-BE3C-7566-DC0E-2E8E43466740}"
+	ProjectSection(SolutionItems) = preProject
+		benchmark\README.md = benchmark\README.md
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X39.Solutions.PdfTemplate.Benchmark", "benchmark\X39.Solutions.PdfTemplate.Benchmark\X39.Solutions.PdfTemplate.Benchmark.csproj", "{652994D1-E6AA-4E7C-9D2E-638361A8EFE6}"
 EndProject

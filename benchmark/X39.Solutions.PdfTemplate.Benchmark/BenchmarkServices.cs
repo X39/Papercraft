@@ -34,21 +34,21 @@ internal static class BenchmarkServices
     public static ServiceProvider CreateServiceProvider()
     {
         var services = new ServiceCollection();
-        services.AddPdfTemplateServices();
+        services.AddPdfTemplateService(
+            (builder) => builder
+                .AddControl<NoDependencyControl>()
+                .AddControl<ServiceDependencyControl>()
+                .AddControl<ParameterHeavyControl>()
+                .AddControl<ContentParameterControl>()
+                .AddControl<BenchmarkContainerControl>());
         services.AddSingleton<IBenchmarkDependency, BenchmarkDependency>();
-        services.AddPdfTemplateControl<NoDependencyControl>();
-        services.AddPdfTemplateControl<ServiceDependencyControl>();
-        services.AddPdfTemplateControl<ParameterHeavyControl>();
-        services.AddPdfTemplateControl<ContentParameterControl>();
-        services.AddPdfTemplateControl<BenchmarkContainerControl>();
         return services.BuildServiceProvider();
     }
 
     public static ServiceProvider CreateDefaultServiceProvider()
     {
         var services = new ServiceCollection();
-        services.AddPdfTemplateServices();
-        services.AddPdfTemplateDefaults();
+        services.AddPdfTemplateService();
         return services.BuildServiceProvider();
     }
 
