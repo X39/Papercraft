@@ -7,7 +7,8 @@ Status: started. The first entries are checked against `XmlTemplateReader`, `Tem
 `TableControl`, `TableRowControlBase`, `TableSample.LongTableRows`, `GeneralExpressionTests`,
 `TableControlTest.RowTallerThanPageStartsAfterRepeatedHeaderAndIsNotSplit`, `TroubleshootingExpressionTests`,
 `TroubleshootingTransformerTests`, `TroubleshootingImageTests`, `XmlTemplateReaderTests`,
-`LengthTests`, `ColorTests`, `ThicknessParsingTests` and the existing XML/control activation tests.
+`LengthTests`, `ColorTests`, `ThicknessParsingTests`, the chart control tests and the existing XML/control
+activation tests.
 
 ## What Is This?
 
@@ -241,6 +242,27 @@ Common checks:
 - If `source="@LogoImage"` is used, confirm that the application supplies the image value in the format its resolver expects.
 
 These cases are verified by `TroubleshootingImageTests`.
+
+## A Chart Shows No Data Or Missing Values
+
+Chart data values are parsed as numbers before the chart is drawn.
+If no usable data remains, line charts and bar charts render a "No Data Available" message.
+Pie charts show the same kind of message when all `y` values are missing, invalid or add up to zero or less.
+
+Common checks:
+
+- Use `3.5` for decimal values, not a localized decimal comma such as `3,5`.
+- For `lineChart` and `barChart`, every visible point or bar needs both numeric `x` and numeric `y` values.
+- For `pieChart`, every visible slice needs a numeric `y` value. `x` is optional for pie slices.
+- Invalid rows are skipped. One bad `data` row does not stop the whole chart, but a chart with only invalid rows has no data to draw.
+- Put `data` inside `lineChart`, `barChart` or `pieChart`, not directly inside `chart`.
+- Bar and line charts do not draw category labels from `label`, `x-label` or `y-label`; use a table when exact labels are required.
+
+`ChartDataControlTests` verifies invariant numeric parsing and invalid value handling.
+`LineChartTests.LineChart_WithOnlyInvalidData_RendersNoDataMessage`,
+`BarChartTests.BarChart_WithOnlyInvalidData_RendersNoDataMessage` and
+`PieChartTests.PieChart_WithOnlyInvalidYValues_RendersNoDataMessage` verify the no-data behavior.
+For the chart authoring reference, see [Chart controls](controls-chart.md).
 
 ## Content Moves To Another Page
 

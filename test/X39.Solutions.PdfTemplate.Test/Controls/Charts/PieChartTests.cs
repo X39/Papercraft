@@ -288,6 +288,18 @@ public class PieChartTests
     }
 
     [Fact]
+    public void PieChart_WithOnlyInvalidYValues_RendersNoDataMessage()
+    {
+        var chart = new PieChart();
+        chart.Add(new ChartDataControl { Y = "not-a-number" });
+
+        var (mock, _) = RenderChart(chart);
+
+        mock.AssertState();
+        mock.AssertAnyDrawTextContains("No Data");
+    }
+
+    [Fact]
     public void PieChart_WithNegativeValues_RendersErrorMessage()
     {
         var chart = new PieChart();

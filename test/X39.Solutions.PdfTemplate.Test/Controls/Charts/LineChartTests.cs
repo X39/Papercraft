@@ -279,6 +279,19 @@ public class LineChartTests
     }
 
     [Fact]
+    public void LineChart_WithOnlyInvalidData_RendersNoDataMessage()
+    {
+        var chart = new LineChart();
+        chart.Add(new ChartDataControl { X = "not-a-number", Y = "10" });
+        chart.Add(new ChartDataControl { X = "1", Y = "not-a-number" });
+
+        var (mock, _) = RenderChart(chart);
+
+        mock.AssertState();
+        mock.AssertAnyDrawTextContains("No Data");
+    }
+
+    [Fact]
     public void LineChart_SortsDataByX()
     {
         var chart = new LineChart

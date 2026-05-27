@@ -275,6 +275,19 @@ public class BarChartTests
         mock.AssertAnyDrawTextContains("No Data");
     }
 
+    [Fact]
+    public void BarChart_WithOnlyInvalidData_RendersNoDataMessage()
+    {
+        var chart = new BarChart();
+        chart.Add(new ChartDataControl { X = "not-a-number", Y = "10" });
+        chart.Add(new ChartDataControl { X = "1", Y = "not-a-number" });
+
+        var (mock, _) = RenderChart(chart);
+
+        mock.AssertState();
+        mock.AssertAnyDrawTextContains("No Data");
+    }
+
     #endregion
 
     #region Measurement

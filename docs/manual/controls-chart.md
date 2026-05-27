@@ -118,6 +118,8 @@ Pie chart `data` elements need `y`; when `x` is omitted, the control can still r
 
 Invalid or missing values are ignored by the chart data parser.
 If no valid data remains, the chart renders a "No Data" message.
+For troubleshooting steps, see
+[A chart shows no data or missing values](troubleshooting.md#a-chart-shows-no-data-or-missing-values).
 
 ## Supported Attributes
 
