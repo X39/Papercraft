@@ -6,7 +6,8 @@ Status: started. The first entries are checked against `XmlTemplateReader`, `Tem
 `ControlRegistry`, `ControlActivationCache`, `ImageControl`, `DefaultResourceResolver`,
 `TableControl`, `TableRowControlBase`, `TableSample.LongTableRows`, `GeneralExpressionTests`,
 `TableControlTest.RowTallerThanPageStartsAfterRepeatedHeaderAndIsNotSplit`, `TroubleshootingExpressionTests`,
-`TroubleshootingTransformerTests`, `TroubleshootingImageTests` and the existing XML/control activation tests.
+`TroubleshootingTransformerTests`, `TroubleshootingImageTests`, `XmlTemplateReaderTests`,
+`LengthTests`, `ColorTests`, `ThicknessParsingTests` and the existing XML/control activation tests.
 
 ## What Is This?
 
@@ -58,6 +59,33 @@ Common causes:
 Developer setup and custom control registration belong in the
 [developer integration appendix](developer-integration.md).
 
+## A Namespace Or Prefix Breaks Controls
+
+The manual examples intentionally omit `xmlns`.
+When an element has no XML namespace, the reader treats it as part of the built-in control namespace.
+`XmlTemplateReaderTests.ElementsWithoutNamespaceUseBuiltInControlNamespace` verifies this behavior.
+
+Do not add a custom default namespace to normal templates:
+
+```xml
+<template xmlns="MyApp.PdfControls">
+    <body>
+        <text>Hello</text>
+    </body>
+</template>
+```
+
+In this XML, `text` is read in `MyApp.PdfControls`, not in the built-in namespace.
+The result is usually an unknown-control error for `MyApp.PdfControls:text`.
+`XmlTemplateReaderTests.CustomDefaultNamespaceDoesNotActivateBuiltInControls` verifies this behavior.
+
+Do not use prefixed controls such as `<pt:text>`.
+The current reader treats the element name as `pt:text`, and control names cannot contain `:`.
+`XmlTemplateReaderTests.PrefixedControlNameIsRejected` verifies this behavior.
+
+For normal authoring, remove the namespace declaration and use unprefixed control names.
+If a template needs an application-specific control, ask the application team which unprefixed element name they registered.
+
 ## An Attribute Is Rejected
 
 Attributes are not free-form labels.
@@ -76,6 +104,26 @@ Check the focused control page for the supported attribute names:
 - [Chart controls](controls-chart.md)
 
 For shared spacing, clipping and alignment attributes, see [Layout fundamentals](layout-fundamentals.md).
+
+## A Length, Color Or Thickness Value Is Rejected
+
+Layout values are parsed by the type of the attribute.
+If a control rejects a value such as `length`, `margin`, `padding`, `thickness`, `color`, `background` or
+`foreground`, check the value format before changing the surrounding layout.
+
+Common checks:
+
+- Lengths can use numbers without a unit, `px`, `pt`, `mm`, `cm`, `in`, `%` or `auto`.
+- A number without a unit is pixels, so use `50%` for half the available space, not `0.5`.
+- Colors can use names such as `red`, `orange`, `black`, `white` and `transparent`, or hex values such as `#f00`,
+  `#ff0000` and `#ff000080`.
+- Thickness values such as `margin`, `padding` and border `thickness` take one, two or four lengths separated by spaces.
+  Three values are not supported.
+- Star widths such as `1*` and `2*` are table-column values only; do not use them for normal length attributes.
+
+The accepted length, color and thickness formats are checked against `Length`, `Color`, `Thickness`, `LengthTests`,
+`ColorTests` and `ThicknessParsingTests`.
+For the full user-facing reference, see [Layout fundamentals](layout-fundamentals.md#lengths).
 
 ## A Control Does Not Allow Children
 

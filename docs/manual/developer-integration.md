@@ -20,7 +20,8 @@ Start with the package and service registration.
 The examples on this page are checked against the README and these implementation sources:
 `ServiceCollectionExtensions`, `PdfTemplateServiceBuilder`, `Generator`, `DocumentOptions`,
 `IFunction`, `ITransformer`, `IControl`, `ITemplateData`, `IResourceResolver`, `IDrawableCanvas`,
-`IDeferredCanvas`, `IImmediateCanvas`, `IPropertyAccessCache`, `ITextService` and `IParameterConverter`.
+`IDeferredCanvas`, `IImmediateCanvas`, `IPropertyAccessCache`, `ITextService`, `IParameterConverter`
+and `XmlTemplateReaderTests`.
 
 ## Install
 
@@ -186,12 +187,13 @@ Most custom controls should derive from `Control` or an existing base control in
 
 ```csharp
 using System.Globalization;
+using X39.Solutions.PdfTemplate;
 using X39.Solutions.PdfTemplate.Abstraction;
 using X39.Solutions.PdfTemplate.Attributes;
 using X39.Solutions.PdfTemplate.Controls.Base;
 using X39.Solutions.PdfTemplate.Data;
 
-[Control("MyApp.PdfControls", "approvalStamp")]
+[Control(Constants.ControlsNamespace, "approvalStamp")]
 public sealed class ApprovalStampControl : Control
 {
     protected override Size DoMeasure(
@@ -226,15 +228,22 @@ services.AddPdfTemplateService(
     (builder) => builder.AddControl<ApprovalStampControl>());
 ```
 
-Use a separate XML namespace prefix for application controls:
+Use the registered element name in the template:
 
 ```xml
-<template xmlns:app="MyApp.PdfControls">
+<template>
     <body>
-        <app:approvalStamp />
+        <approvalStamp/>
     </body>
 </template>
 ```
+
+The current XML reader does not support namespace-prefixed element names for controls.
+`XmlTemplateReaderTests.PrefixedControlNameIsRejected` verifies that a prefixed name such as `app:approvalStamp`
+is rejected before control activation.
+If a custom control must appear beside built-in controls, register it with `Constants.ControlsNamespace`
+and a unique element name, as shown above.
+`XmlTemplateReaderTests.CustomControlInBuiltInNamespaceActivatesWithoutPrefix` verifies that pattern.
 
 ## Add A Transformer
 

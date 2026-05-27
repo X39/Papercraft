@@ -3,8 +3,8 @@
 Previous: [Introduction](introduction.md) | [Manual home](index.md) | Next: [Areas](areas.md)
 
 Status: started. The starter walkthrough and visual examples on this page are verified by
-`FirstDocumentDocumentationSamples`. No-namespace behavior is checked against `XmlTemplateReader.ReadXmlNode`
-and `Constants.ControlsNamespace`.
+`FirstDocumentDocumentationSamples`. No-namespace, custom default namespace and prefix behavior are checked against
+`XmlTemplateReaderTests`, `XmlTemplateReader.ReadXmlNode`, `Template.CreateAsync` and `Constants.ControlsNamespace`.
 
 ## What Is This?
 
@@ -19,6 +19,7 @@ The other sections are optional layers or repeated page sections that you add on
 The examples in this manual omit `xmlns` because the XML reader assigns the built-in control namespace
 to elements that do not already have an XML namespace.
 That lets template authors write `<text>` instead of a longer namespaced element name.
+Avoid XML namespace prefixes in normal templates; prefixed control names are not supported by the current reader.
 
 ## When Should I Use This?
 
@@ -62,8 +63,25 @@ When an element has no namespace, the reader treats it as part of the built-in t
 
 For normal template-author work, prefer the unprefixed examples used throughout this manual.
 
-TODO: Verify custom default namespaces and prefixed built-in controls against `XmlTemplateReader.ReadXmlNode`,
-`Template` section lookup and control activation before documenting a supported prefix pattern for template authors.
+If a template sets a different default namespace, the reader keeps that namespace for the unprefixed elements:
+
+```xml
+<template xmlns="MyApp.PdfControls">
+    <body>
+        <text>This text is no longer in the built-in control namespace.</text>
+    </body>
+</template>
+```
+
+In that example, `text` is read as `MyApp.PdfControls:text`, so the built-in `text` control is not found.
+`XmlTemplateReaderTests.CustomDefaultNamespaceDoesNotActivateBuiltInControls` verifies this behavior.
+
+Do not use a prefix such as `pt:text` for built-in controls.
+The current reader treats the prefixed element name as `pt:text`, and control names cannot contain `:`.
+`XmlTemplateReaderTests.PrefixedControlNameIsRejected` verifies this behavior.
+
+If your application adds custom controls, ask the application team which unprefixed element names are available.
+Developer-facing control registration guidance lives in the [developer integration appendix](developer-integration.md).
 
 ## Add A Header And Footer
 

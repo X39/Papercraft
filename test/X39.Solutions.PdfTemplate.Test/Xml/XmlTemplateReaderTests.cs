@@ -1,7 +1,10 @@
 ﻿using System.Globalization;
 using System.Text;
 using System.Xml;
+using Microsoft.Extensions.DependencyInjection;
 using X39.Solutions.PdfTemplate.Abstraction;
+using X39.Solutions.PdfTemplate.Attributes;
+using X39.Solutions.PdfTemplate.Data;
 using X39.Solutions.PdfTemplate.Exceptions;
 using X39.Solutions.PdfTemplate.Transformers;
 using X39.Solutions.PdfTemplate.Xml;
@@ -10,6 +13,139 @@ namespace X39.Solutions.PdfTemplate.Test.Xml;
 
 public class XmlTemplateReaderTests
 {
+    [Fact]
+    public async Task ElementsWithoutNamespaceUseBuiltInControlNamespace()
+    {
+        const string template = """
+                                <?xml version="1.0" encoding="utf-8"?>
+                                <template>
+                                    <body>
+                                        <text>Hello</text>
+                                    </body>
+                                </template>
+                                """;
+        var templateReader = new XmlTemplateReader(
+            default,
+            CultureInfo.InvariantCulture,
+            new TemplateData(),
+            ArraySegment<ITransformer>.Empty);
+        using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
+        using var xmlReader = XmlReader.Create(xmlStream);
+
+        var node = await templateReader.ReadAsync(xmlReader);
+
+        Assert.Equal(Constants.ControlsNamespace, node.NodeNamespace);
+        Assert.Equal(Constants.ControlsNamespace, node["body", Constants.ControlsNamespace]!.NodeNamespace);
+        Assert.Equal(
+            Constants.ControlsNamespace,
+            node["body", Constants.ControlsNamespace]!["text", Constants.ControlsNamespace]!.NodeNamespace);
+    }
+
+    [Fact]
+    public async Task CustomDefaultNamespaceIsPreserved()
+    {
+        const string customNamespace = "MyApp.PdfControls";
+        const string template = $"""
+                                 <?xml version="1.0" encoding="utf-8"?>
+                                 <template xmlns="{customNamespace}">
+                                     <body>
+                                         <approvalStamp/>
+                                     </body>
+                                 </template>
+                                 """;
+        var templateReader = new XmlTemplateReader(
+            default,
+            CultureInfo.InvariantCulture,
+            new TemplateData(),
+            ArraySegment<ITransformer>.Empty);
+        using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
+        using var xmlReader = XmlReader.Create(xmlStream);
+
+        var node = await templateReader.ReadAsync(xmlReader);
+
+        Assert.Equal(customNamespace, node.NodeNamespace);
+        Assert.Equal(customNamespace, node["body", customNamespace]!.NodeNamespace);
+        Assert.Equal(customNamespace, node["body", customNamespace]!["approvalStamp", customNamespace]!.NodeNamespace);
+    }
+
+    [Fact]
+    public async Task PrefixedControlNameIsRejected()
+    {
+        const string template = $"""
+                                 <?xml version="1.0" encoding="utf-8"?>
+                                 <template>
+                                     <body xmlns:pt="{Constants.ControlsNamespace}">
+                                         <pt:text>Hello</pt:text>
+                                     </body>
+                                 </template>
+                                 """;
+        var templateReader = new XmlTemplateReader(
+            default,
+            CultureInfo.InvariantCulture,
+            new TemplateData(),
+            ArraySegment<ITransformer>.Empty);
+        using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
+        using var xmlReader = XmlReader.Create(xmlStream);
+
+        await Assert.ThrowsAsync<XmlNodeNameException>(() => templateReader.ReadAsync(xmlReader));
+    }
+
+    [Fact]
+    public async Task CustomDefaultNamespaceDoesNotActivateBuiltInControls()
+    {
+        const string customNamespace = "MyApp.PdfControls";
+        const string template = $"""
+                                 <?xml version="1.0" encoding="utf-8"?>
+                                 <template xmlns="{customNamespace}">
+                                     <body>
+                                         <text>Hello</text>
+                                     </body>
+                                 </template>
+                                 """;
+        var root = await ReadTemplateAsync(template);
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddPdfTemplateService();
+        await using var serviceProvider = serviceCollection.BuildServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+
+        var exception = await Assert.ThrowsAsync<FailedToCreateControlException>(
+            () => Template.CreateAsync(
+                root,
+                scope.ServiceProvider.GetRequiredService<IControlFactory>(),
+                CultureInfo.InvariantCulture,
+                null,
+                default));
+
+        Assert.Contains($"{customNamespace}:text", exception.InnerException?.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task CustomControlInBuiltInNamespaceActivatesWithoutPrefix()
+    {
+        const string template = """
+                                <?xml version="1.0" encoding="utf-8"?>
+                                <template>
+                                    <body>
+                                        <namespace-test/>
+                                    </body>
+                                </template>
+                                """;
+        var root = await ReadTemplateAsync(template);
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddPdfTemplateService((builder) => builder.AddControl<NamespaceTestControl>());
+        await using var serviceProvider = serviceCollection.BuildServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+
+        await using var parsedTemplate = await Template.CreateAsync(
+            root,
+            scope.ServiceProvider.GetRequiredService<IControlFactory>(),
+            CultureInfo.InvariantCulture,
+            null,
+            default);
+
+        Assert.IsType<NamespaceTestControl>(Assert.Single(parsedTemplate.BodyControls));
+    }
+
     [Fact]
     public async Task EffectiveStyle()
     {
@@ -141,5 +277,40 @@ public class XmlTemplateReaderTests
         using var xmlReader = XmlReader.Create(xmlStream);
         var nodeInformation = await templateReader.ReadAsync(xmlReader);
         Assert.Equal(10, nodeInformation.Children.Count);
+    }
+
+    private static async Task<XmlNodeInformation> ReadTemplateAsync(string template)
+    {
+        var templateReader = new XmlTemplateReader(
+            default,
+            CultureInfo.InvariantCulture,
+            new TemplateData(),
+            ArraySegment<ITransformer>.Empty);
+        using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
+        using var xmlReader = XmlReader.Create(xmlStream);
+        return await templateReader.ReadAsync(xmlReader);
+    }
+
+    [Control(Constants.ControlsNamespace, "namespace-test")]
+    private sealed class NamespaceTestControl : IControl
+    {
+        public Size Measure(
+            float dpi,
+            in Size fullPageSize,
+            in Size framedPageSize,
+            in Size remainingSize,
+            CultureInfo cultureInfo)
+            => Size.Zero;
+
+        public Size Arrange(
+            float dpi,
+            in Size fullPageSize,
+            in Size framedPageSize,
+            in Size remainingSize,
+            CultureInfo cultureInfo)
+            => Size.Zero;
+
+        public Size Render(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
+            => Size.Zero;
     }
 }

@@ -67,6 +67,7 @@ Template language now includes generated examples for conditional sections and s
 source-checked optional-value guidance.
 The troubleshooting chapter now has source-checked starter entries.
 The developer appendix now contains setup and extension-point guidance for application developers.
+Namespace and prefix behavior is now source-checked in the first-document, troubleshooting and developer appendix pages.
 The README is now a short project overview that links back to this manual.
 Remaining reference work is mostly edge-case guidance and future supported data patterns.
 Until a chapter says its examples are verified, the tests and source remain the source of truth for detailed behavior.
