@@ -2,14 +2,6 @@
 
 Previous: [Complete examples](complete-examples.md) | [Manual home](index.md) | Next: [Developer integration appendix](developer-integration.md)
 
-Status: complete for current supported behavior. The entries are checked against `XmlTemplateReader`, `Template`, `Generator`,
-`ControlRegistry`, `ControlActivationCache`, `ImageControl`, `DefaultResourceResolver`,
-`TableControl`, `TableRowControlBase`, `TableSample.LongTableRows`, `GeneralExpressionTests`,
-`TableControlTest.RowTallerThanPageStartsAfterRepeatedHeaderAndIsNotSplit`, `TroubleshootingExpressionTests`,
-`TroubleshootingTransformerTests`, `TroubleshootingImageTests`, `XmlTemplateReaderTests`,
-`LengthTests`, `ColorTests`, `ThicknessParsingTests`, the chart control tests and the existing XML/control
-activation tests.
-
 ## What Is This?
 
 Troubleshooting collects common reasons a template does not render as expected.
@@ -40,7 +32,6 @@ Check basic XML syntax first:
 - Transformer blocks still live inside XML text, so the surrounding XML must remain valid.
 
 If the error mentions an invalid node name, check for a dot in a normal control name.
-`XmlTemplateReaderTests.NoDotInName` verifies that dotted names are rejected for normal nodes.
 Style nodes are the special case documented in [Styles](styles.md).
 
 ## A Control Is Unknown
@@ -64,7 +55,6 @@ Developer setup and custom control registration belong in the
 
 The manual examples intentionally omit `xmlns`.
 When an element has no XML namespace, the reader treats it as part of the built-in control namespace.
-`XmlTemplateReaderTests.ElementsWithoutNamespaceUseBuiltInControlNamespace` verifies this behavior.
 
 Do not add a custom default namespace to normal templates:
 
@@ -78,11 +68,9 @@ Do not add a custom default namespace to normal templates:
 
 In this XML, `text` is read in `MyApp.PdfControls`, not in the built-in namespace.
 The result is usually an unknown-control error for `MyApp.PdfControls:text`.
-`XmlTemplateReaderTests.CustomDefaultNamespaceDoesNotActivateBuiltInControls` verifies this behavior.
 
 Do not use prefixed controls such as `<pt:text>`.
 The current reader treats the element name as `pt:text`, and control names cannot contain `:`.
-`XmlTemplateReaderTests.PrefixedControlNameIsRejected` verifies this behavior.
 
 For normal authoring, remove the namespace declaration and use unprefixed control names.
 If a template needs an application-specific control, ask the application team which unprefixed element name they registered.
@@ -91,11 +79,8 @@ If a template needs an application-specific control, ask the application team wh
 
 Attributes are not free-form labels.
 Each control accepts only the parameters implemented for that control.
-`ControlActivationCacheTests.CreateControl_ThrowsForUnknownParameter` verifies that unknown parameters are rejected
-and that the error can list available parameters.
 
 If an attribute seems to be accepted but has no visible effect, check the focused control page for that attribute.
-The current manual documents source-backed exceptions where they are known, such as `columnSpan="0"` on table cells.
 Do not treat ignored attributes as a general fallback behavior; unsupported attribute names are rejected.
 
 Check the focused control page for the supported attribute names:
@@ -126,8 +111,6 @@ Common checks:
   Three values are not supported.
 - Star widths such as `1*` and `2*` are table-column values only; do not use them for normal length attributes.
 
-The accepted length, color and thickness formats are checked against `Length`, `Color`, `Thickness`, `LengthTests`,
-`ColorTests` and `ThicknessParsingTests`.
 For the full user-facing reference, see [Layout fundamentals](layout-fundamentals.md#lengths).
 
 ## A Control Does Not Allow Children
@@ -137,20 +120,17 @@ For example, `border` can contain other controls, while `text` and `line` render
 
 If the error says a control does not support child controls, move the child content into a container such as
 `border`, `table` or the document `body`.
-`Template.CreateControlAsync` verifies this while building controls from the parsed XML.
 For the control-authoring mental model, see [Control concepts](controls-concepts.md).
 
 ## A Value Prints Empty Or Does Not Change
 
 Check the exact variable or function name with the application team.
 Template data names must match what the application supplies.
-The verified [Template data](template-data.md) examples currently cover simple variables and data-backed attributes.
+The [Template data](template-data.md) chapter covers simple variables and data-backed attributes.
 
 If a text value still shows the `@` name, such as `@OrderNumber`, the XML reader did not find a matching variable.
-`TroubleshootingExpressionTests.MissingVariableInTextRemainsLiteral` verifies this behavior.
 
 If an attribute value starts with `@` and the variable is missing, the evaluated attribute value becomes empty before
-the control receives it. `TroubleshootingExpressionTests.MissingVariableInAttributeBecomesEmptyString` verifies this
 behavior. This can later make the control reject the attribute if an empty value is not valid for that attribute type.
 
 Common checks:
@@ -158,10 +138,7 @@ Common checks:
 - Compare the template name with the data name supplied by the application.
 - Check casing, spelling and underscores.
 - Do not use `@Customer.Name` for nested object fields. In text, the dot stops the variable name, so this is read as
-  `@Customer` followed by `.Name`. `GeneralExpressionTests.DottedTextExpressionReadsOnlyNameBeforeDot` verifies this.
 - Do not use a text value as an `@if` condition. Ask for a Boolean flag such as `HasOrderNumber`, or a Boolean
-  function supplied by the application. `IfTransformerTests.IfConditionWithoutOperatorRejectsNonBooleanVariable`
-  verifies that `@if OrderNumber` is not a supported existence check.
 - For attributes such as `color="@AccentColor"`, confirm that the supplied value is a valid value for that attribute.
 - Keep a visible fallback label in normal text when missing data would otherwise be hard to notice.
 
@@ -174,7 +151,6 @@ Function calls need a closing parenthesis.
 Transformer blocks such as `@if` and `@foreach` need opening and closing braces.
 The XML reader has dedicated exceptions for missing function brackets and missing transformer braces.
 
-`TroubleshootingExpressionTests` verifies the common function-expression cases:
 
 - An unknown function in text, such as `@formatTotal()`, is reported as a missing function.
 - An unknown function in an attribute, such as `color="@statusColor()"`, is reported as a failed expression evaluation.
@@ -186,7 +162,6 @@ Remove unrelated content until only the failing condition or loop remains, then 
 
 ## Common Transformer Mistakes
 
-These checks are verified by the existing transformer tests and `TroubleshootingTransformerTests`.
 
 For `@if`:
 
@@ -195,8 +170,6 @@ For `@if`:
 - Use only one `@else`.
 - When there is no comparison operator, the expression must evaluate to `true` or `false`.
 
-`IfTransformerTests.ElseIfAfterElseThrows`, `IfTransformerTests.DuplicateElseThrows` and
-`IfTransformerTests.IfTheory` cover these cases.
 
 For `@switch`:
 
@@ -205,8 +178,6 @@ For `@switch`:
 - Use `@default` only once.
 - Give every `@case` a value or comparison.
 
-`SwitchTransformerTests.SwitchThrowsForDirectContent`, `SwitchTransformerTests.SwitchThrowsForDuplicateDefault`,
-`SwitchTransformerTests.SwitchThrowsForCaseAfterDefault` and `SwitchTransformerTests.SwitchThrowsForEmptyCase`
 cover these cases.
 
 For `@for`:
@@ -215,8 +186,6 @@ For `@for`:
 - Use `step` only when the loop should skip values.
 - Use a positive `step` when counting up and a negative `step` when counting down.
 
-`ForTransformerTests.ForLoopWithNumbers` verifies normal ranges.
-`TroubleshootingTransformerTests.ForLoopStepMustMoveTowardEnd` verifies the step-direction error.
 
 For `@foreach`:
 
@@ -224,9 +193,6 @@ For `@foreach`:
 - An empty collection renders no repeated content.
 - The optional `with IndexName` part creates a zero-based counter for the block.
 
-`ForEachTransformerTests.ForEachLoopWithVariableSourceAndIndex`,
-`ForEachTransformerTests.ForEachLoopWithEmptyVariableSource` and
-`TroubleshootingTransformerTests.ForEachSourceMustBeCollection` cover these cases.
 
 ## An Image Does Not Appear
 
@@ -245,7 +211,6 @@ Common checks:
 - If `source` is plain base64, it still must decode to real image bytes. Base64 text that is not an image fails during image initialization.
 - If `source="@LogoImage"` is used, confirm that the application supplies the image value in the format its resolver expects.
 
-These cases are verified by `TroubleshootingImageTests`.
 
 ## A Chart Shows No Data Or Missing Values
 
@@ -262,10 +227,6 @@ Common checks:
 - Put `data` inside `lineChart`, `barChart` or `pieChart`, not directly inside `chart`.
 - Bar and line charts do not draw category labels from `label`, `x-label` or `y-label`; use a table when exact labels are required.
 
-`ChartDataControlTests` verifies invariant numeric parsing and invalid value handling.
-`LineChartTests.LineChart_WithOnlyInvalidData_RendersNoDataMessage`,
-`BarChartTests.BarChart_WithOnlyInvalidData_RendersNoDataMessage` and
-`PieChartTests.PieChart_WithOnlyInvalidYValues_RendersNoDataMessage` verify the no-data behavior.
 For the chart authoring reference, see [Chart controls](controls-chart.md).
 
 ## Content Moves To Another Page
@@ -308,7 +269,6 @@ Tables are laid out row by row.
 `TableControl` checks the remaining page height before each body row is rendered.
 When the next row is taller than the space left on the current page, the table advances to the next page and renders
 the table header again before the row.
-`TableSample.LongTableRows` exercises a long table with a header, repeated rows, header content and footer content.
 
 Common checks:
 
@@ -322,14 +282,7 @@ If one body row is taller than a full available page, the table does not split t
 The row is still moved to a fresh page when it does not fit in the remaining space. If the table has a `th` header,
 the header is rendered again before the oversized row. The row then keeps its arranged height, so it can continue
 past one page of body space instead of behaving like normal flowing body text.
-`TableControlTest.RowTallerThanPageStartsAfterRepeatedHeaderAndIsNotSplit` verifies this against
-`TableControl.PreRender`, `TableControl.DoRender` and `TableRowControlBase.DoArrange`.
 
 For long readable content, split the content into several rows or move it out of the table into normal body content.
-
-## Future Product-Support Follow-Ups
-
-- Add more source-backed troubleshooting entries as new recurring template-author issues are identified.
-- Add a broader ignored-attribute troubleshooting example only after a recurring, source-backed case exists.
 
 Previous: [Complete examples](complete-examples.md) | [Manual home](index.md) | Next: [Developer integration appendix](developer-integration.md)

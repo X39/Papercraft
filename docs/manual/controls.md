@@ -1,16 +1,16 @@
 # Controls
 
-Previous: [Styles](styles.md) | [Manual home](index.md) | Next: [Transformers](transformers.md)
-
-Status: complete for current supported behavior. [Control concepts](controls-concepts.md) and the focused [Text control](controls-text.md), [Border control](controls-border.md),
-[Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md),
-[Table control](controls-table.md) and [Chart controls](controls-chart.md) pages now have verified examples and shared
-layout cross-links.
+Previous: [Quick reference](quick-reference.md) | [Manual home](index.md) | Next: [Transformers](transformers.md)
 
 ## What Is This?
 
 Controls are XML elements that measure, arrange and render document content.
-Common controls include `text`, `border`, `image`, `line`, `pageNumber`, `table` and chart controls.
+Common controls include [`text`](controls-text.md), [`border`](controls-border.md), [`image`](controls-image.md),
+[`line`](controls-line.md), [`pageNumber`](controls-page-number.md), [`table`](controls-table.md) and
+[chart controls](controls-chart.md).
+
+If you only need to check names, attributes and value formats, use the
+[Quick reference](quick-reference.md).
 
 Some controls can contain other controls.
 For example, a `border` can contain content inside it, while a simple text control renders text directly.
@@ -25,35 +25,27 @@ how to build a table and how to show page numbers.
 
 Choose the smallest control that matches the document part:
 
-- Use `text` for words and values.
-- Use `border` when content needs a surrounding box, background or border line.
-- Use `line` for separators.
-- Use `pageNumber` for current page and total page count text.
-- Use `table`, `tr`, `td` and `th` for rows and columns.
-- Use `chart`, `lineChart`, `barChart` and `pieChart` for compact data visuals.
+- Use [`text`](controls-text.md) for words and values.
+- Use [`border`](controls-border.md) when content needs a surrounding box, background or border line.
+- Use [`line`](controls-line.md) for separators.
+- Use [`pageNumber`](controls-page-number.md) for current page and total page count text.
+- Use [`table`, `tr`, `td` and `th`](controls-table.md) for rows and columns.
+- Use [`chart`, `lineChart`, `barChart` and `pieChart`](controls-chart.md) for compact data visuals.
 
+Use the [Quick reference](quick-reference.md) when you need a compact attribute table.
 Read [Control concepts](controls-concepts.md) first if you are unsure whether a control can contain other controls.
-The focused reference pages verify attribute names against source or tests.
 
 ## Built-In Controls
 
-| Control | Use it for | Status |
-|---------|------------|--------|
-| [Control concepts](controls-concepts.md) | How controls, containers and child rules fit together. | Verified with source checks and reused generated samples. |
-| [`text`](controls-text.md) | Words, labels, headings and values. | Verified examples. |
-| [`border`](controls-border.md) | Boxes, backgrounds and border lines around content. | Verified examples. |
-| [`line`](controls-line.md) | Separators and simple rules. | Verified horizontal, vertical and header-rule examples. |
-| [`image`](controls-image.md) | Raster images loaded by the application. | Verified source and sizing guidance. |
-| [`pageNumber`](controls-page-number.md) | Current page and total page count text. | Verified footer example. |
-| [`table`, `tr`, `td`, `th`](controls-table.md) | Rows, columns and table cells. | Verified table examples. |
-| [`chart`, `lineChart`, `barChart`, `pieChart`, `data`](controls-chart.md) | Line, bar and pie chart visuals. | Verified chart examples. |
+| Control | Use it for |
+|---------|------------|
+| [Control concepts](controls-concepts.md) | How controls, containers and child rules fit together. |
+| [`text`](controls-text.md) | Words, labels, headings and values. |
+| [`border`](controls-border.md) | Boxes, backgrounds and border lines around content. |
+| [`line`](controls-line.md) | Separators and simple rules. |
+| [`image`](controls-image.md) | Raster images loaded by the application. |
+| [`pageNumber`](controls-page-number.md) | Current page and total page count text. |
+| [`table`, `tr`, `td`, `th`](controls-table.md) | Rows, columns and table cells. |
+| [`chart`, `lineChart`, `barChart`, `pieChart`, `data`](controls-chart.md) | Line, bar and pie chart visuals. |
 
-## Future Maintenance
-
-- Keep this page as the controls landing page and use the reference split described in the
-  [documentation style guide](style-guide.md) for future controls.
-- Keep generated samples current as visual control pages expand.
-- Keep shared layout attributes linked back to [Layout fundamentals](layout-fundamentals.md).
-- Link repeated shared attributes back to [Styles](styles.md).
-
-Previous: [Styles](styles.md) | [Manual home](index.md) | Next: [Transformers](transformers.md)
+Previous: [Quick reference](quick-reference.md) | [Manual home](index.md) | Next: [Transformers](transformers.md)

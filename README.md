@@ -24,6 +24,7 @@ Useful manual entry points:
 - [First document](https://x39.github.io/X39.Solutions.PdfTemplate/manual/first-document.html)
 - [Template data](https://x39.github.io/X39.Solutions.PdfTemplate/manual/template-data.html)
 - [Layout fundamentals](https://x39.github.io/X39.Solutions.PdfTemplate/manual/layout-fundamentals.html)
+- [Quick reference](https://x39.github.io/X39.Solutions.PdfTemplate/manual/quick-reference.html)
 - [Controls](https://x39.github.io/X39.Solutions.PdfTemplate/manual/controls.html)
 - [Template language](https://x39.github.io/X39.Solutions.PdfTemplate/manual/template-language.html)
 - [Complete examples](https://x39.github.io/X39.Solutions.PdfTemplate/manual/complete-examples.html)
@@ -137,7 +138,6 @@ The publish workflow is defined in `.github/workflows/main.yml`.
 
 The GitHub Pages source lives under [`docs`](docs/index.md).
 The Pages table of contents is maintained in [`docs/_data/navigation.yml`](docs/_data/navigation.yml).
-The manual roadmap lives in [`docs/manual/work-plan.md`](docs/manual/work-plan.md).
 Executable documentation samples live under `test/X39.Solutions.PdfTemplate.Test/Samples`
 and write generated preview assets under `docs/assets/samples`.
 

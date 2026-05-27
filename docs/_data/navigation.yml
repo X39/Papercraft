@@ -12,6 +12,8 @@
   url: /manual/layout-fundamentals.html
 - title: Styles
   url: /manual/styles.html
+- title: Quick reference
+  url: /manual/quick-reference.html
 - title: Controls
   url: /manual/controls.html
 - title: Control concepts
@@ -40,7 +42,3 @@
   url: /manual/troubleshooting.html
 - title: Developer appendix
   url: /manual/developer-integration.html
-- title: Style guide
-  url: /manual/style-guide.html
-- title: Documentation roadmap
-  url: /manual/work-plan.html

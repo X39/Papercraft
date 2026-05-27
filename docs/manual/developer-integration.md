@@ -2,8 +2,6 @@
 
 Previous: [Troubleshooting](troubleshooting.md) | [Manual home](index.md)
 
-Status: complete for current supported behavior. Application setup and extension-point orientation have been migrated from the README.
-
 ## What Is This?
 
 The developer integration appendix is the place for application setup and extension details.
@@ -17,11 +15,9 @@ supplying new data, loading images from a custom location, or registering a cust
 ## How Do I Start?
 
 Start with the package and service registration.
-The examples on this page are checked against the README and these implementation sources:
 `ServiceCollectionExtensions`, `PdfTemplateServiceBuilder`, `Generator`, `DocumentOptions`,
 `IFunction`, `ITransformer`, `IControl`, `ITemplateData`, `IResourceResolver`, `IDrawableCanvas`,
 `IDeferredCanvas`, `IImmediateCanvas`, `IPropertyAccessCache`, `ITextService`, `IParameterConverter`
-and `XmlTemplateReaderTests`.
 
 ## Install
 
@@ -239,11 +235,9 @@ Use the registered element name in the template:
 ```
 
 The current XML reader does not support namespace-prefixed element names for controls.
-`XmlTemplateReaderTests.PrefixedControlNameIsRejected` verifies that a prefixed name such as `app:approvalStamp`
 is rejected before control activation.
 If a custom control must appear beside built-in controls, register it with `Constants.ControlsNamespace`
 and a unique element name, as shown above.
-`XmlTemplateReaderTests.CustomControlInBuiltInNamespaceActivatesWithoutPrefix` verifies that pattern.
 
 ## Add A Transformer
 

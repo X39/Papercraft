@@ -2,10 +2,6 @@
 
 Previous: [Controls](controls.md) | [Manual home](index.md) | Next: [Template language](template-language.md)
 
-Status: complete for current supported behavior. Built-in transformer names, block syntax and common mistakes are checked against
-`XmlTemplateReader`, `IfTransformer`, `SwitchTransformer`, `ForTransformer`, `ForEachTransformer`,
-`VariableTransformer`, `AlternateTransformer` and the transformer tests under `ExpressionTests`.
-
 ## What Is This?
 
 A transformer is a template-language block that rewrites part of the XML before the PDF controls are created.
@@ -37,8 +33,6 @@ Templates are easier to maintain when they choose between ready-to-print values 
 ## How Do I Start?
 
 Start with one block and one visible result.
-This `@if` shape is checked against `IfTransformerTests` and the generated conditional sample in
-`TemplateLanguageDocumentationSamples.TemplateLanguage_ConditionalSection`.
 
 ```xml
 <template>
@@ -85,9 +79,8 @@ Keep braces easy to see; most transformer mistakes are easier to find when each 
 Prefer `@foreach` over `@for` for real business lists.
 Prefer prepared data over complicated template expressions.
 
-## Small Verified Shapes
+## Small Transformer Shapes
 
-These fragments are source/test-checked starting shapes.
 Use the full examples in [Template language](template-language.md) when you need more detail.
 
 ```xml
