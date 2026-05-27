@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
     /// This method adds the following services:
     /// <list type="bullet">
     ///     <item><see cref="SkPaintCache"/></item>
-    ///     <item><see cref="ControlExpressionCache"/></item>
+    ///     <item><see cref="ControlActivationCache"/></item>
     ///     <item><see cref="ITextService"/></item>
     ///     <item><see cref="IPropertyAccessCache"/></item>
     ///     <item><see cref="ITemplateData"/></item>
@@ -66,7 +66,7 @@ public static class ServiceCollectionExtensions
     private static void AddInfrastructure(IServiceCollection services)
     {
         services.TryAddSingleton<SkPaintCache>();
-        services.TryAddSingleton<ControlExpressionCache>();
+        services.TryAddSingleton<ControlActivationCache>();
         services.TryAddSingleton<ControlRegistry>();
         services.TryAddSingleton<ITextService, TextService>();
         services.TryAddSingleton<IPropertyAccessCache, PropertyAccessCache>();

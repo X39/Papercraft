@@ -26,7 +26,7 @@ public class DefaultControlTemplateCreationBenchmarks
         _controlFactory = _serviceProvider.GetRequiredService<IControlFactory>();
         BenchmarkServices.WarmDefaultControlCache(
             _serviceProvider,
-            _serviceProvider.GetRequiredService<ControlExpressionCache>());
+            _serviceProvider.GetRequiredService<ControlActivationCache>());
         _template = Parse(BenchmarkTemplates.GetBuiltInControlTemplate(Control));
     }
 

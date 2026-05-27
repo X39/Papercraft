@@ -1,4 +1,5 @@
-﻿using X39.Solutions.PdfTemplate.Abstraction;
+using Microsoft.Extensions.DependencyInjection;
+using X39.Solutions.PdfTemplate.Abstraction;
 
 namespace X39.Solutions.PdfTemplate.Attributes;
 
@@ -6,4 +7,4 @@ namespace X39.Solutions.PdfTemplate.Attributes;
 /// Attribute to explicitly mark a constructor for use when creating a <see cref="IParameterConverter{T}"/>.
 /// </summary>
 [AttributeUsage(AttributeTargets.Constructor)]
-public class ParameterConverterConstructorAttribute : Attribute;
+public class ParameterConverterConstructorAttribute : ActivatorUtilitiesConstructorAttribute;

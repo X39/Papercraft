@@ -9,7 +9,7 @@ namespace X39.Solutions.PdfTemplate.Benchmark;
 public class DefaultControlActivationBenchmarks
 {
     private ServiceProvider _serviceProvider = null!;
-    private ControlExpressionCache _expressionCache = null!;
+    private ControlActivationCache _controlActivationCache = null!;
     private Type _controlType = null!;
     private IReadOnlyDictionary<string, string> _parameters = null!;
     private string? _content;
@@ -23,8 +23,8 @@ public class DefaultControlActivationBenchmarks
     public void GlobalSetup()
     {
         _serviceProvider = BenchmarkServices.CreateDefaultServiceProvider();
-        _expressionCache = _serviceProvider.GetRequiredService<ControlExpressionCache>();
-        BenchmarkServices.WarmDefaultControlCache(_serviceProvider, _expressionCache);
+        _controlActivationCache = _serviceProvider.GetRequiredService<ControlActivationCache>();
+        BenchmarkServices.WarmDefaultControlCache(_serviceProvider, _controlActivationCache);
         _controlType = BenchmarkServices.GetBuiltInControlType(Control);
         _parameters = BenchmarkServices.GetBuiltInControlParameters(Control);
         _content = BenchmarkServices.GetBuiltInControlContent(Control);
@@ -39,7 +39,7 @@ public class DefaultControlActivationBenchmarks
     [Benchmark]
     public IControl CreateBuiltInControl()
     {
-        return _expressionCache.CreateControl(
+        return _controlActivationCache.CreateControl(
             _serviceProvider,
             _controlType,
             _parameters,

@@ -23,7 +23,7 @@ public class TemplateCreationBenchmarks
         _controlFactory = _serviceProvider.GetRequiredService<IControlFactory>();
         BenchmarkServices.WarmBenchmarkControlCache(
             _serviceProvider,
-            _serviceProvider.GetRequiredService<ControlExpressionCache>());
+            _serviceProvider.GetRequiredService<ControlActivationCache>());
         _simpleTemplate = Parse(BenchmarkTemplates.SimpleTemplateCreationTemplate);
         _nestedTemplate = Parse(BenchmarkTemplates.NestedTemplateCreationTemplate);
         _mediumTemplate = Parse(BenchmarkTemplates.MediumTemplateCreationTemplate);

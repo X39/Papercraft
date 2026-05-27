@@ -9,22 +9,22 @@ namespace X39.Solutions.PdfTemplate;
 public sealed class ControlFactory : IControlFactory
 {
     private readonly IServiceProvider       _serviceProvider;
-    private readonly ControlExpressionCache _controlExpressionCache;
+    private readonly ControlActivationCache _controlActivationCache;
     private readonly ControlRegistry        _controlRegistry;
 
     /// <summary>
     /// Creates a new <see cref="ControlFactory"/>.
     /// </summary>
     /// <param name="serviceProvider">The service provider to resolve constructor dependencies from.</param>
-    /// <param name="controlExpressionCache">The expression cache used for control activation and parameter binding.</param>
+    /// <param name="controlActivationCache">The cache used for control activation and parameter binding.</param>
     /// <param name="controlRegistry">The registry containing available controls.</param>
     public ControlFactory(
         IServiceProvider serviceProvider,
-        ControlExpressionCache controlExpressionCache,
+        ControlActivationCache controlActivationCache,
         ControlRegistry controlRegistry)
     {
         _serviceProvider        = serviceProvider;
-        _controlExpressionCache = controlExpressionCache;
+        _controlActivationCache = controlActivationCache;
         _controlRegistry        = controlRegistry;
     }
 
@@ -45,7 +45,7 @@ public sealed class ControlFactory : IControlFactory
         CultureInfo cultureInfo)
     {
         var type = _controlRegistry.GetControlType(@namespace, name);
-        return _controlExpressionCache.CreateControl(
+        return _controlActivationCache.CreateControl(
             _serviceProvider,
             type,
             parameterDictionary,

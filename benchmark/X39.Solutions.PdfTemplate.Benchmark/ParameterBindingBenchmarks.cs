@@ -8,7 +8,7 @@ namespace X39.Solutions.PdfTemplate.Benchmark;
 public class ParameterBindingBenchmarks
 {
     private ServiceProvider _serviceProvider = null!;
-    private ControlExpressionCache _expressionCache = null!;
+    private ControlActivationCache _controlActivationCache = null!;
 
     [Params(1, 50, 250)]
     public int ControlCount { get; set; }
@@ -17,8 +17,8 @@ public class ParameterBindingBenchmarks
     public void GlobalSetup()
     {
         _serviceProvider = BenchmarkServices.CreateServiceProvider();
-        _expressionCache = _serviceProvider.GetRequiredService<ControlExpressionCache>();
-        BenchmarkServices.WarmBenchmarkControlCache(_serviceProvider, _expressionCache);
+        _controlActivationCache = _serviceProvider.GetRequiredService<ControlActivationCache>();
+        BenchmarkServices.WarmBenchmarkControlCache(_serviceProvider, _controlActivationCache);
     }
 
     [GlobalCleanup]
@@ -33,7 +33,7 @@ public class ParameterBindingBenchmarks
         var checksum = 0;
         for (var i = 0; i < ControlCount; i++)
         {
-            var control = (ParameterHeavyControl) _expressionCache.CreateControl(
+            var control = (ParameterHeavyControl) _controlActivationCache.CreateControl(
                 _serviceProvider,
                 typeof(ParameterHeavyControl),
                 BenchmarkServices.LightParameters,
@@ -51,7 +51,7 @@ public class ParameterBindingBenchmarks
         var checksum = 0;
         for (var i = 0; i < ControlCount; i++)
         {
-            var control = (ParameterHeavyControl) _expressionCache.CreateControl(
+            var control = (ParameterHeavyControl) _controlActivationCache.CreateControl(
                 _serviceProvider,
                 typeof(ParameterHeavyControl),
                 BenchmarkServices.HeavyParameters,
@@ -69,7 +69,7 @@ public class ParameterBindingBenchmarks
         var checksum = 0;
         for (var i = 0; i < ControlCount; i++)
         {
-            var control = (ContentParameterControl) _expressionCache.CreateControl(
+            var control = (ContentParameterControl) _controlActivationCache.CreateControl(
                 _serviceProvider,
                 typeof(ContentParameterControl),
                 BenchmarkServices.EmptyParameters,

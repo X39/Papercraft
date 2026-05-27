@@ -11,7 +11,7 @@ public class ControlActivationBenchmarks
     private static readonly object[] NoArguments = Array.Empty<object>();
 
     private ServiceProvider _serviceProvider = null!;
-    private ControlExpressionCache _expressionCache = null!;
+    private ControlActivationCache _controlActivationCache = null!;
     private ObjectFactory _noDependencyFactory = null!;
     private ObjectFactory _dependencyFactory = null!;
 
@@ -19,8 +19,8 @@ public class ControlActivationBenchmarks
     public void GlobalSetup()
     {
         _serviceProvider = BenchmarkServices.CreateServiceProvider();
-        _expressionCache = _serviceProvider.GetRequiredService<ControlExpressionCache>();
-        BenchmarkServices.WarmBenchmarkControlCache(_serviceProvider, _expressionCache);
+        _controlActivationCache = _serviceProvider.GetRequiredService<ControlActivationCache>();
+        BenchmarkServices.WarmBenchmarkControlCache(_serviceProvider, _controlActivationCache);
         _noDependencyFactory = ActivatorUtilities.CreateFactory(typeof(NoDependencyControl), Type.EmptyTypes);
         _dependencyFactory = ActivatorUtilities.CreateFactory(typeof(ServiceDependencyControl), Type.EmptyTypes);
     }
@@ -32,9 +32,9 @@ public class ControlActivationBenchmarks
     }
 
     [Benchmark(Baseline = true)]
-    public IControl ExpressionCache_NoDependencies()
+    public IControl CachedControlFactory_NoDependencies()
     {
-        return _expressionCache.CreateControl(
+        return _controlActivationCache.CreateControl(
             _serviceProvider,
             typeof(NoDependencyControl),
             BenchmarkServices.EmptyParameters,
@@ -55,9 +55,9 @@ public class ControlActivationBenchmarks
     }
 
     [Benchmark]
-    public IControl ExpressionCache_WithDependency()
+    public IControl CachedControlFactory_WithDependency()
     {
-        return _expressionCache.CreateControl(
+        return _controlActivationCache.CreateControl(
             _serviceProvider,
             typeof(ServiceDependencyControl),
             BenchmarkServices.EmptyParameters,
@@ -78,9 +78,9 @@ public class ControlActivationBenchmarks
     }
 
     [Benchmark]
-    public IControl ExpressionCache_FirstUse_NoDependencies()
+    public IControl CachedControlFactory_FirstUse_NoDependencies()
     {
-        using var cache = new ControlExpressionCache();
+        var cache = new ControlActivationCache();
         return cache.CreateControl(
             _serviceProvider,
             typeof(NoDependencyControl),
@@ -90,9 +90,9 @@ public class ControlActivationBenchmarks
     }
 
     [Benchmark]
-    public IControl ExpressionCache_FirstUse_WithDependency()
+    public IControl CachedControlFactory_FirstUse_WithDependency()
     {
-        using var cache = new ControlExpressionCache();
+        var cache = new ControlActivationCache();
         return cache.CreateControl(
             _serviceProvider,
             typeof(ServiceDependencyControl),

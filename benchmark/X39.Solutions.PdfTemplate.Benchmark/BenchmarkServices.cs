@@ -30,6 +30,14 @@ internal static class BenchmarkServices
         ["COLOR"]       = "#336699",
     };
 
+    public static readonly IReadOnlyDictionary<string, string> AsyncParameters = new Dictionary<string, string>
+    {
+        ["TITLE"] = "Benchmark",
+        ["COUNT"] = "42",
+        ["RATIO"] = "1.5",
+        ["WIDTH"] = "12px",
+    };
+
     public const string ContentText = "Deterministic content parameter text.";
     public const string TinyPngDataUri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=";
 
@@ -60,7 +68,9 @@ internal static class BenchmarkServices
                 .AddControl<ServiceDependencyControl>()
                 .AddControl<ParameterHeavyControl>()
                 .AddControl<ContentParameterControl>()
-                .AddControl<BenchmarkContainerControl>());
+                .AddControl<BenchmarkContainerControl>()
+                .AddControl<CompletedInitializedControl>()
+                .AddControl<YieldInitializedControl>());
         services.AddSingleton<IBenchmarkDependency, BenchmarkDependency>();
         return services.BuildServiceProvider();
     }
@@ -72,16 +82,18 @@ internal static class BenchmarkServices
         return services.BuildServiceProvider();
     }
 
-    public static void WarmBenchmarkControlCache(IServiceProvider serviceProvider, ControlExpressionCache cache)
+    public static void WarmBenchmarkControlCache(IServiceProvider serviceProvider, ControlActivationCache cache)
     {
         cache.CreateControl(serviceProvider, typeof(NoDependencyControl), EmptyParameters, null, Culture);
         cache.CreateControl(serviceProvider, typeof(ServiceDependencyControl), EmptyParameters, null, Culture);
         cache.CreateControl(serviceProvider, typeof(ParameterHeavyControl), HeavyParameters, null, Culture);
         cache.CreateControl(serviceProvider, typeof(ContentParameterControl), EmptyParameters, ContentText, Culture);
         cache.CreateControl(serviceProvider, typeof(BenchmarkContainerControl), EmptyParameters, null, Culture);
+        cache.CreateControl(serviceProvider, typeof(CompletedInitializedControl), AsyncParameters, ContentText, Culture);
+        cache.CreateControl(serviceProvider, typeof(YieldInitializedControl), AsyncParameters, ContentText, Culture);
     }
 
-    public static void WarmDefaultControlCache(IServiceProvider serviceProvider, ControlExpressionCache cache)
+    public static void WarmDefaultControlCache(IServiceProvider serviceProvider, ControlActivationCache cache)
     {
         foreach (var controlName in BuiltInControlNames)
         {
