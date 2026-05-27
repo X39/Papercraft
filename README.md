@@ -47,6 +47,17 @@ Use [GitHub](https://github.com/X39/X39.Solutions.PdfTemplate) for best reading 
       * [`IDrawableCanvas`](#idrawablecanvas)
       * [`IDeferredCanvas`](#ideferredcanvas)
       * [`IImmediateCanvas`](#iimmediatecanvas)
+      * [`IControl`](#icontrol)
+      * [`IContentControl`](#icontentcontrol)
+      * [`IFunction`](#ifunction)
+      * [`IInitializeControlAsync`](#iinitializecontrolasync)
+      * [`IParameterConverter`](#iparameterconverter)
+      * [`ITemplateData`](#itemplatedata)
+      * [`ITransformer`](#itransformer)
+      * [`IAddControls`](#iaddcontrols)
+      * [`IAddTransformers`](#iaddtransformers)
+      * [`IPropertyAccessCache`](#ipropertyaccesscache)
+      * [`ITextService`](#itextservice)
       * [`IResourceResolver`](#iresourceresolver)
   * [Building and Testing](#building-and-testing)
   * [Proper documentation for End-Users](#proper-documentation-for-end-users)
@@ -79,6 +90,11 @@ project:
 ```shell
 dotnet add package X39.Solutions.PdfTemplate
 ```
+
+The package targets .NET 8.0, is marked trim-compatible, and depends on SkiaSharp,
+`Microsoft.Extensions.DependencyInjection.Abstractions` and `X39.Util`.
+This README is included in the NuGet package.
+Issues are tracked in the GitHub repository at <https://github.com/X39/X39.Solutions.PdfTemplate/issues>.
 
 If you are running linux, you also will have to add
 the [SkiaSharp linux assets](https://www.nuget.org/packages/SkiaSharp.NativeAssets.Linux):
@@ -113,20 +129,26 @@ You can use the following code to generate a PDF document from the template:
 // Stream xmlTemplateStream
 var paintCache             = serviceProvider.GetRequiredService<SkPaintCache>();
 var controlExpressionCache = serviceProvider.GetRequiredService<ControlExpressionCache>();
+var functions              = Enumerable.Empty<IFunction>();
 await using var generator = new Generator(
     paintCache,
     controlExpressionCache,
-    Enumerable.Empty<IFunction>()
+    functions
 );
 generator.AddDefaults();
-using var textReader   = new StringReader(xmlTemplateStream);
-using var reader       = XmlReader.Create(textReader);
+using var reader    = XmlReader.Create(xmlTemplateStream);
 using var pdfStream = new MemoryStream();
 await generator.GeneratePdfAsync(pdfStream, reader, CultureInfo.CurrentUICulture);
 // pdfStream now contains the PDF
 ```
 
 This will generate a PDF document with the text "Hello, world!".
+
+`AddPdfTemplateServices` registers the supporting services used by `Generator`.
+It does not register `Generator` itself and does not discover custom `IFunction`
+implementations automatically. Pass any custom functions to the `Generator`
+constructor, then call `generator.AddDefaults()` to register the built-in controls
+and transformers.
 
 ## Template structure
 
@@ -230,13 +252,13 @@ The library supports custom functions for use in templates and comes with two bu
 and `allVariables()`.
 These functions are used to list all available functions and variables, respectively.
 
-To create your own function, derive a class from the `IFunction` interface and implement the `Invoke` method. Here is an
-example:
+To create your own function, derive a class from the `IFunction` interface and implement the `ExecuteAsync` method.
+Pass function instances to the `Generator` constructor when creating a generator. Here is an example:
 
 ```csharp
 public class MyFunction : IFunction
 {
-    public MyFunction(ISomeDependency someDependency) // You can inject dependencies via the constructor.
+    public MyFunction(ISomeDependency someDependency) // Pass any dependencies when constructing the function.
     {
         // ...
     }
@@ -328,6 +350,21 @@ It can have one of the following formats:
 
 The library supports a variety of controls for creating complex layouts. Each control is represented by a class in
 the `X39.Solutions.PdfTemplate.Controls` namespace.
+
+All controls inherit the following attributes:
+
+| Attribute | Description | Values | Default |
+|-----------|-------------|--------|---------|
+| `Margin`  | The outer spacing around the control. | Any [`Thickness`](#thickness) | `0` |
+| `Padding` | The inner spacing inside the control. | Any [`Thickness`](#thickness) | `0` |
+| `Clip`    | Whether the control should clip content to its arranged bounds. | `true` or `false` | `true` |
+
+All alignable controls additionally support:
+
+| Attribute             | Description                              | Values                                   | Default   |
+|-----------------------|------------------------------------------|------------------------------------------|-----------|
+| `HorizontalAlignment` | Horizontal placement within the parent.  | `Left`, `Center`, `Right`, `Stretch`     | `Stretch` |
+| `VerticalAlignment`   | Vertical placement within the parent.    | `Top`, `Center`, `Bottom`, `Stretch`     | `Stretch` |
 
 #### Creating your own control
 
@@ -427,9 +464,9 @@ The `text` control supports the following attributes:
 | `Scale`           | The scale of the text.                                               | A positive number                                                                 | `1.0`                                                        |
 | `Rotation`        | The rotation of the text in degrees.                                 | A number                                                                          | `0`                                                          |
 | `StrokeThickness` | The thickness of the text stroke in points.                          | A positive number                                                                 | `1`                                                          |
-| `FontSpacing`     | The spacing between characters in points.                            | A number                                                                          | `0`                                                          |
-| `FontWeight`      | The weight of the font.                                              | Any positive number or the common names without a `-` (`thin`, `extraLight`, ...) | `normal`                                                     |
-| `FontStyle`       | The style of the font.                                               | `normal`, `italic`, `oblique`, `upright`                                          | `normal`                                                     |
+| `LetterSpacing`   | The letter spacing/font width.                                       | A number                                                                          | `0`                                                          |
+| `Weight`          | The weight of the font.                                              | Any positive number or the common names without a `-` (`thin`, `extraLight`, ...) | `0`                                                          |
+| `Style`           | The style of the font.                                               | `normal`, `italic`, `oblique`, `upright`                                          | `normal`                                                     |
 | `FontFamily`      | The font family of the text.                                         | A font family name or a comma-separated list of font family names                 | Windows: `Arial`, Any other system: OS-specific default font |
 | `Text`            | The text to render. Also accepted as XML Content.                    | Any text                                                                          | `""`                                                         |
 
@@ -442,9 +479,9 @@ The `border` control supports the following attributes:
 
 | Attribute    | Description                                                             | Values                        | Default           |
 |--------------|-------------------------------------------------------------------------|-------------------------------|-------------------|
-| `Thickness`  | The thickness of the border. See [`Thickness`](#thickness) for details. | Any [`Thickness`](#thickness) | `1pt 1pt 1pt 1pt` |
-| `Background` | The background color of the border. See [`Color`](#color) for details.  | Any [`Color`](#color)         | `#FF0000`         |
-| `Color`      | The color of the border. See [`Color`](#color) for details.             | Any [`Color`](#color)         | `#FF0000`         |
+| `Thickness`  | The thickness of the border. See [`Thickness`](#thickness) for details. | Any [`Thickness`](#thickness) | `0`               |
+| `Background` | The background color of the border. See [`Color`](#color) for details.  | Any [`Color`](#color)         | `transparent`     |
+| `Color`      | The color of the border. See [`Color`](#color) for details.             | Any [`Color`](#color)         | `transparent`     |
 
 Usage:
 
@@ -467,7 +504,7 @@ It supports the following attributes:
 
 | Attribute | Description                                                                                                                         | Values                                                                       | Default                     |
 |-----------|-------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|-----------------------------|
-| `Source`  | The source of the image. By default, the source is interpreted as Base64. Use a custom `IResourceResolver` to change this behavior. | Any URI, see [`IResourceResolver`](#iresourceresolver) for different formats | `data:image/png;base64,...` |
+| `Source`  | The source of the image. By default, the source is interpreted as Base64. Use a custom `IResourceResolver` to change this behavior. | Any URI, see [`IResourceResolver`](#iresourceresolver) for different formats | `""`                        |
 | `Width`   | The width of the image in [`Length`](#length).                                                                                      | Any [`Length`](#length)                                                      | `auto`                      |
 | `Height`  | The height of the image in [`Length`](#length).                                                                                     | Any [`Length`](#length)                                                      | `auto`                      |
 
@@ -490,8 +527,8 @@ It supports the following attributes:
 
 | Attribute     | Description                                                                 | Values                        | Default      |
 |---------------|-----------------------------------------------------------------------------|-------------------------------|--------------|
-| `Thickness`   | The thickness of the line. See [`Length`](#length) for details.             | Any [`Length`](#length)       | `1pt`        |
-| `Color`       | The color of the line. See [`Color`](#color) for details.                   | Any [`Color`](#color)         | `#FF0000`    |
+| `Thickness`   | The thickness of the line. See [`Length`](#length) for details.             | Any [`Length`](#length)       | `auto`       |
+| `Color`       | The color of the line. See [`Color`](#color) for details.                   | Any [`Color`](#color)         | `black`      |
 | `Length`      | The length of the line in [`Length`](#length).                              | Any [`Length`](#length)       | `auto`       |
 | `Orientation` | The orientation of the line. See [`Orientation`](#orientation) for details. | [`Orientation`](#orientation) | `Horizontal` |
 
@@ -511,6 +548,9 @@ Usage:
 The `pageNumber` control renders the current page number or the total number of pages or both.
 
 It supports the following attributes:
+
+In addition to these page-number-specific attributes, `pageNumber` supports the same text styling attributes as
+[`text`](#text).
 
 | Attribute   | Description                                                                               | Values                                             | Default   |
 |-------------|-------------------------------------------------------------------------------------------|----------------------------------------------------|-----------|
@@ -535,7 +575,7 @@ Usage:
 The `table` control allows to render tables.
 It is used in conjunction with the [`th`](#th), [`tr`](#tr) and [`td`](#td) controls.
 
-It has no attributes.
+It has no table-specific attributes.
 
 Usage:
 
@@ -562,7 +602,7 @@ Usage:
 The `th` control is used to define the table headers.
 A table header is repeated on every page if the table spans multiple pages.
 
-It has no attributes.
+It has no header-specific attributes.
 
 See [`table`](#table) for usage.
 
@@ -571,7 +611,7 @@ See [`table`](#table) for usage.
 The `tr` control is used to define the table rows.
 A table row cannot span multiple pages, but total rows will be broken across pages.
 
-It has no attributes.
+It has no row-specific attributes.
 
 See [`table`](#table) for usage.
 
@@ -593,7 +633,7 @@ See [`table`](#table) for usage.
 The `chart` control is a container for chart visualizations.
 It can contain one or more chart types: [`lineChart`](#linechart), [`barChart`](#barchart), or [`pieChart`](#piechart).
 
-It has no attributes.
+It has no chart-container-specific attributes.
 
 Usage:
 
@@ -747,7 +787,7 @@ A transformer, at its core, is a class that implements the `ITransformer` interf
 It allows manipulating every node in its `{...}` block and hence is a very powerful tool regarding template
 manipulation.
 
-To create your own transformer, derive a class from the `ITransformer` interface and implement the `Transform` method:
+To create your own transformer, derive a class from the `ITransformer` interface and implement the `TransformAsync` method:
 
 ```csharp
 public class MyTransformer : ITransformer
@@ -807,6 +847,10 @@ To then set a variable, use `templateData.SetVariable(variable, value);`
 Do note that while you can certainly receive variable values using `templateData.GetVariable(value);`,
 chances are that you are more interested in [evaluating the user data](#evaluating-user-data) to also
 accept functions.
+
+Transformers may also share transformer-specific state through
+`templateData.GetTransformerData<T>(name)` and `templateData.SetTransformerData(name, value)`.
+The state is keyed by both type and name and lives for the lifetime of the `ITemplateData` instance.
 
 #### `alternate`
 
@@ -946,80 +990,129 @@ generator.TemplateData.SetVariable("MyList", new[] { "one", "two", "three" });
 
 ### Interfaces
 
-This section contains the different interfaces relevant to implementors.
+This section contains the interfaces you may encounter when extending the library.
+Not every public interface is intended to be implemented by consumers.
+The usual extension points are custom controls, content controls, functions, transformers,
+parameter converters and resource resolvers.
 
 #### `IDrawableCanvas`
 
-The `IDrawableCanvas` is implementing the abstraction required for the actual, concrete backend.
-Currently, only `SkiaSharp` is available as render backend.
+`IDrawableCanvas` is the low-level drawing abstraction used by controls while rendering.
+It exists to isolate controls from the concrete SkiaSharp canvas operations.
+External code should generally not implement this interface.
+There is currently no supported alternate rendering backend, so a custom implementation would only be useful
+for specialized tests or experimentation.
 
 #### `IDeferredCanvas`
 
-The `IDeferredCanvas` is extending the [`IDrawableCanvas`](#idrawablecanvas) by introducing a way
-to defer a rendering call to the background. The call then is executed only when the actual
-rendering is done. This is required for things like page number,
-which are not calculated ahead of rendering, to work. You usually do not have to rely on this
-unless you specifically need it.
+`IDeferredCanvas` is the canvas type passed to `IControl.Render`.
+It records draw operations first and replays them later when the actual page canvas is available.
+This is what makes page-dependent rendering possible: controls can call `Defer` when they need values such as the
+current page number or total page count.
+External code should use this interface inside custom controls, but should not implement it.
 See also: [`IImmediateCanvas`](#iimmediatecanvas)
 
 #### `IImmediateCanvas`
 
-The `IImmediateCanvas` is extending the [`IDrawableCanvas`](#idrawablecanvas) by introducing
-specialized properties available at point of rendering. It is exposed by the [`IDeferredCanvas`](#ideferredcanvas),
-representing the actual time of rendering of any canvas operation.
-<!--
+`IImmediateCanvas` represents the real render-time canvas exposed inside `IDeferredCanvas.Defer`.
+It provides page-specific information such as `PageNumber` and `TotalPages`.
+Use it only when a custom control cannot know the final value during normal deferred rendering.
+Like the other canvas interfaces, it is an internal rendering abstraction and should not be implemented by consumers.
+
 #### `IControl`
 
-Stub
+`IControl` is the base contract for renderable controls.
+It exposes the measure, arrange and render phases used by the generator.
+You can implement it directly, but most custom controls should derive from the `Control` base class instead.
+The base class already handles common XML parameters such as `Margin`, `Padding`, `Clip`,
+arrangement state and canvas state management.
+Implement `IControl` directly only when you need full control over the layout lifecycle.
 
 #### `IContentControl`
 
-Stub
+`IContentControl` extends `IControl` for controls that can contain child controls.
+It is relevant when creating container controls such as custom tables, panels or layout primitives.
+Implement `CanAdd` to restrict which child control types are valid, and use the collection members to store children.
+Most custom container controls should derive from `AlignableContentControl` instead of implementing this interface
+from scratch.
 
 #### `IFunction`
 
-Stub
+`IFunction` is the intended extension point for values that should be calculated from template expressions,
+for example `@customerName()` or `@formatCurrency(@total)`.
+Implement it when template authors need reusable logic or data access that should not be encoded directly in XML.
+Functions are registered on `ITemplateData`; the `Generator` constructor registers the function instances it receives.
+Use `IsVariadic` only when the function can accept more arguments than the fixed `Arguments` count.
 
-#### `IInitializeAsync`
+#### `IInitializeControlAsync`
 
-Stub
+`IInitializeControlAsync` is an optional control hook.
+Implement it when a control needs asynchronous setup after XML construction but before measure, arrange and render.
+The default `image` control uses it to resolve and decode image resources.
+This is the right place for request-scoped resource lookup, metadata loading or other preparation that should happen
+once per generated document.
+Keep heavy repeated work out of `Measure` and `Render`.
 
 #### `IParameterConverter`
 
-Stub
+`IParameterConverter<T>` is an opt-in extension point for custom control parameter parsing.
+Use it when a `[Parameter]` property cannot be parsed by the normal .NET type converter or `IParsable<T>` path.
+Attach the converter through `ParameterAttribute.Converter`.
+Converters are useful for compact XML syntaxes, formatted values or domain-specific value objects.
 
-#### `ITempalteData`
+#### `ITemplateData`
 
-Stub
+`ITemplateData` is the document-generation data context.
+It stores variables, registered functions, expression evaluation and transformer-specific shared data.
+Custom functions and transformers use this interface heavily.
+Application code usually interacts with it through `generator.TemplateData` to set variables or register functions.
+You normally should not replace the implementation; use scopes when a transformer needs temporary variables.
 
 #### `ITransformer`
 
-Stub
+`ITransformer` is the intended extension point for XML preprocessing blocks.
+Built-in examples are `@if`, `@for`, `@foreach`, `@var` and `@alternate`.
+Implement a transformer when you need to add, remove or repeat XML nodes before controls are constructed.
+Transformers are powerful and operate on raw template nodes, so prefer functions for simple value substitution.
+Use `ITemplateData.Scope` when introducing variables so changes stay limited to the transformed nodes.
 
 #### `IAddControls`
 
-Stub
+`IAddControls` is an internal registration abstraction used by the default-control helper methods.
+It is not intended for external implementation.
+Consumer code should call `generator.AddControl<TControl>()` for custom controls and `generator.AddDefaults()` for
+the built-in control set.
 
 #### `IAddTransformers`
 
-Stub
+`IAddTransformers` is an internal registration abstraction used by the default-transformer helper methods.
+It is not intended for external implementation.
+Consumer code should call `generator.AddTransformer(transformer)` for custom transformers and `generator.AddDefaults()`
+for the built-in transformer set.
 
 #### `IPropertyAccessCache`
 
-Stub
+`IPropertyAccessCache` is infrastructure for expression evaluation.
+It caches property-access delegates so repeated template expressions can read object properties efficiently.
+It is registered by `AddPdfTemplateServices` and is not a normal customization point.
+Replace it only if you are changing expression-evaluation behavior at library-infrastructure level.
 
 #### `ITextService`
 
-Stub
--->
+`ITextService` is infrastructure for measuring and drawing text used by `TextBaseControl`.
+Custom text controls should usually consume the existing service by deriving from `TextBaseControl`.
+Replacing the service changes text layout and rendering behavior globally, so it is an advanced customization point
+rather than a typical application extension.
 
 #### `IResourceResolver`
 
 The resource resolver is responsible for resolving resources when controls need them.
 The default controls library only uses it for the `image` control.
 
-Its purpose is to allow fine control about how resources are resolved by the system.
+This is the primary extension point for custom image loading.
 The default implementation provided will treat all input as base64 encoded images.
+Override it when images should come from a database, object storage, a trusted file system location,
+authenticated HTTP requests or another application-specific source.
 `DocumentOptions.Context` is passed unchanged into the resolver, allowing custom
 resolvers to associate a resource lookup with the current print request.
 
@@ -1052,20 +1145,39 @@ await generator.GeneratePdfAsync(
 
 ## Building and Testing
 
-This project uses GitHub Actions for continuous integration. The workflow is defined in `.github/workflows/main.yml`. It
-includes steps for restoring dependencies, building the project, running tests, and publishing a NuGet package.
+This project uses GitHub Actions for continuous integration.
+The pull-request workflow is defined in `.github/workflows/run-dotnet-tests.yml`.
+The publish workflow is defined in `.github/workflows/main.yml` and restores dependencies,
+builds, runs tests, packs the library and publishes the NuGet package.
+
+To restore and build locally, use the following commands:
+
+```shell
+dotnet restore
+dotnet build --no-restore
+```
 
 To run the tests locally, use the following command:
 
 ```shell
-dotnet test --framework net7.0 --no-build --verbosity normal
+dotnet test --framework net8.0 --no-build --verbosity normal
+```
+
+To create a local package, use:
+
+```shell
+dotnet pack --configuration Release
 ```
 
 ## Proper documentation for End-Users
 
-While the code is documented, an appropriate documentation for end-users is still missing.
-This is planned tho given that this is a spare-time project, it might take a while and does not have a high priority (on
-my list).
+While the code is documented, a dedicated documentation site for end-users is still missing.
+The test project contains executable samples in `test/X39.Solutions.PdfTemplate.Test/Samples`,
+including a README-style invoice sample.
+There is also a `samples/WebAppSampleApi` project in the repository, but it is currently only a generic ASP.NET sample
+host and does not yet demonstrate the PDF template package.
+Dedicated end-user documentation is planned tho given that this is a spare-time project,
+it might take a while and does not have a high priority (on my list).
 Feel free to contribute to this project by adding documentation for end-users (e.g. using JetBrains Writerside or
 similar tools) and
 submitting a pull request. I will gladly review it and provide the necessary web-hosting in this repository (including a
