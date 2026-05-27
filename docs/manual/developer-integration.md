@@ -2,7 +2,7 @@
 
 Previous: [Troubleshooting](troubleshooting.md) | [Manual home](index.md)
 
-Status: planned.
+Status: started. Application setup and extension-point orientation have been migrated from the README.
 
 ## What Is This?
 
@@ -16,14 +16,328 @@ supplying new data, loading images from a custom location, or registering a cust
 
 ## How Do I Start?
 
-For now, use the README integration sections as the detailed source of truth.
-Future work will migrate installation, generator setup and extension-point guidance here without interrupting the beginner manual.
+Start with the package and service registration.
+The examples on this page are checked against the README and these implementation sources:
+`ServiceCollectionExtensions`, `PdfTemplateServiceBuilder`, `Generator`, `DocumentOptions`,
+`IFunction`, `ITransformer`, `IControl`, `ITemplateData` and `IResourceResolver`.
 
-## Planned Work
+## Install
 
-- Move installation and generator setup from the README into this appendix.
-- Explain when a template author needs help from a developer.
-- Document custom functions, controls, transformers and resource resolvers.
-- Keep interface descriptions concise and linked to practical use cases.
+The library targets .NET 8.0.
+Install the main package in the application that generates the PDF:
+
+```shell
+dotnet add package X39.Solutions.PdfTemplate
+```
+
+On Linux, also install the SkiaSharp native Linux assets package:
+
+```shell
+dotnet add package SkiaSharp.NativeAssets.Linux
+```
+
+## Register Services
+
+Register the built-in generator, controls, transformers and supporting services at application startup:
+
+```csharp
+using Microsoft.Extensions.DependencyInjection;
+using X39.Solutions.PdfTemplate;
+
+services.AddPdfTemplateService();
+```
+
+`AddPdfTemplateService` registers the built-in controls, the built-in transformers, `Generator`,
+`ITemplateData`, `IControlFactory`, the default text service, property-access cache and default image resolver.
+
+Use the builder overload when the application needs to add or replace template features:
+
+```csharp
+services.AddPdfTemplateService(
+    (builder) => builder
+        .AddFunction<MyFunction>()
+        .AddControl<MyControl>()
+        .AddTransformer<MyTransformer>());
+```
+
+## Generate A PDF
+
+Resolve a `Generator`, create an `XmlReader` for the template, and write the PDF to a stream:
+
+```csharp
+using System.Globalization;
+using System.Xml;
+using Microsoft.Extensions.DependencyInjection;
+using X39.Solutions.PdfTemplate;
+
+await using var scope = serviceProvider.CreateAsyncScope();
+using var generator = scope.ServiceProvider.GetRequiredService<Generator>();
+
+using var reader = XmlReader.Create(xmlTemplateStream);
+await using var output = File.Create("document.pdf");
+
+await generator.GeneratePdfAsync(
+    output,
+    reader,
+    CultureInfo.CurrentUICulture);
+```
+
+`Generator` is registered as transient and is not thread-safe.
+Use a fresh resolved generator for each document render, or keep concurrent use outside the same instance.
+
+## Supply Template Data
+
+Template authors can only use data that the application supplies.
+Set variables before rendering:
+
+```csharp
+generator.TemplateData.SetVariable("CustomerName", customer.Name);
+generator.TemplateData.SetVariable("InvoiceTotal", invoice.Total);
+```
+
+The template can then read those values:
+
+```xml
+<template>
+    <body>
+        <text>@CustomerName</text>
+        <text>Total: @InvoiceTotal</text>
+    </body>
+</template>
+```
+
+If a template author needs a new value, the application should expose it as a variable or function instead of asking the author to hard-code business logic in XML.
+
+## Configure Document Options
+
+Pass `DocumentOptions` when page setup or per-request context must differ from the default:
+
+```csharp
+using System.Globalization;
+using X39.Solutions.PdfTemplate;
+using X39.Solutions.PdfTemplate.Data;
+
+await generator.GeneratePdfAsync(
+    output,
+    reader,
+    CultureInfo.CurrentUICulture,
+    new DocumentOptions
+    {
+        Margin = new Thickness(new Length(1, ELengthUnit.Centimeters)),
+        Producer = "Invoice service",
+        Context = new PrintRequestContext(invoice.Id),
+    });
+```
+
+Useful options include:
+
+| Option | Use |
+|--------|-----|
+| `PageWidthInMillimeters` and `PageHeightInMillimeters` | Change the page size. Defaults match A4 dimensions. |
+| `DotsPerInch`, `DotsPerCentimeter` and `DotsPerMillimeter` | Change render density. |
+| `Margin` | Reserve document margin before header, body and footer layout. |
+| `Producer` and `Modified` | Set PDF metadata. |
+| `Context` | Pass request-specific information to context-aware extension points. |
+| `IgnoreErrors` | Instruct the generator to ignore errors where possible. Use carefully, because XML can still become invalid. |
+
+## Add A Function
+
+Use a function when a template needs a reusable value or calculation such as a formatted total, lookup result or application-specific label.
+
+```csharp
+using System.Globalization;
+using X39.Solutions.PdfTemplate.Abstraction;
+
+public sealed class CustomerLabelFunction : IFunction
+{
+    public string Name => "customerLabel";
+    public int Arguments => 1;
+    public bool IsVariadic => false;
+
+    public ValueTask<object?> ExecuteAsync(
+        CultureInfo cultureInfo,
+        object?[] arguments,
+        CancellationToken cancellationToken = default)
+    {
+        var customerId = Convert.ToString(arguments[0], cultureInfo);
+        return ValueTask.FromResult<object?>($"Customer {customerId}");
+    }
+}
+```
+
+Register the function:
+
+```csharp
+services.AddPdfTemplateService(
+    (builder) => builder.AddFunction<CustomerLabelFunction>());
+```
+
+A template author can call it after the application exposes it:
+
+```xml
+<text>@customerLabel(CustomerId)</text>
+```
+
+## Add A Custom Control
+
+Use a custom control when the built-in XML controls cannot render a required visual element.
+Most custom controls should derive from `Control` or an existing base control instead of implementing `IControl` directly.
+
+```csharp
+using System.Globalization;
+using X39.Solutions.PdfTemplate.Abstraction;
+using X39.Solutions.PdfTemplate.Attributes;
+using X39.Solutions.PdfTemplate.Controls.Base;
+using X39.Solutions.PdfTemplate.Data;
+
+[Control("MyApp.PdfControls", "approvalStamp")]
+public sealed class ApprovalStampControl : Control
+{
+    protected override Size DoMeasure(
+        float dpi,
+        in Size fullPageSize,
+        in Size framedPageSize,
+        in Size remainingSize,
+        CultureInfo cultureInfo)
+        => Size.Zero;
+
+    protected override Size DoArrange(
+        float dpi,
+        in Size fullPageSize,
+        in Size framedPageSize,
+        in Size remainingSize,
+        CultureInfo cultureInfo)
+        => Size.Zero;
+
+    protected override Size DoRender(
+        IDeferredCanvas canvas,
+        float dpi,
+        in Size parentSize,
+        CultureInfo cultureInfo)
+        => Size.Zero;
+}
+```
+
+Register the control:
+
+```csharp
+services.AddPdfTemplateService(
+    (builder) => builder.AddControl<ApprovalStampControl>());
+```
+
+Use a separate XML namespace prefix for application controls:
+
+```xml
+<template xmlns:app="MyApp.PdfControls">
+    <body>
+        <app:approvalStamp />
+    </body>
+</template>
+```
+
+## Add A Transformer
+
+Use a transformer only when XML nodes need to be included, removed, repeated or rewritten before controls are created.
+For simple calculated values, prefer a function.
+
+```csharp
+using System.Globalization;
+using System.Runtime.CompilerServices;
+using X39.Solutions.PdfTemplate.Abstraction;
+using XmlNode = X39.Solutions.PdfTemplate.Xml.XmlNode;
+
+public sealed class KeepChildrenTransformer : ITransformer
+{
+    public string Name => "keep";
+
+    public async IAsyncEnumerable<XmlNode> TransformAsync(
+        CultureInfo cultureInfo,
+        ITemplateData templateData,
+        string remainingLine,
+        IReadOnlyCollection<XmlNode> nodes,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        await Task.Yield();
+        foreach (var node in nodes)
+        {
+            yield return node.DeepCopy();
+        }
+    }
+}
+```
+
+Register the transformer:
+
+```csharp
+services.AddPdfTemplateService(
+    (builder) => builder.AddTransformer<KeepChildrenTransformer>());
+```
+
+The transformer is then available by name:
+
+```xml
+@keep {
+    <text>This node is returned by the custom transformer.</text>
+}
+```
+
+## Add An Image Resolver
+
+The default image resolver accepts base64 image data and `data:image/...;base64,...` sources.
+It does not read the file system or the internet.
+Register a custom `IResourceResolver` after `AddPdfTemplateService` when templates need images from application storage:
+
+```csharp
+using X39.Solutions.PdfTemplate.Services.ResourceResolver;
+
+services.AddPdfTemplateService();
+services.AddScoped<IResourceResolver, ApplicationImageResolver>();
+```
+
+```csharp
+public sealed class ApplicationImageResolver : IResourceResolver
+{
+    public async ValueTask<byte[]> ResolveImageAsync(
+        string source,
+        object? context,
+        CancellationToken cancellationToken = default)
+    {
+        var request = context as PrintRequestContext;
+        return await LoadImageBytesAsync(source, request, cancellationToken);
+    }
+}
+```
+
+`DocumentOptions.Context` is passed unchanged to `IResourceResolver.ResolveImageAsync`
+and to controls that implement `IInitializeControlAsync`.
+
+## Extension Point Map
+
+| Interface or type | Use when |
+|-------------------|----------|
+| `Generator` | The application needs to render a template to PDF or bitmaps. |
+| `ITemplateData` | The application supplies variables, registers functions or evaluates expressions inside custom extensions. |
+| `IFunction` | The template needs a reusable calculated value. |
+| `IControl` | The application must render a new XML element. |
+| `IContentControl` | A custom control must contain child controls. |
+| `IInitializeControlAsync` | A control needs async setup or request context before rendering. |
+| `ITransformer` | XML nodes must be conditionally rewritten, removed or repeated before rendering. |
+| `IResourceResolver` | Image sources must be resolved from application-specific storage. |
+| `IParameterConverter<T>` | A custom control attribute needs custom parsing. |
+| `IControlFactory` | Advanced activation behavior is needed. Most applications should use `AddControl<TControl>()` instead. |
+
+## When Template Authors Need Developer Help
+
+Ask for application work when a manual page or template needs:
+
+- a variable that is not already present,
+- a function that is not already registered,
+- an image source that the current resolver cannot load,
+- a control that does not exist in the built-in controls,
+- a transformer beyond the built-in template language,
+- document options that the application does not expose.
+
+Keep those decisions in application code.
+The user-facing template should stay focused on XML structure, layout, data placeholders and small task examples.
 
 Previous: [Troubleshooting](troubleshooting.md) | [Manual home](index.md)
