@@ -1,6 +1,6 @@
 # Layout Fundamentals
 
-Previous: [Template data](template-data.md) | [Manual home](index.md) | Next: [Controls](controls.md)
+Previous: [Template data](template-data.md) | [Manual home](index.md) | Next: [Styles](styles.md)
 
 Status: started. The visual examples on this page are verified by `LayoutDocumentationSamples`.
 Length, color and thickness formats are checked against source, `LengthTests`, `ColorTests` and `ThicknessParsingTests`.
@@ -184,4 +184,6 @@ Only use two or four values when the sides really need to differ.
 - Using percentages without checking the parent space. Percentages change when the available area changes.
 - Letting a container stretch when it should fit content. Add `verticalAlignment="top"` to a `border` when needed.
 
-Previous: [Template data](template-data.md) | [Manual home](index.md) | Next: [Controls](controls.md)
+Use [Styles](styles.md) when the same layout attributes should be reused on many controls.
+
+Previous: [Template data](template-data.md) | [Manual home](index.md) | Next: [Styles](styles.md)

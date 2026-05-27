@@ -1,6 +1,6 @@
 # Controls
 
-Previous: [Layout fundamentals](layout-fundamentals.md) | [Manual home](index.md) | Next: [Template language](template-language.md)
+Previous: [Styles](styles.md) | [Manual home](index.md) | Next: [Template language](template-language.md)
 
 Status: started. The focused [Text control](controls-text.md), [Border control](controls-border.md),
 [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md) and
@@ -51,5 +51,6 @@ The first complete controls reference will verify each attribute name against so
 - Add purpose, allowed children, attributes, examples and common mistakes for each built-in control.
 - Add generated samples for each visual control.
 - Link shared layout attributes back to [Layout fundamentals](layout-fundamentals.md).
+- Link repeated shared attributes back to [Styles](styles.md).
 
-Previous: [Layout fundamentals](layout-fundamentals.md) | [Manual home](index.md) | Next: [Template language](template-language.md)
+Previous: [Styles](styles.md) | [Manual home](index.md) | Next: [Template language](template-language.md)

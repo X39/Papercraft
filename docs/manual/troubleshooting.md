@@ -37,7 +37,7 @@ Check basic XML syntax first:
 
 If the error mentions an invalid node name, check for a dot in a normal control name.
 `XmlTemplateReaderTests.NoDotInName` verifies that dotted names are rejected for normal nodes.
-Style nodes are the special case documented later in the styles work.
+Style nodes are the special case documented in [Styles](styles.md).
 
 ## A Control Is Unknown
 
