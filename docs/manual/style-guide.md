@@ -7,7 +7,7 @@ Status: current.
 ## What Is This?
 
 This guide keeps the manual consistent as new concept pages, task pages and samples are added.
-It is written for documentation contributors and future agents, not for template authors reading the manual.
+It is written for documentation contributors and maintainers, not for template authors reading the manual.
 
 The user-facing manual should stay concept-led and sample-driven.
 Each page should help a non-developer template author understand what a template feature is,

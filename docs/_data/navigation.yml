@@ -1,0 +1,46 @@
+- title: Manual home
+  url: /manual/
+- title: Introduction
+  url: /manual/introduction.html
+- title: First document
+  url: /manual/first-document.html
+- title: Areas
+  url: /manual/areas.html
+- title: Template data
+  url: /manual/template-data.html
+- title: Layout fundamentals
+  url: /manual/layout-fundamentals.html
+- title: Styles
+  url: /manual/styles.html
+- title: Controls
+  url: /manual/controls.html
+- title: Control concepts
+  url: /manual/controls-concepts.html
+- title: Text control
+  url: /manual/controls-text.html
+- title: Border control
+  url: /manual/controls-border.html
+- title: Image control
+  url: /manual/controls-image.html
+- title: Line control
+  url: /manual/controls-line.html
+- title: Page number control
+  url: /manual/controls-page-number.html
+- title: Table control
+  url: /manual/controls-table.html
+- title: Chart controls
+  url: /manual/controls-chart.html
+- title: Transformers
+  url: /manual/transformers.html
+- title: Template language
+  url: /manual/template-language.html
+- title: Complete examples
+  url: /manual/complete-examples.html
+- title: Troubleshooting
+  url: /manual/troubleshooting.html
+- title: Developer appendix
+  url: /manual/developer-integration.html
+- title: Style guide
+  url: /manual/style-guide.html
+- title: Documentation roadmap
+  url: /manual/work-plan.html

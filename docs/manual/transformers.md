@@ -15,12 +15,12 @@ Use transformers to include, choose, repeat or prepare XML:
 
 | Transformer | Use it for |
 |-------------|------------|
-| `@if` | Include content only when a condition is true. |
-| `@switch` | Choose one branch from several cases. |
-| `@foreach` | Repeat XML for each item in a list supplied by the application. |
-| `@for` | Repeat XML for a numeric range. |
-| `@var` | Create a temporary value for one block. |
-| `@alternate` | Rotate through values, usually row colors. |
+| [`@if`](template-language.md#conditions-with-if) | Include content only when a condition is true. |
+| [`@switch`](template-language.md#choices-with-switch) | Choose one branch from several cases. |
+| [`@foreach`](template-language.md#lists-with-foreach) | Repeat XML for each item in a list supplied by the application. |
+| [`@for`](template-language.md#numeric-ranges-with-for) | Repeat XML for a numeric range. |
+| [`@var`](template-language.md#temporary-values-with-var) | Create a temporary value for one block. |
+| [`@alternate`](template-language.md#alternating-values-with-alternate) | Rotate through values, usually row colors. |
 
 ## When Should I Use This?
 
@@ -75,12 +75,12 @@ Keep braces easy to see; most transformer mistakes are easier to find when each 
 
 | Need | Start with |
 |------|------------|
-| Show or hide one section. | `@if` |
-| Choose one label from a status value. | `@switch` |
-| Repeat rows from application data. | `@foreach` |
-| Repeat a fixed design pattern a known number of times. | `@for` |
-| Name a value once inside a block. | `@var` |
-| Alternate repeated row colors. | `@alternate` |
+| Show or hide one section. | [`@if`](template-language.md#conditions-with-if) |
+| Choose one label from a status value. | [`@switch`](template-language.md#choices-with-switch) |
+| Repeat rows from application data. | [`@foreach`](template-language.md#lists-with-foreach) |
+| Repeat a fixed design pattern a known number of times. | [`@for`](template-language.md#numeric-ranges-with-for) |
+| Name a value once inside a block. | [`@var`](template-language.md#temporary-values-with-var) |
+| Alternate repeated row colors. | [`@alternate`](template-language.md#alternating-values-with-alternate) |
 
 Prefer `@foreach` over `@for` for real business lists.
 Prefer prepared data over complicated template expressions.

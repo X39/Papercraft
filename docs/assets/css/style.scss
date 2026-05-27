@@ -1,0 +1,66 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+header h1 {
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.15;
+}
+
+header p,
+.site-navigation {
+  overflow-wrap: anywhere;
+}
+
+.site-navigation {
+  margin: 1.5rem 0;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e5e5;
+}
+
+.site-navigation h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.site-navigation ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-navigation li {
+  margin: 0;
+  padding: 0;
+}
+
+.site-navigation a {
+  display: block;
+  padding: 0.18rem 0;
+}
+
+.site-navigation a[aria-current="page"] {
+  color: #111;
+  font-weight: 700;
+}
+
+section {
+  overflow-wrap: break-word;
+}
+
+@media print, screen and (max-width: 960px) {
+  .site-navigation {
+    margin-bottom: 1rem;
+  }
+
+  .site-navigation ul {
+    column-width: 12rem;
+    column-gap: 1.5rem;
+  }
+
+  .site-navigation li {
+    break-inside: avoid;
+  }
+}

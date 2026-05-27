@@ -1,0 +1,13 @@
+<nav class="site-navigation" aria-label="Manual table of contents">
+  <h2>Manual contents</h2>
+  <ul>
+    {% for item in site.data.navigation %}
+      {% assign item_url = item.url | relative_url %}
+      <li>
+        <a href="{{ item_url }}" {% if page.url == item.url %}aria-current="page"{% endif %}>
+          {{ item.title }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>

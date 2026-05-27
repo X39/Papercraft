@@ -16,6 +16,8 @@ Template authors should start with the
 [GitHub Pages user manual](https://x39.github.io/X39.Solutions.PdfTemplate/manual/).
 The manual explains document structure, template data, layout, controls, transformers,
 complete examples and troubleshooting from the perspective of people who edit XML templates.
+The Pages site includes a persistent manual table of contents so chapters can be reached
+without returning to the landing page.
 
 Useful manual entry points:
 
@@ -134,6 +136,7 @@ The publish workflow is defined in `.github/workflows/main.yml`.
 ## Documentation
 
 The GitHub Pages source lives under [`docs`](docs/index.md).
+The Pages table of contents is maintained in [`docs/_data/navigation.yml`](docs/_data/navigation.yml).
 The manual roadmap lives in [`docs/manual/work-plan.md`](docs/manual/work-plan.md).
 Executable documentation samples live under `test/X39.Solutions.PdfTemplate.Test/Samples`
 and write generated preview assets under `docs/assets/samples`.
