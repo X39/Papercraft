@@ -21,7 +21,7 @@ Start with the package and service registration.
 
 ## Install
 
-The library targets .NET 8.0.
+The library targets .NET 10.0.
 Install the main package in the application that generates the PDF:
 
 ```shell

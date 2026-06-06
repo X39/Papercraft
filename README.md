@@ -4,11 +4,15 @@
 
 ![A sample output for reference](https://raw.githubusercontent.com/X39/X39.Solutions.PdfTemplate/master/.github/media/sample.png)
 
-# X39.Solutions.PdfTemplate
+# Papercraft
 
-X39.Solutions.PdfTemplate generates PDF documents and images from XML templates in .NET.
-It renders with SkiaSharp and provides built-in controls for text, borders, images, lines,
-tables, page numbers and charts.
+Papercraft is a template-driven document rendering engine for XML templates in .NET.
+The current default backend renders through SkiaSharp and supports PDF output, raster output,
+and built-in controls for text, borders, images, lines, tables, page numbers and charts.
+
+The existing `X39.Solutions.PdfTemplate` package remains the compatibility bridge during the
+Papercraft migration. Existing users can keep `services.AddPdfTemplateService()` and `Generator`;
+new code can start using `services.AddPapercraft()` and `PapercraftGenerator`.
 
 ## User Manual
 
@@ -32,8 +36,8 @@ Useful manual entry points:
 
 ## Requirements
 
-- .NET 8.0 or later
-- A dependency injection container that can provide the services registered by `AddPdfTemplateService`
+- .NET 10.0 or later
+- A dependency injection container that can provide the services registered by `AddPapercraft`
 - On Linux, the SkiaSharp native Linux assets package
 
 The package is marked trim-compatible and depends on SkiaSharp,
@@ -43,11 +47,20 @@ Issues are tracked in the
 
 ## Install
 
-Install the [NuGet package](https://www.nuget.org/packages/X39.Solutions.PdfTemplate/):
+Install the current compatibility package:
 
 ```shell
 dotnet add package X39.Solutions.PdfTemplate
 ```
+
+The planned package split is:
+
+| Package | Use |
+|---------|-----|
+| `X39.Papercraft` | Batteries-included facade for normal PDF users. |
+| `X39.Papercraft.Core` | Renderer-neutral contracts, parsing, layout and validation. |
+| `X39.Papercraft.Rendering.SkiaSharp` | SkiaSharp PDF/raster backend. |
+| `X39.Solutions.PdfTemplate` | Compatibility bridge for existing users. |
 
 On Linux, also install the
 [SkiaSharp native Linux assets](https://www.nuget.org/packages/SkiaSharp.NativeAssets.Linux):
@@ -73,24 +86,24 @@ For template-author guidance, use the
 For application setup, use the
 [developer integration appendix](https://x39.github.io/X39.Solutions.PdfTemplate/manual/developer-integration.html).
 
-## Generate a PDF
+## Generate a PDF With Papercraft
 
 Register the library services at startup:
 
 ```csharp
-services.AddPdfTemplateService();
+services.AddPapercraft();
 ```
 
-Then resolve a `Generator` and render the template:
+Then resolve a `PapercraftGenerator` and render the template:
 
 ```csharp
 using System.Globalization;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
-using X39.Solutions.PdfTemplate;
+using X39.Papercraft;
 
 await using var scope = serviceProvider.CreateAsyncScope();
-using var generator = scope.ServiceProvider.GetRequiredService<Generator>();
+var generator = scope.ServiceProvider.GetRequiredService<PapercraftGenerator>();
 
 using var reader = XmlReader.Create(xmlTemplateStream);
 await using var output = File.Create("document.pdf");
@@ -101,14 +114,29 @@ await generator.GeneratePdfAsync(
     CultureInfo.CurrentUICulture);
 ```
 
+## Existing PdfTemplate Users
+
+The existing API is still available:
+
+```csharp
+services.AddPdfTemplateService();
+
+using var generator = scope.ServiceProvider.GetRequiredService<Generator>();
+await generator.GeneratePdfAsync(output, reader, CultureInfo.CurrentUICulture);
+```
+
+`AddPdfTemplateService()` also registers the new Papercraft facade, so applications can migrate
+call sites before changing their service setup.
+
 Common extension points are documented in the
 [developer integration appendix](https://x39.github.io/X39.Solutions.PdfTemplate/manual/developer-integration.html):
 
 - Set template variables with `generator.TemplateData.SetVariable("Name", value)`.
-- Add custom functions with `services.AddPdfTemplateService((builder) => builder.AddFunction<MyFunction>())`.
-- Add custom controls with `services.AddPdfTemplateService((builder) => builder.AddControl<TControl>())`.
-- Add custom transformers with `services.AddPdfTemplateService((builder) => builder.AddTransformer<TTransformer>())`.
-- Configure document-level options such as margin through `DocumentOptions`.
+- Add custom functions with `services.AddPapercraft((builder) => builder.AddFunction<MyFunction>())`.
+- Add custom controls with `services.AddPapercraft((builder) => builder.AddControl<TControl>())`.
+- Add custom transformers with `services.AddPapercraft((builder) => builder.AddTransformer<TTransformer>())`.
+- Configure document-level options through `PapercraftRenderOptions`.
+- Use `ValidateAsync` to check renderer capabilities and diagnostics before rendering.
 
 ## Building and Testing
 
@@ -122,7 +150,7 @@ dotnet build --no-restore
 Run tests:
 
 ```shell
-dotnet test --framework net8.0 --no-build --verbosity normal
+dotnet test --framework net10.0 --no-build --verbosity normal
 ```
 
 Create a local package:

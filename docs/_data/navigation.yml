@@ -42,3 +42,5 @@
   url: /manual/troubleshooting.html
 - title: Developer appendix
   url: /manual/developer-integration.html
+- title: Migration to Papercraft
+  url: /manual/migration-to-papercraft.html

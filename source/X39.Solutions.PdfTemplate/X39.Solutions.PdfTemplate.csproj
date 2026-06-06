@@ -7,10 +7,11 @@
 
         <PackageId>X39.Solutions.PdfTemplate</PackageId>
         <Authors>X39</Authors>
-        <Title>X39.Solutions.PdfTemplate</Title>
+        <Title>Papercraft compatibility bridge for X39.Solutions.PdfTemplate</Title>
         <PackageDescription>
-            <![CDATA[This library provides a way to generate PDF documents (and images) from XML templates.
-It uses SkiaSharp for rendering and supports a variety of controls for creating complex layouts.
+            <![CDATA[Papercraft is a template-driven document rendering engine for XML templates.
+This package is the X39.Solutions.PdfTemplate compatibility bridge and keeps the existing PDF generation UX available.
+The current default backend uses SkiaSharp for PDF and raster rendering and supports a variety of controls for creating complex layouts.
 You can easily integrate .NET objects into your templates by using so-called "variables" (`@myVariable`)
 or pull data from a database as needed, by providing a custom function (`@myFunction()`).
 You may even create your own controls by deriving from the `Control` base class!
@@ -28,7 +29,7 @@ You may even create your own controls by deriving from the `Control` base class!
         <IsTrimable>true</IsTrimable>
         <NeutralLanguage>en-US</NeutralLanguage>
         <DefaultLanguage>en-US</DefaultLanguage>
-        <PackageTags>XML;semantic-versioning;semver;PDF;C#;dotnet;csharp;.NET;library;document;generation;report;invoice;receipt;image;skia;export;windows;linux;mac;open-source;foss;LGPLv3;free;create-pdf;creation;create;pdf-table</PackageTags>
+        <PackageTags>Papercraft;XML;semantic-versioning;semver;PDF;C#;dotnet;csharp;.NET;library;document;rendering;template;generation;report;invoice;receipt;image;skia;export;windows;linux;mac;open-source;foss;LGPLv3;free;create-pdf;creation;create;pdf-table</PackageTags>
         <AnalysisLevel>latest-recommended</AnalysisLevel>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Deterministic>true</Deterministic>

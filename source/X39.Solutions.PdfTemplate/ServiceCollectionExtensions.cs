@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using X39.Papercraft;
+using X39.Papercraft.Rendering.SkiaSharp;
 using X39.Solutions.PdfTemplate.Abstraction;
 using X39.Solutions.PdfTemplate.Services;
 using X39.Solutions.PdfTemplate.Services.PropertyAccessCache;
@@ -44,6 +46,8 @@ public static class ServiceCollectionExtensions
         var builder = new PdfTemplateServiceBuilder(services);
         AddInfrastructure(services);
         AddDefaults(builder);
+        AddPapercraftRuntime(services);
+        AddPapercraftSkiaSharpRenderer(services);
         return builder;
     }
 
@@ -63,7 +67,7 @@ public static class ServiceCollectionExtensions
         return builder;
     }
 
-    private static void AddInfrastructure(IServiceCollection services)
+    internal static void AddInfrastructure(IServiceCollection services)
     {
         services.TryAddSingleton<SkPaintCache>();
         services.TryAddSingleton<ControlActivationCache>();
@@ -76,7 +80,7 @@ public static class ServiceCollectionExtensions
         services.TryAddTransient<Generator>();
     }
 
-    private static void AddDefaults(PdfTemplateServiceBuilder builder)
+    internal static void AddDefaults(PdfTemplateServiceBuilder builder)
     {
         builder.AddControl<Controls.BarChart>();
         builder.AddControl<Controls.BorderControl>();
@@ -99,5 +103,15 @@ public static class ServiceCollectionExtensions
         builder.AddTransformer<ForEachTransformer>();
         builder.AddTransformer<AlternateTransformer>();
         builder.AddTransformer<VariableTransformer>();
+    }
+
+    internal static void AddPapercraftRuntime(IServiceCollection services)
+    {
+        services.TryAddTransient<PapercraftGenerator>();
+    }
+
+    internal static void AddPapercraftSkiaSharpRenderer(IServiceCollection services)
+    {
+        services.TryAddEnumerable(ServiceDescriptor.Transient<IPapercraftRenderer, SkiaSharpPapercraftRenderer>());
     }
 }
