@@ -115,12 +115,13 @@ public class BorderControlTests
         control.Render(canvas, Dpi, PageSize, CultureInfo.InvariantCulture);
 
         canvas.AssertState();
-        canvas.AssertDrawRect(new Rectangle(0, 0, 104, 56), Colors.Blue);
-        canvas.AssertDrawLine(
-            (Colors.Green, 2F, 0F, 0F, 0F, 56F),
-            (Colors.Green, 4F, 0F, 0F, 104F, 0F),
-            (Colors.Green, 6F, 104F, 56F, 104F, 0F),
-            (Colors.Green, 8F, 104F, 56F, 0F, 56F));
+        canvas.AssertDrawRect(
+            (new Rectangle(0, 0, 104, 56), Colors.Blue),
+            (new Rectangle(0, 0, 1, 56), Colors.Green),
+            (new Rectangle(0, 0, 104, 2), Colors.Green),
+            (new Rectangle(101, 0, 3, 56), Colors.Green),
+            (new Rectangle(0, 52, 104, 4), Colors.Green));
+        Assert.Equal(0, canvas.DrawLineCount);
     }
 
     [Fact]
@@ -138,10 +139,10 @@ public class BorderControlTests
         control.Arrange(Dpi, PageSize, PageSize, PageSize, CultureInfo.InvariantCulture);
         control.Render(canvas, Dpi, PageSize, CultureInfo.InvariantCulture);
 
-        Assert.Equal(0, canvas.DrawRectCount);
-        canvas.AssertDrawLine(
-            (Colors.Green, 4F, 0F, 0F, 50F, 0F),
-            (Colors.Green, 8F, 50F, 26F, 0F, 26F));
+        canvas.AssertDrawRect(
+            (new Rectangle(0, 0, 50, 2), Colors.Green),
+            (new Rectangle(0, 22, 50, 4), Colors.Green));
+        Assert.Equal(0, canvas.DrawLineCount);
     }
 
     [Fact]
@@ -165,12 +166,13 @@ public class BorderControlTests
         Assert.Equal(new Size(52, 42), arranged);
         canvas.AssertState();
         canvas.AssertClip(new Rectangle(5, 5, 42, 32));
-        canvas.AssertDrawRect(new Rectangle(5, 5, 42, 32), Colors.Blue);
-        canvas.AssertDrawLine(
-            (Colors.Red, 2F, 5F, 5F, 5F, 37F),
-            (Colors.Red, 2F, 5F, 5F, 47F, 5F),
-            (Colors.Red, 2F, 47F, 37F, 47F, 5F),
-            (Colors.Red, 2F, 47F, 37F, 5F, 37F));
+        canvas.AssertDrawRect(
+            (new Rectangle(5, 5, 42, 32), Colors.Blue),
+            (new Rectangle(5, 5, 1, 32), Colors.Red),
+            (new Rectangle(5, 5, 42, 1), Colors.Red),
+            (new Rectangle(46, 5, 1, 32), Colors.Red),
+            (new Rectangle(5, 36, 42, 1), Colors.Red));
+        Assert.Equal(0, canvas.DrawLineCount);
     }
 
     [Fact]
@@ -189,11 +191,12 @@ public class BorderControlTests
         control.Arrange(Dpi, PageSize, PageSize, PageSize, CultureInfo.InvariantCulture);
         control.Render(canvas, Dpi, PageSize, CultureInfo.InvariantCulture);
 
+        canvas.AssertDrawRect(
+            (new Rectangle(0, 0, 1, 26), Colors.Red),
+            (new Rectangle(0, 0, 24, 2), Colors.Red),
+            (new Rectangle(21, 0, 3, 26), Colors.Red),
+            (new Rectangle(0, 22, 24, 4), Colors.Red));
         canvas.AssertDrawLine(
-            (Colors.Red, 2F, 0F, 0F, 0F, 26F),
-            (Colors.Red, 4F, 0F, 0F, 24F, 0F),
-            (Colors.Red, 6F, 24F, 26F, 24F, 0F),
-            (Colors.Red, 8F, 24F, 26F, 0F, 26F),
             (Colors.Black, 1F, 1F, 2F, 2F, 3F),
             (Colors.Magenta, 1F, 1F, 14F, 2F, 15F));
     }
@@ -215,11 +218,12 @@ public class BorderControlTests
         control.Arrange(Dpi, PageSize, PageSize, PageSize, CultureInfo.InvariantCulture);
         control.Render(canvas, Dpi, PageSize, CultureInfo.InvariantCulture);
 
+        canvas.AssertDrawRect(
+            (new Rectangle(0, 0, 1, 72), Colors.Red),
+            (new Rectangle(0, 0, 12, 1), Colors.Red),
+            (new Rectangle(11, 0, 1, 72), Colors.Red),
+            (new Rectangle(0, 71, 12, 1), Colors.Red));
         canvas.AssertDrawLine(
-            (Colors.Red, 2F, 0F, 0F, 0F, 72F),
-            (Colors.Red, 2F, 0F, 0F, 12F, 0F),
-            (Colors.Red, 2F, 12F, 72F, 12F, 0F),
-            (Colors.Red, 2F, 12F, 72F, 0F, 72F),
             (Colors.Black, 1F, 1F, 1F, 2F, 2F),
             (Colors.Magenta, 1F, 1F, 31F, 2F, 32F));
     }

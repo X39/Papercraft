@@ -109,37 +109,37 @@ public class BorderControl : AlignableContentControl
         if (Background != Colors.Transparent)
             canvas.DrawRect(Arrangement with {Left = 0, Top = 0}, Background);
         if (thickness.Left > 0)
-            canvas.DrawLine(
-                Color,
-                thickness.Left * 2,
-                0,
-                0,
-                0,
-                Arrangement.Height);
+            DrawBorderRectangle(
+                canvas,
+                new Rectangle(
+                    0,
+                    0,
+                    Math.Min(thickness.Left, Arrangement.Width),
+                    Arrangement.Height));
         if (thickness.Top > 0)
-            canvas.DrawLine(
-                Color,
-                thickness.Top * 2,
-                0,
-                0,
-                Arrangement.Width,
-                0);
-        if (thickness.Right > 0)
-            canvas.DrawLine(
-                Color,
-                thickness.Width * 2,
-                Arrangement.Width,
-                Arrangement.Height,
-                Arrangement.Width,
-                0);
-        if (thickness.Bottom > 0)
-            canvas.DrawLine(
-                Color,
-                thickness.Height * 2,
-                Arrangement.Width,
-                Arrangement.Height,
-                0,
-                Arrangement.Height);
+            DrawBorderRectangle(
+                canvas,
+                new Rectangle(
+                    0,
+                    0,
+                    Arrangement.Width,
+                    Math.Min(thickness.Top, Arrangement.Height)));
+        if (thickness.Width > 0)
+            DrawBorderRectangle(
+                canvas,
+                new Rectangle(
+                    Math.Max(0, Arrangement.Width - thickness.Width),
+                    0,
+                    Math.Min(thickness.Width, Arrangement.Width),
+                    Arrangement.Height));
+        if (thickness.Height > 0)
+            DrawBorderRectangle(
+                canvas,
+                new Rectangle(
+                    0,
+                    Math.Max(0, Arrangement.Height - thickness.Height),
+                    Arrangement.Width,
+                    Math.Min(thickness.Height, Arrangement.Height)));
 
         canvas.Translate(-Arrangement);
         canvas.Translate(ArrangementInner);
@@ -153,6 +153,13 @@ public class BorderControl : AlignableContentControl
         }
 
         return new Size(additionalWidth, additionalHeight);
+    }
+
+    private void DrawBorderRectangle(IDeferredCanvas canvas, Rectangle rectangle)
+    {
+        if (rectangle is not { Width: > 0, Height: > 0 })
+            return;
+        canvas.DrawRect(rectangle, Color);
     }
 
     /// <inheritdoc />
