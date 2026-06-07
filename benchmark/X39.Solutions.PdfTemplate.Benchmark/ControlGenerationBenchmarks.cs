@@ -1,7 +1,9 @@
 using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.DependencyInjection;
 using SkiaSharp;
-using X39.Solutions.PdfTemplate.Data;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Rendering.SkiaSharp;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 

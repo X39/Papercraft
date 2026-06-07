@@ -1,541 +1,119 @@
-﻿using System.Xml;
+using System.Xml;
 using SkiaSharp;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Canvas;
-using X39.Solutions.PdfTemplate.Data;
-using X39.Solutions.PdfTemplate.Functions;
-using X39.Solutions.PdfTemplate.Services;
-using X39.Solutions.PdfTemplate.Xml;
-using X39.Util.Collections;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Abstraction;
 
 namespace X39.Solutions.PdfTemplate;
 
 /// <summary>
-/// Generator for PDF files
+/// Compatibility wrapper for the legacy PDF template generator entry point.
 /// </summary>
-/// <remarks>
-/// This class is not thread safe. Make sure to implement locking if you want to use it in a multi-threaded environment.
-/// </remarks>
 [PublicAPI]
 public sealed class Generator : IDisposable, IAsyncDisposable
 {
+    private readonly PapercraftRenderer _renderer;
+    private readonly Dictionary<string, object> _data = new();
+
+    /// <summary>
+    /// Creates a compatibility generator.
+    /// </summary>
+    public Generator(PapercraftRenderer renderer)
+    {
+        ArgumentNullException.ThrowIfNull(renderer);
+        _renderer = renderer;
+    }
+
     /// <summary>
     /// The data available to the templates processed by this generator.
     /// </summary>
-    public ITemplateData TemplateData { get; }
-
-    private readonly SkPaintCache               _skPaintCache;
-    private readonly IControlFactory            _controlFactory;
-    private readonly Dictionary<string, object> _data         = new();
-    private readonly IReadOnlyCollection<ITransformer> _transformers;
-
-    /// <summary>
-    /// Creates a new instance of the <see cref="Generator"/> class.
-    /// </summary>
-    /// <param name="skPaintCache">The paint cache to use.</param>
-    /// <param name="controlFactory">The control factory to use.</param>
-    /// <param name="functions">The functions to register.</param>
-    /// <param name="transformers">The transformers to register.</param>
-    public Generator(
-        SkPaintCache skPaintCache,
-        IControlFactory controlFactory,
-        IEnumerable<IFunction> functions,
-        IEnumerable<ITransformer> transformers
-    )
-    {
-        TemplateData = new TemplateData();
-        TemplateData.RegisterFunction(new AllTemplateDataFunctions(TemplateData));
-        TemplateData.RegisterFunction(new AllTemplateDataVariables(TemplateData));
-        foreach (var function in functions)
-        {
-            TemplateData.RegisterFunction(function);
-        }
-
-        var transformerArray = transformers.ToArray();
-        var duplicateTransformers = transformerArray
-                                    .GroupBy((q) => q.Name, StringComparer.OrdinalIgnoreCase)
-                                    .FirstOrDefault((q) => q.Count() > 1);
-        if (duplicateTransformers is not null)
-            throw new InvalidOperationException(
-                $"The transformer {duplicateTransformers.Key} is registered more than once.");
-
-        _skPaintCache   = skPaintCache;
-        _controlFactory = controlFactory;
-        _transformers   = transformerArray;
-    }
+    public ITemplateData TemplateData => _renderer.TemplateData;
 
     /// <summary>
     /// Adds data to the generator, making it available for use in templates.
     /// </summary>
-    /// <param name="key">The key to store the data under.</param>
-    /// <param name="data">The data to store.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="data"/> is <see langword="null"/>.</exception>
     public void AddData(string key, object data)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
         ArgumentNullException.ThrowIfNull(data);
         _data.Add(key, data);
+        TemplateData.SetVariable(key, data);
     }
 
     /// <summary>
-    /// Generates a PDF document from the given <paramref name="reader"/>.
+    /// Generates a PDF document from the given template reader.
     /// </summary>
-    /// <param name="outputStream">The stream to write the PDF document to.</param>
-    /// <param name="reader">The reader to read the template from.</param>
-    /// <param name="cultureInfo">The culture to use for the generation.</param>
-    /// <param name="documentOptions">The options for the document.</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the execution.</param>
-    /// <returns>
-    ///     A <see cref="Task{TResult}"/> that will complete when the generation has finished,
-    ///     returning the <see cref="SKBitmap"/>'s.
-    /// </returns>
-    public async Task GeneratePdfAsync(
+    public Task GeneratePdfAsync(
         Stream outputStream,
         XmlReader reader,
         CultureInfo cultureInfo,
         DocumentOptions? documentOptions = default,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var options = documentOptions ?? DocumentOptions.Default;
-        var pageSize = new Size(
-            options.DotsPerMillimeter * options.PageWidthInMillimeters,
-            options.DotsPerMillimeter * options.PageHeightInMillimeters
-        );
-        using var skDocument = SKDocument.CreatePdf(
+        CancellationToken cancellationToken = default)
+        => _renderer.GeneratePdfAsync(
             outputStream,
-            new SKDocumentPdfMetadata
-            {
-                RasterDpi = options.DotsPerInch,
-                Producer  = options.Producer,
-                Modified  = options.Modified,
-                PdfA      = true,
-            }
-        );
-        var hasOpenPage = false;
-        await GenerateAsync(
-                () =>
-                {
-                    hasOpenPage = true;
-                    return skDocument.BeginPage(pageSize.Width, pageSize.Height);
-                },
-                reader,
-                cultureInfo,
-                options,
-                cancellationToken
-            )
-            .ConfigureAwait(false);
-        if (!hasOpenPage)
-            skDocument.BeginPage(pageSize.Width, pageSize.Height)
-                .Dispose();
-        skDocument.EndPage();
-        skDocument.Close();
-    }
-
+            reader,
+            cultureInfo,
+            CreateRenderOptions(documentOptions),
+            cancellationToken);
 
     /// <summary>
-    /// Generates <see cref="SKBitmap"/>'s from the given <paramref name="reader"/>.
+    /// Generates SkiaSharp bitmaps from the given template reader.
     /// </summary>
-    /// <remarks>
-    /// The caller is responsible for disposing the returned <see cref="SKBitmap"/>'s.
-    /// </remarks>
-    /// <param name="reader">The reader to read the template from.</param>
-    /// <param name="cultureInfo">The culture to use for the generation.</param>
-    /// <param name="documentOptions">The options for the document.</param>
-    /// <param name="cancellationToken">A cancellation token to cancel the execution.</param>
-    /// <returns>
-    ///     A <see cref="Task{TResult}"/> that will complete when the generation has finished,
-    ///     returning the <see cref="SKBitmap"/>'s.
-    /// </returns>
     public async Task<IReadOnlyCollection<SKBitmap>> GenerateBitmapsAsync(
         XmlReader reader,
         CultureInfo cultureInfo,
         DocumentOptions? documentOptions = default,
-        CancellationToken cancellationToken = default
-    )
+        CancellationToken cancellationToken = default)
     {
-        var options = documentOptions ?? DocumentOptions.Default;
-        var pageSize = new Size(
-            options.DotsPerMillimeter * options.PageWidthInMillimeters,
-            options.DotsPerMillimeter * options.PageHeightInMillimeters
-        );
-        var bitmaps = new List<SKBitmap>();
+        ArgumentNullException.ThrowIfNull(reader);
+        ArgumentNullException.ThrowIfNull(cultureInfo);
+
+        var pageStreams = new List<MemoryStream>();
+        await _renderer.RenderRasterPagesAsync(
+                reader,
+                new RasterPageRenderOutput(
+                    PapercraftMediaTypes.ImagePng,
+                    (_, _) =>
+                    {
+                        var stream = new MemoryStream();
+                        pageStreams.Add(stream);
+                        return ValueTask.FromResult<Stream>(stream);
+                    },
+                    leaveStreamsOpen: true),
+                cultureInfo,
+                CreateRenderOptions(documentOptions),
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        var bitmaps = new List<SKBitmap>(pageStreams.Count);
         try
         {
-            SKCanvas? canvas = null;
-            await GenerateAsync(
-                    () =>
-                    {
-                        var bitmap = new SKBitmap(
-                            (int) Math.Ceiling(pageSize.Width),
-                            (int) Math.Ceiling(pageSize.Height)
-                        );
-                        bitmaps.Add(bitmap);
-                        canvas = new SKCanvas(bitmap);
-                        canvas.Clear(SKColors.White);
-                        return canvas;
-                    },
-                    reader,
-                    cultureInfo,
-                    options,
-                    cancellationToken
-                )
-                .ConfigureAwait(false);
-            canvas?.Dispose();
+            foreach (var pageStream in pageStreams)
+            {
+                pageStream.Position = 0;
+                var bitmap = SKBitmap.Decode(pageStream)
+                             ?? throw new InvalidOperationException("Papercraft raster output did not produce a decodable bitmap.");
+                bitmaps.Add(bitmap);
+            }
+
             return bitmaps.AsReadOnly();
         }
         catch
         {
-            bitmaps.ForEach((q) => q.Dispose());
+            foreach (var bitmap in bitmaps)
+            {
+                bitmap.Dispose();
+            }
+
             throw;
         }
-    }
-
-    private async Task GenerateAsync(
-        [InstantHandle] Func<SKCanvas> nextCanvas,
-        XmlReader reader,
-        CultureInfo cultureInfo,
-        DocumentOptions? documentOptions = default,
-        CancellationToken cancellationToken = default
-    )
-    {
-        using var templateDataScope = TemplateData.Scope("Document");
-        var options = documentOptions ?? DocumentOptions.Default;
-        XmlNodeInformation rootNode;
-        using (var templateReader = new XmlTemplateReader(options, cultureInfo, TemplateData, _transformers))
-            rootNode = await templateReader.ReadAsync(reader, cancellationToken)
-                .ConfigureAwait(false);
-
-        await using var template = await Template.CreateAsync(
-                rootNode,
-                _controlFactory,
-                cultureInfo,
-                options.Context,
-                cancellationToken)
-            .ConfigureAwait(false);
-        var originalPageSize = new Size(
-            options.DotsPerMillimeter * options.PageWidthInMillimeters,
-            options.DotsPerMillimeter * options.PageHeightInMillimeters
-        );
-        var marginLeft = options.Margin.Left.ToPixels(originalPageSize.Width, options.DotsPerInch);
-        var marginTop = options.Margin.Top.ToPixels(originalPageSize.Height, options.DotsPerInch);
-        var pageSize = new Size(
-            originalPageSize.Width
-            - marginLeft
-            - options.Margin.Right.ToPixels(originalPageSize.Width, options.DotsPerInch),
-            originalPageSize.Height
-            - marginTop
-            - options.Margin.Bottom.ToPixels(originalPageSize.Height, options.DotsPerInch)
-        );
-
-        #region Measure
-
-        foreach (var control in Enumerable.Empty<IControl>()
-                     .Concat(template.BackgroundControls)
-                     .Concat(template.HeaderControls)
-                     .Concat(template.BodyControls)
-                     .Concat(template.FooterControls)
-                     .Concat(template.ForegroundControls))
+        finally
         {
-            control.Measure(options.DotsPerInch, pageSize, pageSize, pageSize, cultureInfo);
-        }
-
-        foreach (var area in template.AreaControls)
-        {
-            var tuple = area.CalculateClippingAndTranslationData(options.DotsPerInch, originalPageSize);
-            foreach (var areaControl in area.Controls)
+            foreach (var pageStream in pageStreams)
             {
-                areaControl.Measure(options.DotsPerInch, tuple.size, tuple.size, tuple.size, cultureInfo);
+                await pageStream.DisposeAsync()
+                    .ConfigureAwait(false);
             }
         }
-
-        #endregion
-
-        #region Arrange
-
-        #region Background
-
-        var backgroundSizes = new List<Size>();
-        var backgroundPageSize = originalPageSize with { Height = originalPageSize.Height };
-        foreach (var control in template.BackgroundControls)
-        {
-            var size = control.Arrange(
-                options.DotsPerInch,
-                originalPageSize,
-                backgroundPageSize,
-                backgroundPageSize,
-                cultureInfo
-            );
-            backgroundSizes.Add(size);
-        }
-
-        backgroundPageSize = backgroundPageSize with { Height = originalPageSize.Height };
-
-        #endregion
-
-        #region Header
-
-        var headerSizes = new List<Size>();
-        var headerPageSize = pageSize with { Height = pageSize.Height * 0.25F };
-        foreach (var control in template.HeaderControls)
-        {
-            var size = control.Arrange(options.DotsPerInch, pageSize, headerPageSize, headerPageSize, cultureInfo);
-            headerSizes.Add(size);
-        }
-
-        headerPageSize = headerPageSize with { Height = headerSizes.Sum((q) => q.Height) };
-        if (headerPageSize.Height > pageSize.Height * 0.25F)
-            headerPageSize = headerPageSize with { Height = pageSize.Height * 0.25F };
-
-        #endregion
-
-        #region Footer
-
-        var footerSizes = new List<Size>();
-        var footerPageSize = pageSize with { Height = pageSize.Height * 0.25F };
-        foreach (var control in template.FooterControls)
-        {
-            var size = control.Arrange(options.DotsPerInch, pageSize, footerPageSize, footerPageSize, cultureInfo);
-            footerSizes.Add(size);
-        }
-
-        footerPageSize = footerPageSize with { Height = footerSizes.Sum((q) => q.Height) };
-        if (footerPageSize.Height > pageSize.Height * 0.25F)
-            footerPageSize = footerPageSize with { Height = pageSize.Height * 0.25F };
-
-        #endregion
-
-        #region Body
-
-        var bodySizes = new List<Size>();
-        var bodyPageSize = pageSize with { Height = pageSize.Height - headerPageSize.Height - footerPageSize.Height };
-        foreach (var control in template.BodyControls)
-        {
-            var size = control.Arrange(options.DotsPerInch, pageSize, bodyPageSize, bodyPageSize, cultureInfo);
-            bodySizes.Add(size);
-        }
-
-        #endregion
-
-        #region Foreground
-
-        var foregroundSizes = new List<Size>();
-        var foregroundPageSize = originalPageSize with { Height = originalPageSize.Height };
-        foreach (var control in template.ForegroundControls)
-        {
-            var size = control.Arrange(
-                options.DotsPerInch,
-                originalPageSize,
-                foregroundPageSize,
-                foregroundPageSize,
-                cultureInfo
-            );
-            foregroundSizes.Add(size);
-        }
-
-        foregroundPageSize = foregroundPageSize with { Height = originalPageSize.Height };
-
-        #endregion
-
-        #region Areas
-
-        var areaSizes = new List<(int areaIndex, Size size)>();
-        foreach (var (area, areaIndex) in template.AreaControls.Indexed())
-        {
-            var tuple = area.CalculateClippingAndTranslationData(options.DotsPerInch, originalPageSize);
-
-            foreach (var control in area.Controls)
-            {
-                var size = control.Arrange(options.DotsPerInch, tuple.size, tuple.size, tuple.size, cultureInfo);
-                areaSizes.Add((areaIndex, size));
-            }
-        }
-
-        #endregion
-
-        #endregion
-
-        #region Render
-
-        #region Background
-
-        var backgroundCanvasAbstraction = new DeferredCanvasImpl
-        {
-            ActualPageSize = originalPageSize, PageSize = originalPageSize,
-        };
-        using (backgroundCanvasAbstraction.CreateState())
-        {
-            foreach (var (control, size) in template.BackgroundControls.Zip(backgroundSizes))
-            {
-                _ = control.Render(backgroundCanvasAbstraction, options.DotsPerInch, backgroundPageSize, cultureInfo);
-                backgroundCanvasAbstraction.Translate(0F, size.Height);
-            }
-        }
-
-        #endregion
-
-        #region Header
-
-        var headerCanvasAbstraction = new DeferredCanvasImpl
-        {
-            ActualPageSize = originalPageSize, PageSize = pageSize,
-        };
-        using (headerCanvasAbstraction.CreateState())
-        {
-            foreach (var (control, size) in template.HeaderControls.Zip(headerSizes))
-            {
-                _ = control.Render(headerCanvasAbstraction, options.DotsPerInch, headerPageSize, cultureInfo);
-                headerCanvasAbstraction.Translate(0F, size.Height);
-            }
-        }
-
-        #endregion
-
-        #region Body
-
-        var bodyCanvasAbstraction = new DeferredCanvasImpl { ActualPageSize = originalPageSize, PageSize = pageSize, };
-        float desiredBodyHeight;
-        using (bodyCanvasAbstraction.CreateState())
-        {
-            desiredBodyHeight = bodySizes.Sum((q) => q.Height);
-            foreach (var (control, size) in template.BodyControls.Zip(bodySizes))
-            {
-                var (_, additionalHeight) = control.Render(
-                    bodyCanvasAbstraction,
-                    options.DotsPerInch,
-                    bodyPageSize,
-                    cultureInfo
-                );
-                desiredBodyHeight += additionalHeight;
-                bodyCanvasAbstraction.Translate(0F, size.Height + additionalHeight);
-            }
-        }
-
-        #endregion
-
-
-        #region Footer
-
-        var footerCanvasAbstraction = new DeferredCanvasImpl
-        {
-            ActualPageSize = originalPageSize, PageSize = pageSize,
-        };
-        using (footerCanvasAbstraction.CreateState())
-        {
-            foreach (var (control, size) in template.FooterControls.Zip(footerSizes))
-            {
-                _ = control.Render(footerCanvasAbstraction, options.DotsPerInch, footerPageSize, cultureInfo);
-                footerCanvasAbstraction.Translate(0F, size.Height);
-            }
-        }
-
-        #endregion
-
-        #region Area
-
-        var areaCanvasAbstraction = new DeferredCanvasImpl
-        {
-            ActualPageSize = originalPageSize, PageSize = originalPageSize,
-        };
-        using (areaCanvasAbstraction.CreateState())
-        {
-            foreach (var (area, areaIndex) in template.AreaControls.Indexed())
-            {
-                var tuple = area.CalculateClippingAndTranslationData(options.DotsPerInch, originalPageSize);
-                using (areaCanvasAbstraction.CreateState())
-                {
-                    // Translate canvas
-                    areaCanvasAbstraction.Translate(tuple.left, tuple.top);
-                    // Clip Canvas
-                    areaCanvasAbstraction.Clip(0, 0, tuple.width, tuple.height);
-                    foreach (var (control, (_, size)) in area.Controls.Zip(areaSizes.Where(t => t.areaIndex == areaIndex)))
-                    {
-                        _ = control.Render(areaCanvasAbstraction, options.DotsPerInch, tuple.size, cultureInfo);
-                        areaCanvasAbstraction.Translate(0F, size.Height);
-                    }
-                }
-            }
-        }
-
-
-        #endregion
-
-        #region Foreground
-
-        var foregroundCanvasAbstraction = new DeferredCanvasImpl
-        {
-            ActualPageSize = originalPageSize, PageSize = originalPageSize,
-        };
-        using (foregroundCanvasAbstraction.CreateState())
-        {
-            foreach (var (control, size) in template.ForegroundControls.Zip(foregroundSizes))
-            {
-                _ = control.Render(foregroundCanvasAbstraction, options.DotsPerInch, foregroundPageSize, cultureInfo);
-                foregroundCanvasAbstraction.Translate(0F, size.Height);
-            }
-        }
-
-        #endregion
-
-        var currentHeight = 0F;
-
-        var pageCount = Math.Max((ushort) Math.Ceiling(desiredBodyHeight / bodyPageSize.Height), (ushort) 1);
-        for (var i = 0; i < pageCount; i++)
-        {
-            // ReSharper disable AccessToDisposedClosure
-            using var canvas = nextCanvas();
-            var immediateCanvas = new ImmediateCanvasImpl(canvas, _skPaintCache)
-            {
-                PageNumber = (ushort) (i + 1), TotalPages = pageCount,
-            };
-            using var initialScope = new Disposable(() => canvas.Save(), () => canvas.Restore());
-            using (immediateCanvas.CreateState())
-            {
-                immediateCanvas.Clip(0, 0, backgroundPageSize.Width, backgroundPageSize.Height);
-                backgroundCanvasAbstraction.Render(immediateCanvas);
-            }
-
-            using (immediateCanvas.CreateState())
-            {
-                canvas.Translate(marginLeft, marginTop);
-                using (immediateCanvas.CreateState())
-                {
-                    immediateCanvas.Clip(0, 0, headerPageSize.Width, headerPageSize.Height);
-                    headerCanvasAbstraction.Render(immediateCanvas);
-                }
-
-                using (immediateCanvas.CreateState())
-                {
-                    immediateCanvas.Translate(0, headerPageSize.Height);
-                    immediateCanvas.Clip(0, 0, bodyPageSize.Width, bodyPageSize.Height);
-                    immediateCanvas.Translate(0, -currentHeight);
-                    bodyCanvasAbstraction.Render(immediateCanvas);
-                }
-
-                using (immediateCanvas.CreateState())
-                {
-                    immediateCanvas.Translate(0, headerPageSize.Height);
-                    immediateCanvas.Translate(0, bodyPageSize.Height);
-                    immediateCanvas.Clip(0, 0, footerPageSize.Width, footerPageSize.Height);
-                    footerCanvasAbstraction.Render(immediateCanvas);
-                }
-            }
-            using (immediateCanvas.CreateState())
-            {
-                immediateCanvas.Translate(0, i * originalPageSize.Height);
-                areaCanvasAbstraction.Render(immediateCanvas);
-            }
-
-            using (immediateCanvas.CreateState())
-            {
-                immediateCanvas.Clip(0, 0, foregroundPageSize.Width, foregroundPageSize.Height);
-                foregroundCanvasAbstraction.Render(immediateCanvas);
-            }
-
-            currentHeight += bodyPageSize.Height;
-        }
-        // ReSharper restore AccessToDisposedClosure
-
-        #endregion
     }
 
     /// <inheritdoc />
@@ -543,12 +121,8 @@ public sealed class Generator : IDisposable, IAsyncDisposable
     {
         foreach (var (_, value) in _data)
         {
-            switch (value)
-            {
-                case IDisposable disposable:
-                    disposable.Dispose();
-                    break;
-            }
+            if (value is IDisposable disposable)
+                disposable.Dispose();
         }
 
         _data.Clear();
@@ -562,7 +136,8 @@ public sealed class Generator : IDisposable, IAsyncDisposable
             switch (value)
             {
                 case IAsyncDisposable asyncDisposable:
-                    await asyncDisposable.DisposeAsync();
+                    await asyncDisposable.DisposeAsync()
+                        .ConfigureAwait(false);
                     break;
                 case IDisposable disposable:
                     disposable.Dispose();
@@ -572,4 +147,9 @@ public sealed class Generator : IDisposable, IAsyncDisposable
 
         _data.Clear();
     }
+
+    private static PapercraftRenderOptions CreateRenderOptions(DocumentOptions? documentOptions)
+        => documentOptions is null
+            ? PapercraftRenderOptions.Default
+            : PapercraftRenderOptions.Default with { DocumentOptions = documentOptions.Value };
 }

@@ -51,7 +51,7 @@ Common causes:
 Developer setup and custom control registration belong in the
 [developer integration appendix](developer-integration.md).
 
-## A Namespace Or Prefix Breaks Controls
+## A Custom Default Namespace Breaks Built-In Controls
 
 The manual examples intentionally omit `xmlns`.
 When an element has no XML namespace, the reader treats it as part of the built-in control namespace.
@@ -69,8 +69,17 @@ Do not add a custom default namespace to normal templates:
 In this XML, `text` is read in `MyApp.PdfControls`, not in the built-in namespace.
 The result is usually an unknown-control error for `MyApp.PdfControls:text`.
 
-Do not use prefixed controls such as `<pt:text>`.
-The current reader treats the element name as `pt:text`, and control names cannot contain `:`.
+If the custom namespace is intentional, bind the built-in namespace to a prefix and use that prefix
+for built-in controls:
+
+```xml
+<template xmlns="MyApp.PdfControls"
+          xmlns:default="X39.Solutions.PdfTemplate.Controls">
+    <body>
+        <default:text>Hello</default:text>
+    </body>
+</template>
+```
 
 For normal authoring, remove the namespace declaration and use unprefixed control names.
 If a template needs an application-specific control, ask the application team which unprefixed element name they registered.

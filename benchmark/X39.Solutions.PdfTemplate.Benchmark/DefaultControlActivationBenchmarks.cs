@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.DependencyInjection;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Services;
+using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Services;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 

@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Attributes;
-using X39.Solutions.PdfTemplate.Transformers;
-using X39.Solutions.PdfTemplate.Xml;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Xml;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 
@@ -13,11 +13,11 @@ public class TransformerDirectBenchmarks
     private TemplateData _alternateData = null!;
     private TemplateData _variableData = null!;
 
-    private ForTransformer _forTransformer = null!;
-    private ForEachTransformer _forEachTransformer = null!;
-    private IfTransformer _ifTransformer = null!;
-    private AlternateTransformer _alternateTransformer = null!;
-    private VariableTransformer _variableTransformer = null!;
+    private Papercraft.Transformers.ForTransformer       _forTransformer       = null!;
+    private Papercraft.Transformers.ForEachTransformer   _forEachTransformer   = null!;
+    private Papercraft.Transformers.IfTransformer        _ifTransformer        = null!;
+    private Papercraft.Transformers.AlternateTransformer _alternateTransformer = null!;
+    private Papercraft.Transformers.VariableTransformer  _variableTransformer  = null!;
 
     [GlobalSetup]
     public void GlobalSetup()
@@ -31,11 +31,11 @@ public class TransformerDirectBenchmarks
         _alternateData = new TemplateData();
         _variableData = new TemplateData();
 
-        _forTransformer = new ForTransformer();
-        _forEachTransformer = new ForEachTransformer();
-        _ifTransformer = new IfTransformer();
-        _alternateTransformer = new AlternateTransformer();
-        _variableTransformer = new VariableTransformer();
+        _forTransformer       = new Papercraft.Transformers.ForTransformer();
+        _forEachTransformer   = new Papercraft.Transformers.ForEachTransformer();
+        _ifTransformer        = new Papercraft.Transformers.IfTransformer();
+        _alternateTransformer = new Papercraft.Transformers.AlternateTransformer();
+        _variableTransformer  = new Papercraft.Transformers.VariableTransformer();
 
         ConsumeAsync(
                 _alternateTransformer.TransformAsync(

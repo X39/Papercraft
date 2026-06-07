@@ -1,0 +1,99 @@
+namespace X39.Solutions.Papercraft;
+
+/// <summary>
+/// The result of validating a document against a renderer and output target.
+/// </summary>
+public sealed class RenderValidationResult
+{
+    /// <summary>
+    /// Creates a validation result.
+    /// </summary>
+    /// <param name="diagnostics">The diagnostics produced by validation.</param>
+    public RenderValidationResult(IEnumerable<RenderDiagnostic> diagnostics)
+    {
+        ArgumentNullException.ThrowIfNull(diagnostics);
+        Diagnostics = diagnostics.ToArray();
+    }
+
+    /// <summary>
+    /// A validation result without diagnostics.
+    /// </summary>
+    public static RenderValidationResult Supported { get; } = new(Array.Empty<RenderDiagnostic>());
+
+    /// <summary>
+    /// Combines validation results.
+    /// </summary>
+    /// <param name="results">The validation results to combine.</param>
+    /// <returns>The combined validation result.</returns>
+    public static RenderValidationResult Combine(params RenderValidationResult[] results)
+    {
+        ArgumentNullException.ThrowIfNull(results);
+        var nonEmptyResults = results
+            .Where((q) => q.Diagnostics.Count is not 0)
+            .ToArray();
+        if (nonEmptyResults.Length is 0)
+            return Supported;
+        if (nonEmptyResults.Length is 1)
+            return nonEmptyResults[0];
+
+        var diagnostics = results.SelectMany((q) => q.Diagnostics).ToArray();
+        return new RenderValidationResult(diagnostics);
+    }
+
+    /// <summary>
+    /// Diagnostics produced by validation.
+    /// </summary>
+    public IReadOnlyList<RenderDiagnostic> Diagnostics { get; }
+
+    /// <summary>
+    /// Indicates whether any diagnostic represents degraded rendering.
+    /// </summary>
+    public bool HasDegradedDiagnostics
+        => Diagnostics.Any((q) => q.Level is RendererSupportLevel.Degraded);
+
+    /// <summary>
+    /// Indicates whether any diagnostic represents unsupported rendering.
+    /// </summary>
+    public bool HasUnsupportedDiagnostics
+        => Diagnostics.Any((q) => q.Level is RendererSupportLevel.Unsupported);
+
+    /// <summary>
+    /// The aggregate support level.
+    /// </summary>
+    public RendererSupportLevel SupportLevel
+    {
+        get
+        {
+            if (HasUnsupportedDiagnostics)
+                return RendererSupportLevel.Unsupported;
+            return HasDegradedDiagnostics
+                ? RendererSupportLevel.Degraded
+                : RendererSupportLevel.Supported;
+        }
+    }
+
+    /// <summary>
+    /// Indicates whether rendering can proceed without unsupported diagnostics.
+    /// </summary>
+    public bool IsSupported => SupportLevel is not RendererSupportLevel.Unsupported;
+
+    /// <summary>
+    /// Throws a <see cref="RenderValidationException"/> if unsupported diagnostics exist.
+    /// </summary>
+    public void ThrowIfUnsupported()
+    {
+        if (!IsSupported)
+            throw new RenderValidationException(this);
+    }
+
+    /// <summary>
+    /// Throws a <see cref="RenderValidationException"/> if degraded diagnostics should be treated as failures.
+    /// </summary>
+    /// <param name="strict">Whether degraded diagnostics should fail rendering.</param>
+    public void ThrowIfUnsupportedOrStrictDegraded(bool strict)
+    {
+        if (SupportLevel is RendererSupportLevel.Unsupported
+            || (strict && SupportLevel is RendererSupportLevel.Degraded))
+            throw new RenderValidationException(this);
+    }
+}

@@ -1,5 +1,6 @@
 using System.Text;
 using System.Xml;
+using X39.Solutions.Papercraft;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 

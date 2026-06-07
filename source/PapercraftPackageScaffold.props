@@ -1,0 +1,28 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+
+        <Authors>X39</Authors>
+        <SupportUrl>https://github.com/X39/X39.Solutions.PdfTemplate/issues</SupportUrl>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/X39/X39.Solutions.PdfTemplate</RepositoryUrl>
+        <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>Papercraft;XML;semantic-versioning;semver;PDF;C#;dotnet;csharp;.NET;library;document;rendering;template;generation;report;invoice;receipt;image;skia;export;windows;linux;mac;open-source;foss;LGPLv3;free;create-pdf;creation;create;pdf-table</PackageTags>
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <DefaultLanguage>en-US</DefaultLanguage>
+        <Deterministic>true</Deterministic>
+        <IsTrimable>true</IsTrimable>
+        <IsPackable>true</IsPackable>
+        <IncludeSymbols>true</IncludeSymbols>
+        <IncludeSources>true</IncludeSources>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="$(MSBuildProjectDirectory)\README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+</Project>

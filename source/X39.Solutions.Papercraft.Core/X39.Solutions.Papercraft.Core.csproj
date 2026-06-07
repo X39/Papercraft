@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\PapercraftPackageScaffold.props" />
+    <PropertyGroup>
+        <PackageId>X39.Solutions.Papercraft.Core</PackageId>
+        <AssemblyName>X39.Solutions.Papercraft.Core</AssemblyName>
+        <RootNamespace>X39.Solutions.Papercraft</RootNamespace>
+        <Title>Papercraft core contracts and renderer-neutral runtime</Title>
+        <PackageDescription>
+            <![CDATA[Papercraft core package for renderer-neutral output, capability and validation contracts.
+Template parsing and renderer-neutral runtime implementation live here during the additive migration period.
+]]>
+        </PackageDescription>
+    </PropertyGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="X39.Solutions.Papercraft" />
+        <InternalsVisibleTo Include="X39.Solutions.Papercraft.Rendering.SkiaSharp" />
+        <InternalsVisibleTo Include="X39.Solutions.PdfTemplate" />
+        <InternalsVisibleTo Include="X39.Solutions.PdfTemplate.Test" />
+        <InternalsVisibleTo Include="X39.Solutions.PdfTemplate.Benchmark" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+    </ItemGroup>
+</Project>

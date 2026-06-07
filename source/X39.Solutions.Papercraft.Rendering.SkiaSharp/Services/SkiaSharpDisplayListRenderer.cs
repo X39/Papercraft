@@ -1,0 +1,123 @@
+using SkiaSharp;
+using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Display;
+
+namespace X39.Solutions.Papercraft.Rendering.SkiaSharp.Services;
+
+/// <summary>
+/// Renders Papercraft display-list commands onto a SkiaSharp canvas.
+/// </summary>
+public sealed class SkiaSharpDisplayListRenderer
+{
+    private readonly SkPaintCache _paintCache;
+
+    /// <summary>
+    /// Creates a new display-list renderer.
+    /// </summary>
+    /// <param name="paintCache">The Skia paint cache to use while rendering commands.</param>
+    public SkiaSharpDisplayListRenderer(SkPaintCache paintCache)
+    {
+        ArgumentNullException.ThrowIfNull(paintCache);
+        _paintCache = paintCache;
+    }
+
+    /// <summary>
+    /// Renders all commands in a display list to the supplied Skia canvas.
+    /// </summary>
+    /// <param name="canvas">The Skia canvas to render to.</param>
+    /// <param name="displayList">The display list to render.</param>
+    public void Render(SKCanvas canvas, DisplayList displayList)
+    {
+        ArgumentNullException.ThrowIfNull(canvas);
+        ArgumentNullException.ThrowIfNull(displayList);
+
+        foreach (var command in displayList.Commands)
+        {
+            RenderCommand(canvas, command);
+        }
+    }
+
+    private void RenderCommand(SKCanvas canvas, DisplayCommand command)
+    {
+        switch (command)
+        {
+            case PushStateCommand:
+                canvas.Save();
+                break;
+            case PopStateCommand:
+                canvas.Restore();
+                break;
+            case TranslateCommand translate:
+                canvas.Translate(translate.Offset.X, translate.Offset.Y);
+                break;
+            case ClipCommand clip:
+                canvas.ClipRect(ToSkRect(clip.Rectangle));
+                break;
+            case DrawLineCommand line:
+                canvas.DrawLine(
+                    line.StartX,
+                    line.StartY,
+                    line.EndX,
+                    line.EndY,
+                    _paintCache.Get(ToColor(line.Color), line.Thickness));
+                break;
+            case DrawRectangleCommand rectangle:
+                canvas.DrawRect(ToSkRect(rectangle.Rectangle), _paintCache.Get(ToColor(rectangle.Color)));
+                break;
+            case DrawTextCommand text:
+                canvas.DrawText(
+                    text.Text,
+                    text.X,
+                    text.Y,
+                    _paintCache.Get(ToTextStyle(text.TextStyle), text.Dpi));
+                break;
+            case DrawImageCommand image:
+                DrawImage(canvas, image);
+                break;
+        }
+    }
+
+    private static void DrawImage(SKCanvas canvas, DrawImageCommand image)
+    {
+        using var stream = new MemoryStream(image.Bytes);
+        using var bitmap = SKBitmap.Decode(stream);
+        if (bitmap is null)
+            return;
+        canvas.DrawBitmap(bitmap, ToSkRect(image.Rectangle));
+    }
+
+    private static SKRect ToSkRect(DisplayRectangle rectangle)
+        => new(
+            rectangle.Left,
+            rectangle.Top,
+            rectangle.Left + rectangle.Width,
+            rectangle.Top + rectangle.Height);
+
+    private static Color ToColor(DisplayColor color)
+        => new(color.Red, color.Green, color.Blue, color.Alpha);
+
+    private static TextStyle ToTextStyle(DisplayTextStyle textStyle)
+        => new()
+        {
+            Foreground = ToColor(textStyle.Foreground),
+            FontSize = textStyle.FontSize,
+            FontFamily = ToFont(textStyle.FontFamily),
+            Scale = textStyle.Scale,
+            LineHeight = textStyle.LineHeight,
+            Rotation = textStyle.Rotation,
+            StrokeThickness = textStyle.StrokeThickness,
+        };
+
+    private static Font ToFont(DisplayFont font)
+        => new(font.Family)
+        {
+            LetterSpacing = font.LetterSpacing,
+            Weight = font.Weight,
+            Style = font.Style switch
+            {
+                DisplayFontStyle.Italic => EFontStyle.Italic,
+                DisplayFontStyle.Oblique => EFontStyle.Oblique,
+                _ => EFontStyle.Upright,
+            },
+        };
+}

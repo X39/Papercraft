@@ -43,9 +43,13 @@ You may even create your own controls by deriving from the `Control` base class!
         <InternalsVisibleTo Include="X39.Solutions.PdfTemplate.Benchmark"/>
     </ItemGroup>
     <ItemGroup>
-        <None Include="$(SolutionDir)\README.md" Pack="true" PackagePath="\"/>
+        <ProjectReference Include="..\X39.Solutions.Papercraft.Core\X39.Solutions.Papercraft.Core.csproj" />
+        <ProjectReference Include="..\X39.Solutions.Papercraft.Rendering.SkiaSharp\X39.Solutions.Papercraft.Rendering.SkiaSharp.csproj" />
+        <ProjectReference Include="..\X39.Solutions.Papercraft\X39.Solutions.Papercraft.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="$(MSBuildProjectDirectory)\README.md" Pack="true" PackagePath="\"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
-        <PackageReference Include="SkiaSharp" Version="3.119.4" />
         <PackageReference Include="X39.Util" Version="1.0.0.56" />
     </ItemGroup>
 </Project>

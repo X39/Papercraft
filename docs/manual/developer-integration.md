@@ -234,10 +234,22 @@ Use the registered element name in the template:
 </template>
 ```
 
-The current XML reader does not support namespace-prefixed element names for controls.
-is rejected before control activation.
-If a custom control must appear beside built-in controls, register it with `Constants.ControlsNamespace`
-and a unique element name, as shown above.
+Elements without an XML namespace are treated as if they are in `Constants.ControlsNamespace`.
+Registering a custom control in that namespace lets template authors use it beside built-in controls
+without adding `xmlns`, as shown above.
+
+If a template changes the default XML namespace, unprefixed elements move into that namespace.
+Reference built-in controls through an explicit prefix that points back to `Constants.ControlsNamespace`:
+
+```xml
+<template xmlns="MyApp.PdfControls"
+          xmlns:default="X39.Solutions.PdfTemplate.Controls">
+    <body>
+        <approvalStamp/>
+        <default:text>Approved</default:text>
+    </body>
+</template>
+```
 
 ## Add A Transformer
 

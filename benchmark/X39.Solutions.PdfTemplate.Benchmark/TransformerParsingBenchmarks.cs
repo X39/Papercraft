@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Attributes;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Transformers;
-using X39.Solutions.PdfTemplate.Xml;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Xml;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 
@@ -10,11 +10,11 @@ public class TransformerParsingBenchmarks
 {
     private readonly ITransformer[] _transformers =
     [
-        new ForTransformer(),
-        new IfTransformer(),
-        new ForEachTransformer(),
-        new AlternateTransformer(),
-        new VariableTransformer(),
+        new Papercraft.Transformers.ForTransformer(),
+        new Papercraft.Transformers.IfTransformer(),
+        new Papercraft.Transformers.ForEachTransformer(),
+        new Papercraft.Transformers.AlternateTransformer(),
+        new Papercraft.Transformers.VariableTransformer(),
     ];
 
     private byte[] _expandedTemplate = null!;

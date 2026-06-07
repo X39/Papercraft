@@ -1,8 +1,8 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using System.Xml;
-using X39.Solutions.PdfTemplate.Transformers;
-using X39.Solutions.PdfTemplate.Xml;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Xml;
 
 namespace X39.Solutions.PdfTemplate.Test.ExpressionTests;
 
@@ -23,7 +23,7 @@ public class IfTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             new TemplateData(),
-            new[] {new IfTransformer()});
+            new[] {new Papercraft.Transformers.IfTransformer()});
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         var nodeInformation = await templateReader.ReadAsync(xmlReader);
@@ -46,7 +46,7 @@ public class IfTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             new TemplateData(),
-            new[] {new IfTransformer()});
+            new[] {new Papercraft.Transformers.IfTransformer()});
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         var nodeInformation = await templateReader.ReadAsync(xmlReader);
@@ -70,7 +70,7 @@ public class IfTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             data,
-            new[] {new IfTransformer()});
+            new[] {new Papercraft.Transformers.IfTransformer()});
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         var nodeInformation = await templateReader.ReadAsync(xmlReader);
@@ -95,7 +95,7 @@ public class IfTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             data,
-            new[] {new IfTransformer()});
+            new[] {new Papercraft.Transformers.IfTransformer()});
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         var nodeInformation = await templateReader.ReadAsync(xmlReader);
@@ -120,7 +120,7 @@ public class IfTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             data,
-            new[] {new IfTransformer()});
+            new[] {new Papercraft.Transformers.IfTransformer()});
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         await Assert.ThrowsAsync<ArgumentException>(() => templateReader.ReadAsync(xmlReader));
@@ -147,7 +147,7 @@ public class IfTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             new TemplateData(),
-            new[] { new IfTransformer() });
+            new[] { new Papercraft.Transformers.IfTransformer() });
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         var nodeInformation = await templateReader.ReadAsync(xmlReader);
@@ -179,7 +179,7 @@ public class IfTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             new TemplateData(),
-            new[] { new IfTransformer() });
+            new[] { new Papercraft.Transformers.IfTransformer() });
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         var nodeInformation = await templateReader.ReadAsync(xmlReader);
@@ -208,7 +208,7 @@ public class IfTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             new TemplateData(),
-            new[] { new IfTransformer() });
+            new[] { new Papercraft.Transformers.IfTransformer() });
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         var nodeInformation = await templateReader.ReadAsync(xmlReader);
@@ -234,7 +234,7 @@ public class IfTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             new TemplateData(),
-            new[] { new IfTransformer() });
+            new[] { new Papercraft.Transformers.IfTransformer() });
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         var nodeInformation = await templateReader.ReadAsync(xmlReader);
@@ -265,7 +265,7 @@ public class IfTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             new TemplateData(),
-            new[] { new IfTransformer() });
+            new[] { new Papercraft.Transformers.IfTransformer() });
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         var nodeInformation = await templateReader.ReadAsync(xmlReader);
@@ -296,7 +296,7 @@ public class IfTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             new TemplateData(),
-            new[] { new IfTransformer() });
+            new[] { new Papercraft.Transformers.IfTransformer() });
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         var nodeInformation = await templateReader.ReadAsync(xmlReader);
@@ -325,7 +325,7 @@ public class IfTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             new TemplateData(),
-            new[] { new IfTransformer() });
+            new[] { new Papercraft.Transformers.IfTransformer() });
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         await Assert.ThrowsAsync<ArgumentException>(() => templateReader.ReadAsync(xmlReader));
@@ -352,7 +352,7 @@ public class IfTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             new TemplateData(),
-            new[] { new IfTransformer() });
+            new[] { new Papercraft.Transformers.IfTransformer() });
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         await Assert.ThrowsAsync<ArgumentException>(() => templateReader.ReadAsync(xmlReader));
@@ -403,7 +403,7 @@ public class IfTransformerTests
         var data = new TemplateData();
         data.SetVariable("variable", left);
         data.RegisterFunction(new DummyValueFunction("function", right, new[] {typeof(int), typeof(string)}));
-        var templateReader = new XmlTemplateReader(default, CultureInfo.InvariantCulture, data, new[] {new IfTransformer()});
+        var templateReader = new XmlTemplateReader(default, CultureInfo.InvariantCulture, data, new[] {new Papercraft.Transformers.IfTransformer()});
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         var nodeInformation = await templateReader.ReadAsync(xmlReader);

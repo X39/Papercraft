@@ -5,6 +5,9 @@ Previous: [Developer appendix](developer-integration.md) | [Manual home](index.m
 Papercraft is the new product name for the template-driven rendering engine that started as
 `X39.Solutions.PdfTemplate`.
 
+Maintainer implementation details are tracked in the
+[Papercraft architecture plan](papercraft-architecture-plan.md).
+
 The migration is additive. Existing applications can keep the current package and continue using:
 
 ```csharp
@@ -17,21 +20,29 @@ New code can use the Papercraft facade from the same compatibility package:
 
 ```csharp
 services.AddPapercraft();
-var generator = serviceProvider.GetRequiredService<PapercraftGenerator>();
-await generator.GeneratePdfAsync(output, reader, CultureInfo.CurrentUICulture);
+var renderer = serviceProvider.GetRequiredService<PapercraftRenderer>();
+await renderer.GeneratePdfAsync(output, reader, CultureInfo.CurrentUICulture);
 ```
 
 ## Package Direction
 
 The current package remains `X39.Solutions.PdfTemplate` during the compatibility period.
-The planned package split is:
+The source tree now has the partial Papercraft split:
 
 | Package | Purpose |
 |---------|---------|
-| `X39.Papercraft` | Default facade for application developers. |
-| `X39.Papercraft.Core` | Renderer-neutral template, layout, capability and validation contracts. |
-| `X39.Papercraft.Rendering.SkiaSharp` | Default PDF and raster renderer. |
-| `X39.Solutions.PdfTemplate` | Compatibility bridge for existing users. |
+| `X39.Solutions.Papercraft` | Default facade for application developers. It depends on core plus the SkiaSharp renderer and exposes `AddPapercraft()`. |
+| `X39.Solutions.Papercraft.Core` | Renderer-neutral contracts plus the current shared parsing, template data, control, transformer, layout and validation runtime. |
+| `X39.Solutions.Papercraft.Rendering.SkiaSharp` | Default PDF and raster renderer, including Skia canvas, text, image, paint and bitmap services. |
+| `X39.Solutions.Papercraft.Controls.QrCode` | Optional QR code controls. Depends on `X39.Solutions.Papercraft.Core` and `Net.Codecrete.QrCodeGenerator`. |
+| `X39.Solutions.Papercraft.Controls.ZXing` | Optional broad barcode controls. Depends on `X39.Solutions.Papercraft.Core` and `ZXing.Net`. |
+| `X39.Solutions.PdfTemplate` | Compatibility bridge for existing users. It keeps old service registration and type identities available through forwarding or wrappers. |
+
+Core and the SkiaSharp renderer now own real runtime code, and the facade and bridge reference them.
+Barcode packages are deliberately opt-in and are not referenced by the core, facade, SkiaSharp renderer or compatibility bridge.
+Local package consumption, diagnostics, documentation alignment and PDF/PNG parity smoke coverage are
+in place. Remaining migration work is about binary compatibility hardening, release publishing and
+expanded renderer support.
 
 ## API Mapping
 
@@ -39,7 +50,7 @@ The planned package split is:
 |--------------|----------------|
 | `AddPdfTemplateService()` | `AddPapercraft()` |
 | `PdfTemplateServiceBuilder` | `PapercraftServiceBuilder` |
-| `Generator.GeneratePdfAsync(...)` | `PapercraftGenerator.GeneratePdfAsync(...)` |
+| `Generator.GeneratePdfAsync(...)` | `PapercraftRenderer.GeneratePdfAsync(...)` |
 | `DocumentOptions` | `PapercraftRenderOptions.DocumentOptions` |
 | implicit Skia renderer choice | renderer capability validation through `ValidateAsync(...)` |
 
@@ -65,9 +76,15 @@ Unsupported diagnostics block rendering. Degraded diagnostics are warnings unles
 
 ## Compatibility Notes
 
-`GenerateBitmapsAsync` still returns `SKBitmap` from the compatibility API.
-Use it for existing raster workflows until the multi-page renderer-neutral raster API is finalized.
+`RenderRasterPagesAsync` is the renderer-neutral multi-page raster API. It writes each encoded page
+to a caller-provided stream callback and exposes neutral page metadata instead of SkiaSharp objects.
+`GenerateBitmapsAsync` still returns `SKBitmap` from the SkiaSharp runtime available through the
+compatibility path for existing raster workflows.
 
 Custom controls, transformers and functions can be registered through either builder during the
 compatibility period. New custom controls should avoid accepting Skia types directly so they can move
 to renderer-neutral Papercraft APIs later.
+
+Skia-specific shims and obsolete warnings stay out of `X39.Solutions.Papercraft.Core`. APIs that expose
+`SKBitmap`, Skia canvas/paint types or Skia native asset behavior remain in the compatibility package
+or the SkiaSharp renderer package until a documented neutral replacement exists.

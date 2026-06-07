@@ -1,8 +1,8 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using System.Xml;
-using X39.Solutions.PdfTemplate.Transformers;
-using X39.Solutions.PdfTemplate.Xml;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Xml;
 
 namespace X39.Solutions.PdfTemplate.Test.ExpressionTests;
 
@@ -59,7 +59,7 @@ public class VariableTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             data,
-            new[] { new VariableTransformer() }
+            new[] { new Papercraft.Transformers.VariableTransformer() }
         );
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
@@ -109,7 +109,7 @@ public class VariableTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             data,
-            new[] { new VariableTransformer() }
+            new[] { new Papercraft.Transformers.VariableTransformer() }
         );
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
@@ -119,7 +119,7 @@ public class VariableTransformerTests
             nodeInformation.Children,
             Enumerable.Range(0, i)
                       .Select(
-                          (i) => new Action<PdfTemplate.Xml.XmlNodeInformation>(
+                          (i) => new Action<XmlNodeInformation>(
                               value => Assert.Equal(string.Concat("test-value-", i), value.TextContent)
                           )
                       )
@@ -153,7 +153,7 @@ public class VariableTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             data,
-            new[] { new VariableTransformer() }
+            new[] { new Papercraft.Transformers.VariableTransformer() }
         );
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);

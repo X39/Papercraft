@@ -1,4 +1,4 @@
-﻿using X39.Solutions.PdfTemplate.Attributes;
+using X39.Solutions.Papercraft.Attributes;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 

@@ -1,9 +1,9 @@
 using System.Globalization;
 using System.Text;
 using System.Xml;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Transformers;
-using X39.Solutions.PdfTemplate.Xml;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Xml;
 
 namespace X39.Solutions.PdfTemplate.Test.ExpressionTests;
 
@@ -21,7 +21,7 @@ public class TroubleshootingTransformerTests
                                 """;
 
         await Assert.ThrowsAsync<ArgumentException>(
-            () => ReadAsync(template, new TemplateData(), [new ForTransformer()])
+            () => ReadAsync(template, new TemplateData(), [new Papercraft.Transformers.ForTransformer()])
         );
     }
 
@@ -39,7 +39,7 @@ public class TroubleshootingTransformerTests
         templateData.SetVariable("LineCount", 3);
 
         await Assert.ThrowsAsync<ArgumentException>(
-            () => ReadAsync(template, templateData, [new ForEachTransformer()])
+            () => ReadAsync(template, templateData, [new Papercraft.Transformers.ForEachTransformer()])
         );
     }
 

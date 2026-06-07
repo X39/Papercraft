@@ -1,11 +1,11 @@
 using System.Text;
 using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.DependencyInjection;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Services;
+using X39.Solutions.Papercraft.Xml;
 using X39.Solutions.PdfTemplate;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Services;
-using X39.Solutions.PdfTemplate.Transformers;
-using X39.Solutions.PdfTemplate.Xml;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 
@@ -14,7 +14,7 @@ public class CreationSurfaceBenchmarks
 {
     private readonly ITransformer[] _transformers =
     [
-        new ForTransformer(),
+        new Papercraft.Transformers.ForTransformer(),
     ];
 
     private ServiceProvider _serviceProvider = null!;

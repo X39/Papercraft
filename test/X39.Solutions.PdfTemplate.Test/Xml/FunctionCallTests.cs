@@ -1,9 +1,9 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using System.Xml;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Xml;
 using X39.Solutions.PdfTemplate.Test.ExpressionTests;
-using X39.Solutions.PdfTemplate.Transformers;
-using X39.Solutions.PdfTemplate.Xml;
 
 namespace X39.Solutions.PdfTemplate.Test.Xml;
 

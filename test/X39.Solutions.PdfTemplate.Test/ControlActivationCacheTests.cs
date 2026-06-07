@@ -1,10 +1,11 @@
 using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Attributes;
-using X39.Solutions.PdfTemplate.Data;
+using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Attributes;
+using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Exceptions;
+using X39.Solutions.Papercraft.Services;
 using X39.Solutions.PdfTemplate.Exceptions;
-using X39.Solutions.PdfTemplate.Services;
 
 namespace X39.Solutions.PdfTemplate.Test;
 

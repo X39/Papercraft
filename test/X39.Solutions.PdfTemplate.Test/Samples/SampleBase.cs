@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
-using X39.Solutions.PdfTemplate.Abstraction;
+using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Rendering.SkiaSharp;
 using X39.Solutions.PdfTemplate.Test.Mock;
 using X39.Util;
 

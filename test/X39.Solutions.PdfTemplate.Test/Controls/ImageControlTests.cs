@@ -1,8 +1,7 @@
 using System.Globalization;
-using SkiaSharp;
-using X39.Solutions.PdfTemplate.Controls;
-using X39.Solutions.PdfTemplate.Data;
-using X39.Solutions.PdfTemplate.Services.ResourceResolver;
+using X39.Solutions.Papercraft.Controls;
+using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Services.ResourceResolver;
 using X39.Solutions.PdfTemplate.Test.Mock;
 
 namespace X39.Solutions.PdfTemplate.Test.Controls;
@@ -13,7 +12,7 @@ public class ImageControlTests
     private static readonly Size PageSize = new(200, 100);
 
     [Fact]
-    public async Task RenderDrawsBitmapIntoArrangedSize()
+    public async Task RenderDrawsImageIntoArrangedSize()
     {
         using var control = new ImageControl(new FixedImageResourceResolver(CreatePngBytes()))
         {
@@ -32,18 +31,25 @@ public class ImageControlTests
 
         canvas.AssertState();
         canvas.AssertClip(new Rectangle(0, 0, 40, 20));
-        canvas.AssertDrawBitmap(new Rectangle(0, 0, 40, 20));
+        canvas.AssertDrawImage(new Rectangle(0, 0, 40, 20));
+    }
+
+    [Fact]
+    public async Task MeasureUsesPngDimensionsWhenWidthAndHeightAreAuto()
+    {
+        using var control = new ImageControl(new FixedImageResourceResolver(CreatePngBytes()))
+        {
+            Source = "logo",
+        };
+
+        await control.InitializeControlAsync(null);
+
+        Assert.Equal(new Size(4, 2), control.Measure(Dpi, PageSize, PageSize, PageSize, CultureInfo.InvariantCulture));
     }
 
     private static byte[] CreatePngBytes()
-    {
-        using var bitmap = new SKBitmap(4, 2);
-        using var canvas = new SKCanvas(bitmap);
-        canvas.Clear(SKColors.Blue);
-        using var image = SKImage.FromBitmap(bitmap);
-        using var data = image.Encode(SKEncodedImageFormat.Png, 100);
-        return data.ToArray();
-    }
+        => Convert.FromBase64String(
+            "iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAIAAADwyuo0AAAAJUlEQVR4AQEaAOX/AAAA/wAA/wAA/wAA/wAAAP8AAP8AAP8AAP9fugf5AHw6kwAAAABJRU5ErkJggg==");
 
     private sealed class FixedImageResourceResolver(byte[] bytes) : IResourceResolver
     {

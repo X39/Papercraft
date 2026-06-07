@@ -15,7 +15,7 @@ The other sections are optional layers or repeated page sections that you add on
 The examples in this manual omit `xmlns` because the XML reader assigns the built-in control namespace
 to elements that do not already have an XML namespace.
 That lets template authors write `<text>` instead of a longer namespaced element name.
-Avoid XML namespace prefixes in normal templates; prefixed control names are not supported by the current reader.
+Only add XML namespaces when an application deliberately uses custom control namespaces.
 
 ## When Should I Use This?
 
@@ -70,8 +70,16 @@ If a template sets a different default namespace, the reader keeps that namespac
 
 In that example, `text` is read as `MyApp.PdfControls:text`, so the built-in `text` control is not found.
 
-Do not use a prefix such as `pt:text` for built-in controls.
-The current reader treats the prefixed element name as `pt:text`, and control names cannot contain `:`.
+To use built-in controls after changing the default namespace, declare a prefix for the built-in namespace:
+
+```xml
+<template xmlns="MyApp.PdfControls"
+          xmlns:default="X39.Solutions.PdfTemplate.Controls">
+    <body>
+        <default:text>This text uses the built-in control namespace.</default:text>
+    </body>
+</template>
+```
 
 If your application adds custom controls, ask the application team which unprefixed element names are available.
 Developer-facing control registration guidance lives in the [developer integration appendix](developer-integration.md).

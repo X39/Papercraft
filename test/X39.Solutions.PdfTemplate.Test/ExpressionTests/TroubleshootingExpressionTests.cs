@@ -1,8 +1,10 @@
 using System.Globalization;
 using System.Text;
 using System.Xml;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Exceptions;
+using X39.Solutions.Papercraft.Xml;
 using X39.Solutions.PdfTemplate.Exceptions;
-using X39.Solutions.PdfTemplate.Xml;
 
 namespace X39.Solutions.PdfTemplate.Test.ExpressionTests;
 

@@ -50,6 +50,7 @@ For explanations and rendered examples, follow the linked control pages.
 | Page number text. | [`pageNumber`](controls-page-number.md) | `mode`, `prefix`, `delimiter`, `suffix`, plus text styling attributes |
 | Rows and columns. | [`table`](controls-table.md), `th`, `tr`, `td` | `td width`, `td columnspan`, `padding`, `background` through nested `border` |
 | Line, bar or pie chart. | [`chart`](controls-chart.md), `lineChart`, `barChart`, `pieChart`, `data` | `width`, `height`, `title`, chart-specific attributes |
+| QR codes and barcodes. | Optional [`qrCode`, `barcode`, aliases](controls-barcode.md) | `value`, `size`, `format`, `width`, `height`, `quietZone`, colors |
 
 ## Shared Control Attributes
 
@@ -159,6 +160,23 @@ Each chart control contains `data` children.
 </chart>
 ```
 
+## Optional Barcodes
+
+Barcode controls require optional package registration. `X39.Solutions.Papercraft.Controls.QrCode` adds `qrCode`.
+`X39.Solutions.Papercraft.Controls.ZXing` adds `barcode` and alias elements.
+
+| Control | Attributes |
+|---------|------------|
+| `qrCode` | `value`, `size`, `foreground`, `background`, `quietZone`, `errorCorrection`. Content can supply the value. |
+| `barcode` | `format`, `value`, `width`, `height`, `foreground`, `background`, `quietZone`, `gs1Format`. Content can supply the value. |
+| `code128`, `gs1-128`, `code39`, `code93`, `codabar`, `ean13`, `ean8`, `upcA`, `upcE`, `itf`, `dataMatrix`, `pdf417`, `aztec` | Same sizing, color, quiet-zone and value attributes as `barcode`; format comes from the element name. |
+
+```xml
+<qrCode value="https://example.test/order/123" size="24mm" quietZone="4"/>
+<barcode format="Code128" value="ABC123" width="42mm" height="12mm"/>
+<dataMatrix width="22mm" height="22mm">ABC123</dataMatrix>
+```
+
 ## Template Data
 
 | Syntax | Use |
@@ -202,5 +220,7 @@ Inside normal text and attributes, use `@VariableName`.
 | Orientation | `Horizontal`, `Vertical`. | `orientation="Vertical"` |
 | Alignment | `Left`, `Center`, `Right`, `Stretch`, `Top`, `Bottom`. | `horizontalAlignment="right"` |
 | Table width | Length, `auto`, star parts. | `30mm`, `auto`, `1*`, `2*` |
+| QR error correction | `L`, `M`, `Q`, `H`, or `Low`, `Medium`, `Quartile`, `High`. | `errorCorrection="Q"` |
+| Barcode format | `Code128`, `GS1-128`, `Code39`, `EAN13`, `DataMatrix`, `PDF417`, `Aztec`, and other supported ZXing formats. | `format="Code128"` |
 
 Previous: [Styles](styles.md) | [Manual home](index.md) | Next: [Controls](controls.md)

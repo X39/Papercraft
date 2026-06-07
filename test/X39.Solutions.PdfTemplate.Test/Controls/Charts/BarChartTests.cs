@@ -1,6 +1,6 @@
 using System.Globalization;
-using X39.Solutions.PdfTemplate.Controls;
-using X39.Solutions.PdfTemplate.Data;
+using X39.Solutions.Papercraft.Controls;
+using X39.Solutions.Papercraft.Data;
 using X39.Solutions.PdfTemplate.Test.Mock;
 using Xunit;
 

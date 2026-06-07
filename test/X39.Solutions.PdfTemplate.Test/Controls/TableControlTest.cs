@@ -1,6 +1,6 @@
 using System.Globalization;
-using X39.Solutions.PdfTemplate.Controls;
-using X39.Solutions.PdfTemplate.Data;
+using X39.Solutions.Papercraft.Controls;
+using X39.Solutions.Papercraft.Data;
 using X39.Solutions.PdfTemplate.Test.Mock;
 
 namespace X39.Solutions.PdfTemplate.Test.Controls;
@@ -298,12 +298,58 @@ public class TableControlTest
 
         Assert.Equal(new Size(100, 130), arrangedSize);
         Assert.Equal(new Size(0, 100), additionalRenderSize);
-        mockCanvas.AssertClip(0, new Rectangle(0, 0, 100, 320)); // table, including the skipped page space
+        mockCanvas.AssertClip(0, new Rectangle(0, 0, 100, 230)); // table, including the skipped page space
         mockCanvas.AssertClip(1, new Rectangle(0, 0, 100, 10)); // initial table header
         mockCanvas.AssertClip(2, new Rectangle(0, 0, 100, 10)); // initial header cell
         mockCanvas.AssertClip(3, new Rectangle(0, 100, 100, 10)); // repeated header on the next page
         mockCanvas.AssertClip(4, new Rectangle(0, 100, 100, 10)); // repeated header cell
         mockCanvas.AssertClip(5, new Rectangle(0, 110, 100, 120)); // oversized row remains one row
         mockCanvas.AssertClip(6, new Rectangle(0, 110, 100, 120)); // oversized row cell
+    }
+
+    [Fact]
+    public async Task HeaderIsRepeatedWhenPreviousRowEndsExactlyAtPageBoundary()
+    {
+        var control = await $$"""
+                                <table>
+                                    <th>
+                                        <td><mock width="100px" height="10px"/></td>
+                                    </th>
+                                    <tr>
+                                        <td><mock width="100px" height="45px"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><mock width="100px" height="45px"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><mock width="100px" height="45px"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><mock width="100px" height="45px"/></td>
+                                    </tr>
+                                </table>
+                              """.ToControl<TableControl>();
+        var pageSize   = new Size(100, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        var arrangedSize         = control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        var additionalRenderSize = control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+        mockCanvas.AssertState();
+
+        Assert.Equal(new Size(100, 190), arrangedSize);
+        Assert.Equal(new Size(0, 10), additionalRenderSize);
+        mockCanvas.AssertClip(0, new Rectangle(0, 0, 100, 200)); // table, including repeated header space
+        mockCanvas.AssertClip(1, new Rectangle(0, 0, 100, 10)); // initial table header
+        mockCanvas.AssertClip(2, new Rectangle(0, 0, 100, 10)); // initial header cell
+        mockCanvas.AssertClip(3, new Rectangle(0, 10, 100, 45)); // first row
+        mockCanvas.AssertClip(4, new Rectangle(0, 10, 100, 45)); // first row cell
+        mockCanvas.AssertClip(5, new Rectangle(0, 55, 100, 45)); // second row
+        mockCanvas.AssertClip(6, new Rectangle(0, 55, 100, 45)); // second row cell
+        mockCanvas.AssertClip(7, new Rectangle(0, 100, 100, 10)); // repeated header at page boundary
+        mockCanvas.AssertClip(8, new Rectangle(0, 100, 100, 10)); // repeated header cell
+        mockCanvas.AssertClip(9, new Rectangle(0, 110, 100, 45)); // third row
+        mockCanvas.AssertClip(10, new Rectangle(0, 110, 100, 45)); // third row cell
+        mockCanvas.AssertClip(11, new Rectangle(0, 155, 100, 45)); // fourth row
+        mockCanvas.AssertClip(12, new Rectangle(0, 155, 100, 45)); // fourth row cell
     }
 }

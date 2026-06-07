@@ -1,5 +1,5 @@
-using X39.Solutions.PdfTemplate.Controls;
-using X39.Solutions.PdfTemplate.Services.ResourceResolver;
+using X39.Solutions.Papercraft.Controls;
+using X39.Solutions.Papercraft.Services.ResourceResolver;
 
 namespace X39.Solutions.PdfTemplate.Test.Controls;
 
@@ -35,7 +35,9 @@ public class TroubleshootingImageTests
             Source = Convert.ToBase64String([1, 2, 3, 4]),
         };
 
-        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+        var exception = await Assert.ThrowsAsync<NotSupportedException>(async () =>
             await control.InitializeControlAsync(null));
+
+        Assert.Contains("Unsupported image format", exception.Message, StringComparison.Ordinal);
     }
 }

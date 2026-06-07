@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\PapercraftPackageScaffold.props" />
+    <PropertyGroup>
+        <PackageId>X39.Solutions.Papercraft</PackageId>
+        <AssemblyName>X39.Solutions.Papercraft</AssemblyName>
+        <RootNamespace>X39.Solutions.Papercraft</RootNamespace>
+        <Title>Papercraft facade</Title>
+        <PackageDescription>
+            <![CDATA[Papercraft facade package for the default application developer path.
+Default rendering is backed by the SkiaSharp renderer while renderer-neutral contracts are forwarded to Papercraft Core.
+]]>
+        </PackageDescription>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\X39.Solutions.Papercraft.Core\X39.Solutions.Papercraft.Core.csproj" />
+        <ProjectReference Include="..\X39.Solutions.Papercraft.Rendering.SkiaSharp\X39.Solutions.Papercraft.Rendering.SkiaSharp.csproj" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+    </ItemGroup>
+</Project>

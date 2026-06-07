@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\PapercraftPackageScaffold.props" />
+    <PropertyGroup>
+        <PackageId>X39.Solutions.Papercraft.Controls.QrCode</PackageId>
+        <AssemblyName>X39.Solutions.Papercraft.Controls.QrCode</AssemblyName>
+        <RootNamespace>X39.Solutions.Papercraft.Controls.QrCode</RootNamespace>
+        <Title>Papercraft QR code controls</Title>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <PackageDescription>
+            <![CDATA[Optional Papercraft QR code controls backed by Net.Codecrete.QrCodeGenerator.
+The package registers renderer-neutral controls that draw QR modules as vector rectangles.
+]]>
+        </PackageDescription>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\X39.Solutions.Papercraft.Core\X39.Solutions.Papercraft.Core.csproj" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+        <PackageReference Include="Net.Codecrete.QrCodeGenerator" Version="3.0.0" />
+    </ItemGroup>
+</Project>

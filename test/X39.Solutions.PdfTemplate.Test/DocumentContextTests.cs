@@ -3,10 +3,12 @@ using System.Text;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
 using SkiaSharp;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Attributes;
-using X39.Solutions.PdfTemplate.Data;
-using X39.Solutions.PdfTemplate.Services.ResourceResolver;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Attributes;
+using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Rendering.SkiaSharp;
+using X39.Solutions.Papercraft.Services.ResourceResolver;
 
 namespace X39.Solutions.PdfTemplate.Test;
 

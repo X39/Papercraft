@@ -1,9 +1,8 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using SkiaSharp;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Data;
+using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Data;
 using X39.Util;
 
 namespace X39.Solutions.PdfTemplate.Test.Mock;
@@ -145,16 +144,17 @@ public partial class DeferredCanvasMock : IDeferredCanvas, IImmediateCanvas
         _drawRectCalls.Add(new DrawRectCall(rectangle, color));
     }
 
+    public void DrawImage(byte[] image, Rectangle rectangle)
+    {
+        rectangle += Translation;
+        _drawBitmapCalls.Add(new DrawBitmapCall(rectangle));
+    }
+
+    public void DrawImage(ReadOnlyMemory<byte> image, Rectangle rectangle)
+        => DrawImage(image.ToArray(), rectangle);
+
     public void DrawBitmap(byte[] bitmap, Rectangle rectangle)
-    {
-        rectangle += Translation;
-        _drawBitmapCalls.Add(new DrawBitmapCall(rectangle));
-    }
-    public void DrawBitmap(SKBitmap bitmap, Rectangle rectangle)
-    {
-        rectangle += Translation;
-        _drawBitmapCalls.Add(new DrawBitmapCall(rectangle));
-    }
+        => DrawImage(bitmap, rectangle);
 
     public void   AddBreakPageHeight(float additionalPageHeight) {  }
     public ushort EstimatedPageCount                             { get; set; }
@@ -246,6 +246,12 @@ public partial class DeferredCanvasMock
         var actual = _drawBitmapCalls.First();
         var expected = new DrawBitmapCall(rectangle);
         Assert.Equal(expected, actual);
+    }
+
+    [StackTraceHidden]
+    public void AssertDrawImage(Rectangle rectangle)
+    {
+        AssertDrawBitmap(rectangle);
     }
 
     [StackTraceHidden]
@@ -424,5 +430,28 @@ public partial class DeferredCanvasMock
         Assert.True(
             _drawRectCalls.Any(c => c.Color == color),
             $"No DrawRect call uses color {color}.");
+    }
+
+    /// <summary>
+    /// Asserts all DrawRect calls with the specified color are within the given bounds.
+    /// </summary>
+    [StackTraceHidden]
+    public void AssertAllDrawRectsWithColorWithin(Color color, Rectangle bounds, float tolerance = 1f)
+    {
+        var calls = _drawRectCalls.Where((c) => c.Color == color).ToArray();
+        Assert.NotEmpty(calls);
+
+        var minX = bounds.Left - tolerance;
+        var minY = bounds.Top - tolerance;
+        var maxX = bounds.Right + tolerance;
+        var maxY = bounds.Bottom + tolerance;
+        for (var i = 0; i < calls.Length; i++)
+        {
+            var call = calls[i];
+            Assert.True(
+                call.Rectangle.Left >= minX && call.Rectangle.Right <= maxX &&
+                call.Rectangle.Top >= minY && call.Rectangle.Bottom <= maxY,
+                $"DrawRect call #{i} {call.Rectangle} with color {color} is out of bounds {bounds}");
+        }
     }
 }

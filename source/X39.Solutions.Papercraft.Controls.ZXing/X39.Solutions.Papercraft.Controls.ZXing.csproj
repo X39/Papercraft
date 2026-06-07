@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\PapercraftPackageScaffold.props" />
+    <PropertyGroup>
+        <PackageId>X39.Solutions.Papercraft.Controls.ZXing</PackageId>
+        <AssemblyName>X39.Solutions.Papercraft.Controls.ZXing</AssemblyName>
+        <RootNamespace>X39.Solutions.Papercraft.Controls.ZXing</RootNamespace>
+        <Title>Papercraft ZXing barcode controls</Title>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <PackageDescription>
+            <![CDATA[Optional Papercraft barcode controls backed by ZXing.Net.
+The package registers renderer-neutral 1D and 2D barcode controls that draw BitMatrix output as vector rectangles.
+]]>
+        </PackageDescription>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\X39.Solutions.Papercraft.Core\X39.Solutions.Papercraft.Core.csproj" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+        <PackageReference Include="ZXing.Net" Version="0.16.11" />
+    </ItemGroup>
+</Project>

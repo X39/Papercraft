@@ -1,9 +1,9 @@
 using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
+using X39.Solutions.Papercraft.Controls;
+using X39.Solutions.Papercraft.Rendering.SkiaSharp;
+using X39.Solutions.Papercraft.Services;
 using X39.Solutions.PdfTemplate;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Controls;
-using X39.Solutions.PdfTemplate.Services;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 

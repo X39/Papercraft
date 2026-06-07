@@ -1,7 +1,8 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using System.Xml;
-using X39.Solutions.PdfTemplate.Data;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Data;
 
 namespace X39.Solutions.PdfTemplate.Test.Samples;
 

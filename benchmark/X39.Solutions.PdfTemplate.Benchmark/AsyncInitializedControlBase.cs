@@ -1,7 +1,7 @@
 using System.Globalization;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Attributes;
-using X39.Solutions.PdfTemplate.Data;
+using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Attributes;
+using X39.Solutions.Papercraft.Data;
 
 namespace X39.Solutions.PdfTemplate.Benchmark;
 

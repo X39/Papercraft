@@ -32,6 +32,8 @@
   url: /manual/controls-table.html
 - title: Chart controls
   url: /manual/controls-chart.html
+- title: Optional barcode controls
+  url: /manual/controls-barcode.html
 - title: Transformers
   url: /manual/transformers.html
 - title: Template language
@@ -40,7 +42,9 @@
   url: /manual/complete-examples.html
 - title: Troubleshooting
   url: /manual/troubleshooting.html
-- title: Developer appendix
+- title: Developer integration
   url: /manual/developer-integration.html
 - title: Migration to Papercraft
   url: /manual/migration-to-papercraft.html
+- title: Papercraft architecture plan
+  url: /manual/papercraft-architecture-plan.html

@@ -1,5 +1,5 @@
-﻿using System.Globalization;
-using X39.Solutions.PdfTemplate.Data;
+using System.Globalization;
+using X39.Solutions.Papercraft.Data;
 
 namespace X39.Solutions.PdfTemplate.Test.Data;
 

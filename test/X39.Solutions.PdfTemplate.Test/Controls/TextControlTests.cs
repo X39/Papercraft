@@ -1,8 +1,8 @@
-﻿using System.Globalization;
-using X39.Solutions.PdfTemplate.Controls;
-using X39.Solutions.PdfTemplate.Data;
-using X39.Solutions.PdfTemplate.Services;
-using X39.Solutions.PdfTemplate.Services.TextService;
+using System.Globalization;
+using X39.Solutions.Papercraft.Controls;
+using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Rendering.SkiaSharp.Services;
+using X39.Solutions.Papercraft.Rendering.SkiaSharp.Services.TextService;
 using X39.Solutions.PdfTemplate.Test.Mock;
 
 namespace X39.Solutions.PdfTemplate.Test.Controls;

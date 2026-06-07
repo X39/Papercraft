@@ -12,7 +12,7 @@ and built-in controls for text, borders, images, lines, tables, page numbers and
 
 The existing `X39.Solutions.PdfTemplate` package remains the compatibility bridge during the
 Papercraft migration. Existing users can keep `services.AddPdfTemplateService()` and `Generator`;
-new code can start using `services.AddPapercraft()` and `PapercraftGenerator`.
+new code can start using `services.AddPapercraft()` and `PapercraftRenderer`.
 
 ## User Manual
 
@@ -40,8 +40,8 @@ Useful manual entry points:
 - A dependency injection container that can provide the services registered by `AddPapercraft`
 - On Linux, the SkiaSharp native Linux assets package
 
-The package is marked trim-compatible and depends on SkiaSharp,
-`Microsoft.Extensions.DependencyInjection.Abstractions` and `X39.Util`.
+The compatibility package is marked trim-compatible. The default rendering path uses the
+SkiaSharp-backed Papercraft renderer and the dependency-injection abstractions.
 Issues are tracked in the
 [GitHub repository](https://github.com/X39/X39.Solutions.PdfTemplate/issues).
 
@@ -53,14 +53,30 @@ Install the current compatibility package:
 dotnet add package X39.Solutions.PdfTemplate
 ```
 
-The planned package split is:
+The source tree now follows this partial Papercraft package split:
 
 | Package | Use |
 |---------|-----|
-| `X39.Papercraft` | Batteries-included facade for normal PDF users. |
-| `X39.Papercraft.Core` | Renderer-neutral contracts, parsing, layout and validation. |
-| `X39.Papercraft.Rendering.SkiaSharp` | SkiaSharp PDF/raster backend. |
-| `X39.Solutions.PdfTemplate` | Compatibility bridge for existing users. |
+| `X39.Solutions.Papercraft` | Batteries-included facade for normal PDF users. |
+| `X39.Solutions.Papercraft.Core` | Renderer-neutral contracts plus the current shared parsing, layout, control, data and validation runtime. |
+| `X39.Solutions.Papercraft.Rendering.SkiaSharp` | SkiaSharp PDF/raster renderer and runtime services. |
+| `X39.Solutions.PdfTemplate` | Compatibility bridge for existing users and package metadata during the migration. |
+
+## Project READMEs
+
+The root README is the solution overview. Each project now has its own README for package-specific setup,
+public entry points and contributor notes:
+
+| Project | README |
+|---------|--------|
+| `X39.Solutions.Papercraft` | [`source/X39.Solutions.Papercraft/README.md`](source/X39.Solutions.Papercraft/README.md) |
+| `X39.Solutions.Papercraft.Core` | [`source/X39.Solutions.Papercraft.Core/README.md`](source/X39.Solutions.Papercraft.Core/README.md) |
+| `X39.Solutions.Papercraft.Rendering.SkiaSharp` | [`source/X39.Solutions.Papercraft.Rendering.SkiaSharp/README.md`](source/X39.Solutions.Papercraft.Rendering.SkiaSharp/README.md) |
+| `X39.Solutions.Papercraft.Controls.QrCode` | [`source/X39.Solutions.Papercraft.Controls.QrCode/README.md`](source/X39.Solutions.Papercraft.Controls.QrCode/README.md) |
+| `X39.Solutions.Papercraft.Controls.ZXing` | [`source/X39.Solutions.Papercraft.Controls.ZXing/README.md`](source/X39.Solutions.Papercraft.Controls.ZXing/README.md) |
+| `X39.Solutions.PdfTemplate` | [`source/X39.Solutions.PdfTemplate/README.md`](source/X39.Solutions.PdfTemplate/README.md) |
+| `X39.Solutions.PdfTemplate.Test` | [`test/X39.Solutions.PdfTemplate.Test/README.md`](test/X39.Solutions.PdfTemplate.Test/README.md) |
+| `X39.Solutions.PdfTemplate.Benchmark` | [`benchmark/X39.Solutions.PdfTemplate.Benchmark/README.md`](benchmark/X39.Solutions.PdfTemplate.Benchmark/README.md) |
 
 On Linux, also install the
 [SkiaSharp native Linux assets](https://www.nuget.org/packages/SkiaSharp.NativeAssets.Linux):
@@ -94,21 +110,21 @@ Register the library services at startup:
 services.AddPapercraft();
 ```
 
-Then resolve a `PapercraftGenerator` and render the template:
+Then resolve a `PapercraftRenderer` and render the template:
 
 ```csharp
 using System.Globalization;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
-using X39.Papercraft;
+using X39.Solutions.Papercraft;
 
 await using var scope = serviceProvider.CreateAsyncScope();
-var generator = scope.ServiceProvider.GetRequiredService<PapercraftGenerator>();
+var renderer = scope.ServiceProvider.GetRequiredService<PapercraftRenderer>();
 
 using var reader = XmlReader.Create(xmlTemplateStream);
 await using var output = File.Create("document.pdf");
 
-await generator.GeneratePdfAsync(
+await renderer.GeneratePdfAsync(
     output,
     reader,
     CultureInfo.CurrentUICulture);

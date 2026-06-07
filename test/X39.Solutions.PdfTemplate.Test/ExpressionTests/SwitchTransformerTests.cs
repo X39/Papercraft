@@ -1,9 +1,9 @@
 using System.Globalization;
 using System.Text;
 using System.Xml;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Transformers;
-using X39.Solutions.PdfTemplate.Xml;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Xml;
 
 namespace X39.Solutions.PdfTemplate.Test.ExpressionTests;
 
@@ -320,7 +320,7 @@ public class SwitchTransformerTests
             default,
             CultureInfo.InvariantCulture,
             templateData,
-            new ITransformer[] { new SwitchTransformer(), new IfTransformer() });
+            new ITransformer[] { new Papercraft.Transformers.SwitchTransformer(), new Papercraft.Transformers.IfTransformer() });
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         return await templateReader.ReadAsync(xmlReader);

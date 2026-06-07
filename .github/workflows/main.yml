@@ -1,30 +1,100 @@
-name: NuGet package publish
+name: Publish NuGet packages
+
 on:
   push:
-    branches: [ master ]
-  workflow_dispatch:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_VERSION: 10.0.x
+  CONFIGURATION: Release
+  SOLUTION_FILE: X39.Solutions.PdfTemplate.sln
+  PACKAGE_OUTPUT_DIRECTORY: artifacts/packages
+
 jobs:
-  upload-to-npgk:
+  publish:
+    name: Build, pack, and publish
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.x
-      - name: Setup NuGet.exe for use with actions
-        uses: NuGet/setup-nuget@v1.0.5
-        with:
-          nuget-version: latest
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Derive package version
+        shell: bash
+        run: |
+          package_version="${GITHUB_REF_NAME#v}"
+
+          if [ "$package_version" = "$GITHUB_REF_NAME" ]; then
+            echo "Release tags must start with 'v'." >&2
+            exit 1
+          fi
+
+          semver_pattern='^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$'
+          if [[ ! "$package_version" =~ $semver_pattern ]]; then
+            echo "Tag '$GITHUB_REF_NAME' does not contain a valid SemVer package version." >&2
+            exit 1
+          fi
+
+          echo "PACKAGE_VERSION=$package_version" >> "$GITHUB_ENV"
+
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore "$SOLUTION_FILE"
+
       - name: Build
-        run: dotnet build --no-restore
-      - name: Test
-        run: dotnet test --framework net10.0 --no-build --verbosity normal
-      - name: Pack
-        # CHANGE PACKAGE VERSION - The retarded way
-        # Change the /p:VERSION=X.X.X part to change the actual package version.
-        run: dotnet pack --configuration Release /p:VERSION=6.1.0.${{ github.run_number }} --version-suffix ${{ github.sha }}
-      - name: Upload to NuGet
-        run: dotnet nuget push ./source/X39.Solutions.PdfTemplate/bin/Release/X39.Solutions.PdfTemplate.*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_API_KEY }}
+        run: dotnet build "$SOLUTION_FILE" --configuration "$CONFIGURATION" --no-restore /p:ContinuousIntegrationBuild=true
+
+      - name: Pack source projects
+        shell: bash
+        run: |
+          mkdir -p "$PACKAGE_OUTPUT_DIRECTORY"
+
+          mapfile -t projects < <(find source -mindepth 2 -maxdepth 2 -name "*.csproj" | sort)
+          if [ "${#projects[@]}" -eq 0 ]; then
+            echo "No source projects found to pack." >&2
+            exit 1
+          fi
+
+          for project in "${projects[@]}"; do
+            dotnet pack "$project" \
+              --configuration "$CONFIGURATION" \
+              --no-build \
+              --output "$PACKAGE_OUTPUT_DIRECTORY" \
+              /p:PackageVersion="$PACKAGE_VERSION" \
+              /p:ContinuousIntegrationBuild=true
+          done
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages-${{ github.ref_name }}
+          path: |
+            ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg
+            ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.snupkg
+          if-no-files-found: error
+
+      - name: Publish packages to NuGet
+        shell: bash
+        run: |
+          shopt -s nullglob
+          packages=("$PACKAGE_OUTPUT_DIRECTORY"/*.nupkg)
+
+          if [ "${#packages[@]}" -eq 0 ]; then
+            echo "No NuGet packages found to publish." >&2
+            exit 1
+          fi
+
+          for package in "${packages[@]}"; do
+            dotnet nuget push "$package" \
+              --source https://api.nuget.org/v3/index.json \
+              --api-key "${{ secrets.NUGET_API_KEY }}" \
+              --skip-duplicate
+          done

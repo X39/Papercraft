@@ -1,13 +1,14 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Attributes;
-using X39.Solutions.PdfTemplate.Data;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Attributes;
+using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Exceptions;
+using X39.Solutions.Papercraft.Xml;
 using X39.Solutions.PdfTemplate.Exceptions;
-using X39.Solutions.PdfTemplate.Transformers;
-using X39.Solutions.PdfTemplate.Xml;
 
 namespace X39.Solutions.PdfTemplate.Test.Xml;
 
@@ -272,7 +273,7 @@ public class XmlTemplateReaderTests
                                     }
                                  </styleMustBeEmptyTagTest>
                                  """;
-        var templateReader = new XmlTemplateReader(default, CultureInfo.InvariantCulture, new TemplateData(), new []{new ForTransformer()});
+        var templateReader = new XmlTemplateReader(default, CultureInfo.InvariantCulture, new TemplateData(), new []{new Papercraft.Transformers.ForTransformer()});
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         var nodeInformation = await templateReader.ReadAsync(xmlReader);

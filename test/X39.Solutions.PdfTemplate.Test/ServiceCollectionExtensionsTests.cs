@@ -4,12 +4,14 @@ using System.Text;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
 using SkiaSharp;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Attributes;
-using X39.Solutions.PdfTemplate.Data;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Attributes;
+using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Exceptions;
+using X39.Solutions.Papercraft.Rendering.SkiaSharp;
 using X39.Solutions.PdfTemplate.Exceptions;
-using X39.Solutions.PdfTemplate.Transformers;
-using XmlNode = X39.Solutions.PdfTemplate.Xml.XmlNode;
+using XmlNode = X39.Solutions.Papercraft.Xml.XmlNode;
 
 namespace X39.Solutions.PdfTemplate.Test;
 
@@ -36,7 +38,7 @@ public class ServiceCollectionExtensionsTests
         serviceCollection.AddPdfTemplateService();
         using var serviceProvider = serviceCollection.BuildServiceProvider();
 
-        Assert.Contains(serviceProvider.GetServices<ITransformer>(), (q) => q is SwitchTransformer);
+        Assert.Contains(serviceProvider.GetServices<ITransformer>(), (q) => q is Papercraft.Transformers.SwitchTransformer);
     }
 
     [Fact]
