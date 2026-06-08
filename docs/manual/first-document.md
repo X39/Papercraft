@@ -53,8 +53,9 @@ Start with a complete XML file containing one `body` section and one visible con
 ## Understand The Default Namespace
 
 Most templates should not set a default XML namespace.
-When an element has no namespace, the reader treats it as part of the built-in template namespace
-`X39.Solutions.PdfTemplate.Controls`.
+When an element has no namespace, the reader assigns the built-in control namespace configured by the runtime.
+Existing compatibility templates may still refer to the legacy XML namespace
+`X39.Solutions.PdfTemplate.Controls`; keep that namespace unchanged when maintaining those templates.
 
 For normal template-author work, prefer the unprefixed examples used throughout this manual.
 
@@ -70,16 +71,10 @@ If a template sets a different default namespace, the reader keeps that namespac
 
 In that example, `text` is read as `MyApp.PdfControls:text`, so the built-in `text` control is not found.
 
-To use built-in controls after changing the default namespace, declare a prefix for the built-in namespace:
-
-```xml
-<template xmlns="MyApp.PdfControls"
-          xmlns:default="X39.Solutions.PdfTemplate.Controls">
-    <body>
-        <default:text>This text uses the built-in control namespace.</default:text>
-    </body>
-</template>
-```
+Do not use prefixed element names such as `default:text` to work around this in current templates;
+the reader validates the XML element name itself and rejects prefixed control names.
+Prefer no default namespace, or have the application team register the controls that should be available
+in the namespace the template uses.
 
 If your application adds custom controls, ask the application team which unprefixed element names are available.
 Developer-facing control registration guidance lives in the [developer integration appendix](developer-integration.md).

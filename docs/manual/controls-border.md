@@ -94,8 +94,7 @@ and `verticalAlignment` attributes described in [Layout fundamentals](layout-fun
 
 ## Allowed Children
 
-`border` can contain child controls.
-and custom controls.
+`border` can contain built-in child controls and registered custom controls.
 
 Children are arranged one after another inside the border.
 Use `padding` on the border when the child content should not touch the border line.

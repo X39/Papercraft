@@ -2,6 +2,7 @@ using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Attributes;
 using X39.Solutions.Papercraft.Controls.Base;
 using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Services.TextService;
 
 namespace X39.Solutions.Papercraft.Controls;
 
@@ -11,6 +12,24 @@ namespace X39.Solutions.Papercraft.Controls;
 [Control(Constants.ControlsNamespace)]
 public class LineChart : ChartBaseControl
 {
+    private const float DataLabelGap = 4f;
+
+    /// <summary>
+    /// Creates a new line chart.
+    /// </summary>
+    public LineChart()
+    {
+    }
+
+    /// <summary>
+    /// Creates a new line chart.
+    /// </summary>
+    /// <param name="textService">The text service used to measure and render chart labels.</param>
+    [ControlConstructor]
+    public LineChart(ITextService textService) : base(textService)
+    {
+    }
+
     /// <summary>
     /// Thickness of the line.
     /// </summary>
@@ -34,9 +53,6 @@ public class LineChart : ChartBaseControl
     /// </summary>
     [Parameter(Name = "point-size")]
     public float PointSize { get; set; } = 4f;
-
-    private const float TitleHeight = 30f;
-    private const float AxisPadding = 40f;
 
     /// <inheritdoc />
     protected override Size DoMeasure(float dpi, in Size fullPageSize, in Size framedPageSize, in Size remainingSize, CultureInfo cultureInfo)
@@ -80,17 +96,16 @@ public class LineChart : ChartBaseControl
         // Calculate bounds and scaling
         var (minX, maxX, minY, maxY) = CalculateAxisBounds(dataPoints);
 
-        // Calculate plot area
-        var titleOffset = string.IsNullOrEmpty(Title) ? 0f : TitleHeight;
-        var plotLeft = ShowYAxis ? AxisPadding : 10f;
-        var plotTop = titleOffset + 10f;
-        var plotWidth = chartWidth - plotLeft - 20f;
-        var plotHeight = chartHeight - plotTop - (ShowXAxis ? AxisPadding : 10f);
+        var layout = CalculateAxisChartLayout(dpi, chartWidth, chartHeight);
+        var plotLeft = layout.PlotArea.Left;
+        var plotTop = layout.PlotArea.Top;
+        var plotWidth = layout.PlotArea.Width;
+        var plotHeight = layout.PlotArea.Height;
 
         // Render title
         if (!string.IsNullOrEmpty(Title))
         {
-            RenderTitle(canvas, dpi, chartWidth / 2, 5);
+            RenderTitle(canvas, dpi, chartWidth, 4f);
         }
 
         // Render grid
@@ -98,6 +113,7 @@ public class LineChart : ChartBaseControl
 
         // Render axes
         RenderAxes(canvas, plotLeft, plotTop, plotWidth, plotHeight);
+        RenderAxisLabels(canvas, dpi, layout);
 
         // Calculate scaling
         var (scaleX, scaleY) = CalculateScaling(plotWidth, plotHeight, minX, maxX, minY, maxY);
@@ -134,6 +150,37 @@ public class LineChart : ChartBaseControl
             }
         }
 
+        for (var i = 0; i < dataPoints.Count; i++)
+        {
+            var (_, y, control) = dataPoints[i];
+            RenderDataLabel(canvas, dpi, cultureInfo, control, y, screenPoints[i], plotLeft, plotTop, plotWidth, plotHeight);
+        }
+
         return Size.Zero;
+    }
+
+    private void RenderDataLabel(
+        IDeferredCanvas canvas,
+        float dpi,
+        CultureInfo cultureInfo,
+        ChartDataControl control,
+        double y,
+        (float X, float Y) point,
+        float plotLeft,
+        float plotTop,
+        float plotWidth,
+        float plotHeight)
+    {
+        var label = GetDataLabel(control, y, cultureInfo);
+        if (string.IsNullOrEmpty(label))
+            return;
+
+        var style = CreateLabelTextStyle();
+        var size = MeasureText(style, dpi, label, plotWidth);
+        var position = ClampTextPosition(
+            new Point(point.X - size.Width / 2, point.Y - size.Height - DataLabelGap - PointSize / 2),
+            size,
+            new Rectangle(plotLeft, plotTop, plotWidth, plotHeight));
+        DrawText(canvas, dpi, style, label, position.X, position.Y, plotWidth);
     }
 }

@@ -10,8 +10,11 @@ namespace X39.Solutions.PdfTemplate.Test.Samples.Documentation;
 
 public abstract class DocumentationSampleBase : SampleBase
 {
+    private const float DocumentationPreviewDotsPerInch = 192F;
+
     protected static DocumentOptions CompactDocumentOptions { get; } = new()
     {
+        DotsPerInch = DocumentationPreviewDotsPerInch,
         PageWidthInMillimeters = 100,
         PageHeightInMillimeters = 45,
         Margin = new Thickness(new Length(5, ELengthUnit.Millimeters)),
@@ -36,7 +39,7 @@ public abstract class DocumentationSampleBase : SampleBase
         var bitmaps = await generator.GenerateBitmapsAsync(
             xmlReader,
             CultureInfo.InvariantCulture,
-            documentOptions ?? CompactDocumentOptions,
+            WithDocumentationPreviewDensity(documentOptions ?? CompactDocumentOptions),
             cancellationToken);
         Assert.NotEmpty(bitmaps);
 
@@ -68,6 +71,9 @@ public abstract class DocumentationSampleBase : SampleBase
 
     private static string GetSampleOutputDirectory()
         => Path.Combine(GetRepositoryRoot(), "docs", "assets", "samples");
+
+    private static DocumentOptions WithDocumentationPreviewDensity(DocumentOptions documentOptions)
+        => documentOptions with { DotsPerInch = DocumentationPreviewDotsPerInch };
 
     private static string GetRepositoryRoot()
     {

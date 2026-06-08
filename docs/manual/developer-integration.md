@@ -10,78 +10,96 @@ It keeps service registration, custom controls, custom transformers, functions, 
 ## When Should I Use This?
 
 Use this appendix when a template change requires application code, such as adding a new function,
-supplying new data, loading images from a custom location, or registering a custom control.
+supplying new data, loading images from a custom location, registering a custom control or selecting a render target.
 
 ## How Do I Start?
 
-Start with the package and service registration.
-`ServiceCollectionExtensions`, `PdfTemplateServiceBuilder`, `Generator`, `DocumentOptions`,
-`IFunction`, `ITransformer`, `IControl`, `ITemplateData`, `IResourceResolver`, `IDrawableCanvas`,
-`IDeferredCanvas`, `IImmediateCanvas`, `IPropertyAccessCache`, `ITextService`, `IParameterConverter`
+Start with the Papercraft facade package and the default renderer:
+`X39.Solutions.Papercraft`, `AddPapercraft()`, `PapercraftRenderer`, `PapercraftRenderOptions`,
+`DocumentOptions`, `IFunction`, `ITransformer`, `IControl`, `ITemplateData`, `IResourceResolver`,
+`IDrawableCanvas`, `IDeferredCanvas`, `IImmediateCanvas`, `IPropertyAccessCache`, `ITextService`
+and `IParameterConverter<T>`.
+
+Use `X39.Solutions.PdfTemplate`, `AddPdfTemplateService()` and `Generator` only when maintaining
+existing compatibility-package consumers.
 
 ## Install
 
 The library targets .NET 10.0.
-Install the main package in the application that generates the PDF:
+Install the Papercraft facade package in the application that renders documents:
 
 ```shell
-dotnet add package X39.Solutions.PdfTemplate
+dotnet add package X39.Solutions.Papercraft
 ```
 
-On Linux, also install the SkiaSharp native Linux assets package:
+On Linux, also install the SkiaSharp native Linux assets package for the default renderer:
 
 ```shell
 dotnet add package SkiaSharp.NativeAssets.Linux
 ```
 
+Existing applications can keep the compatibility package during migration. See
+[Compatibility Package And Legacy API](#compatibility-package-and-legacy-api).
+
 ## Register Services
 
-Register the built-in generator, controls, transformers and supporting services at application startup:
+Register the built-in parser/runtime, controls, transformers and default SkiaSharp renderer at application startup:
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
-using X39.Solutions.PdfTemplate;
+using X39.Solutions.Papercraft;
 
-services.AddPdfTemplateService();
+services.AddPapercraft();
 ```
 
-`AddPdfTemplateService` registers the built-in controls, the built-in transformers, `Generator`,
-`ITemplateData`, `IControlFactory`, the default text service, property-access cache and default image resolver.
+`AddPapercraft()` registers Papercraft Core services, the built-in controls, the built-in transformers,
+`PapercraftGenerator`, `PapercraftRenderer` and the SkiaSharp render backend.
 
 Use the builder overload when the application needs to add or replace template features:
 
 ```csharp
-services.AddPdfTemplateService(
+services.AddPapercraft(
     (builder) => builder
         .AddFunction<MyFunction>()
         .AddControl<MyControl>()
         .AddTransformer<MyTransformer>());
 ```
 
+Use the renderer-neutral setup only when the application supplies its own render backend:
+
+```csharp
+using Microsoft.Extensions.DependencyInjection;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Abstraction;
+
+services.AddPapercraftCore();
+services.AddTransient<IPapercraftRenderBackend, MyRenderBackend>();
+```
+
 ## Generate A PDF
 
-Resolve a `Generator`, create an `XmlReader` for the template, and write the PDF to a stream:
+Resolve a `PapercraftRenderer`, create an `XmlReader` for the template, and write the PDF to a stream:
 
 ```csharp
 using System.Globalization;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
-using X39.Solutions.PdfTemplate;
+using X39.Solutions.Papercraft;
 
 await using var scope = serviceProvider.CreateAsyncScope();
-using var generator = scope.ServiceProvider.GetRequiredService<Generator>();
+var renderer = scope.ServiceProvider.GetRequiredService<PapercraftRenderer>();
 
 using var reader = XmlReader.Create(xmlTemplateStream);
 await using var output = File.Create("document.pdf");
 
-await generator.GeneratePdfAsync(
+await renderer.GeneratePdfAsync(
     output,
     reader,
     CultureInfo.CurrentUICulture);
 ```
 
-`Generator` is registered as transient and is not thread-safe.
-Use a fresh resolved generator for each document render, or keep concurrent use outside the same instance.
+`PapercraftRenderer` is registered as transient and owns per-render template data through its
+`PapercraftGenerator`. Resolve a fresh renderer when concurrent renders need isolated data.
 
 ## Supply Template Data
 
@@ -89,8 +107,8 @@ Template authors can only use data that the application supplies.
 Set variables before rendering:
 
 ```csharp
-generator.TemplateData.SetVariable("CustomerName", customer.Name);
-generator.TemplateData.SetVariable("InvoiceTotal", invoice.Total);
+renderer.TemplateData.SetVariable("CustomerName", customer.Name);
+renderer.TemplateData.SetVariable("InvoiceTotal", invoice.Total);
 ```
 
 The template can then read those values:
@@ -108,22 +126,25 @@ If a template author needs a new value, the application should expose it as a va
 
 ## Configure Document Options
 
-Pass `DocumentOptions` when page setup or per-request context must differ from the default:
+Pass `PapercraftRenderOptions` when page setup, backend selection or per-request context must differ from the default:
 
 ```csharp
 using System.Globalization;
-using X39.Solutions.PdfTemplate;
-using X39.Solutions.PdfTemplate.Data;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Data;
 
-await generator.GeneratePdfAsync(
+await renderer.GeneratePdfAsync(
     output,
     reader,
     CultureInfo.CurrentUICulture,
-    new DocumentOptions
+    new PapercraftRenderOptions
     {
-        Margin = new Thickness(new Length(1, ELengthUnit.Centimeters)),
-        Producer = "Invoice service",
-        Context = new PrintRequestContext(invoice.Id),
+        DocumentOptions = new DocumentOptions
+        {
+            Margin = new Thickness(new Length(1, ELengthUnit.Centimeters)),
+            Producer = "Invoice service",
+            Context = new PrintRequestContext(invoice.Id),
+        },
     });
 ```
 
@@ -131,12 +152,34 @@ Useful options include:
 
 | Option | Use |
 |--------|-----|
-| `PageWidthInMillimeters` and `PageHeightInMillimeters` | Change the page size. Defaults match A4 dimensions. |
-| `DotsPerInch`, `DotsPerCentimeter` and `DotsPerMillimeter` | Change render density. |
-| `Margin` | Reserve document margin before header, body and footer layout. |
-| `Producer` and `Modified` | Set PDF metadata. |
-| `Context` | Pass request-specific information to context-aware extension points. |
-| `IgnoreErrors` | Instruct the generator to ignore errors where possible. Use carefully, because XML can still become invalid. |
+| `DocumentOptions.PageWidthInMillimeters` and `DocumentOptions.PageHeightInMillimeters` | Change the page size. Defaults match A4 dimensions. |
+| `DocumentOptions.DotsPerInch`, `DocumentOptions.DotsPerCentimeter` and `DocumentOptions.DotsPerMillimeter` | Change render density. |
+| `DocumentOptions.Margin` | Reserve document margin before header, body and footer layout. |
+| `DocumentOptions.Producer` and `DocumentOptions.Modified` | Set PDF metadata. |
+| `DocumentOptions.Context` | Pass request-specific information to context-aware extension points. |
+| `DocumentOptions.IgnoreErrors` | Instruct the generator to ignore errors where possible. Use carefully, because XML can still become invalid. |
+| `BackendId` | Select a registered render backend by renderer id. |
+| `TreatDegradedAsUnsupported` | Treat degraded validation diagnostics as render-blocking diagnostics. |
+
+## Validate Before Rendering
+
+Call `ValidateAsync` when an application lets users choose output formats or renderer backends:
+
+```csharp
+var result = await renderer.ValidateAsync(
+    reader,
+    RenderTarget.Pdf,
+    CultureInfo.CurrentUICulture);
+
+if (!result.IsSupported)
+{
+    // Show result.Diagnostics to the user.
+}
+```
+
+Validation reads the XML template. Create a new `XmlReader` for the actual render after validation.
+Unsupported diagnostics block rendering. Degraded diagnostics are warnings unless
+`PapercraftRenderOptions.TreatDegradedAsUnsupported` is enabled.
 
 ## Add A Function
 
@@ -144,7 +187,7 @@ Use a function when a template needs a reusable value or calculation such as a f
 
 ```csharp
 using System.Globalization;
-using X39.Solutions.PdfTemplate.Abstraction;
+using X39.Solutions.Papercraft.Abstraction;
 
 public sealed class CustomerLabelFunction : IFunction
 {
@@ -166,7 +209,7 @@ public sealed class CustomerLabelFunction : IFunction
 Register the function:
 
 ```csharp
-services.AddPdfTemplateService(
+services.AddPapercraft(
     (builder) => builder.AddFunction<CustomerLabelFunction>());
 ```
 
@@ -183,11 +226,11 @@ Most custom controls should derive from `Control` or an existing base control in
 
 ```csharp
 using System.Globalization;
-using X39.Solutions.PdfTemplate;
-using X39.Solutions.PdfTemplate.Abstraction;
-using X39.Solutions.PdfTemplate.Attributes;
-using X39.Solutions.PdfTemplate.Controls.Base;
-using X39.Solutions.PdfTemplate.Data;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Attributes;
+using X39.Solutions.Papercraft.Controls.Base;
+using X39.Solutions.Papercraft.Data;
 
 [Control(Constants.ControlsNamespace, "approvalStamp")]
 public sealed class ApprovalStampControl : Control
@@ -220,7 +263,7 @@ public sealed class ApprovalStampControl : Control
 Register the control:
 
 ```csharp
-services.AddPdfTemplateService(
+services.AddPapercraft(
     (builder) => builder.AddControl<ApprovalStampControl>());
 ```
 
@@ -234,22 +277,17 @@ Use the registered element name in the template:
 </template>
 ```
 
-Elements without an XML namespace are treated as if they are in `Constants.ControlsNamespace`.
-Registering a custom control in that namespace lets template authors use it beside built-in controls
+Elements without an XML namespace are treated as if they are in the runtime's built-in control namespace.
+Registering a custom control with `Constants.ControlsNamespace` lets template authors use it beside built-in controls
 without adding `xmlns`, as shown above.
 
-If a template changes the default XML namespace, unprefixed elements move into that namespace.
-Reference built-in controls through an explicit prefix that points back to `Constants.ControlsNamespace`:
+If a template sets a custom default XML namespace, unprefixed elements move into that namespace and built-in controls
+are not found unless the application registers matching controls there. Current templates should not use prefixed
+element names such as `default:text`; the reader validates the XML element name itself and rejects prefixed control names.
 
-```xml
-<template xmlns="MyApp.PdfControls"
-          xmlns:default="X39.Solutions.PdfTemplate.Controls">
-    <body>
-        <approvalStamp/>
-        <default:text>Approved</default:text>
-    </body>
-</template>
-```
+Existing compatibility templates may still contain the legacy XML namespace
+`X39.Solutions.PdfTemplate.Controls`. Keep that namespace unchanged during a package migration unless the
+application team has verified the runtime namespace registrations for the release being used.
 
 ## Add A Transformer
 
@@ -259,8 +297,8 @@ For simple calculated values, prefer a function.
 ```csharp
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using X39.Solutions.PdfTemplate.Abstraction;
-using XmlNode = X39.Solutions.PdfTemplate.Xml.XmlNode;
+using X39.Solutions.Papercraft.Abstraction;
+using XmlNode = X39.Solutions.Papercraft.Xml.XmlNode;
 
 public sealed class KeepChildrenTransformer : ITransformer
 {
@@ -285,7 +323,7 @@ public sealed class KeepChildrenTransformer : ITransformer
 Register the transformer:
 
 ```csharp
-services.AddPdfTemplateService(
+services.AddPapercraft(
     (builder) => builder.AddTransformer<KeepChildrenTransformer>());
 ```
 
@@ -301,12 +339,12 @@ The transformer is then available by name:
 
 The default image resolver accepts base64 image data and `data:image/...;base64,...` sources.
 It does not read the file system or the internet.
-Register a custom `IResourceResolver` after `AddPdfTemplateService` when templates need images from application storage:
+Register a custom `IResourceResolver` after `AddPapercraft` when templates need images from application storage:
 
 ```csharp
-using X39.Solutions.PdfTemplate.Services.ResourceResolver;
+using X39.Solutions.Papercraft.Services.ResourceResolver;
 
-services.AddPdfTemplateService();
+services.AddPapercraft();
 services.AddScoped<IResourceResolver, ApplicationImageResolver>();
 ```
 
@@ -324,8 +362,8 @@ public sealed class ApplicationImageResolver : IResourceResolver
 }
 ```
 
-`DocumentOptions.Context` is passed unchanged to `IResourceResolver.ResolveImageAsync`
-and to controls that implement `IInitializeControlAsync`.
+`PapercraftRenderOptions.DocumentOptions.Context` is passed unchanged to
+`IResourceResolver.ResolveImageAsync` and to controls that implement `IInitializeControlAsync`.
 
 ## Extension Point Map
 
@@ -334,21 +372,24 @@ Most requests fit one of these rows:
 
 | Interface or type | Use when | How it is wired |
 |-------------------|----------|-----------------|
-| `Generator` | The application needs to render a template to PDF or bitmaps. | Resolve it from dependency injection for each render. |
-| `ITemplateData` | The application supplies variables, registers functions or evaluates expressions inside custom extensions. | Use `generator.TemplateData` before rendering; custom transformers and functions receive it through their APIs. |
+| `PapercraftRenderer` | The application needs to render or validate a template. | Resolve it from dependency injection for each isolated render workflow. |
+| `PapercraftGenerator` | Advanced code needs a backend-neutral `PapercraftDocument` before rendering. | Resolve it from dependency injection when a backend-neutral document is needed directly. |
+| `ITemplateData` | The application supplies variables, registers functions or evaluates expressions inside custom extensions. | Use `renderer.TemplateData` before rendering; custom transformers and functions receive it through their APIs. |
 | `IFunction` | The template needs a reusable calculated value. | Implement `Name`, argument metadata and `ExecuteAsync`, then register with `AddFunction<TFunction>()`. |
 | `IControl` | The application must render a new XML element. | Add `[Control(...)]`, implement measure/arrange/render behavior and register with `AddControl<TControl>()`. |
 | `IContentControl` | A custom control must contain child controls. | Implement `CanAdd` and child storage, or derive from an existing content-control base. |
 | `IInitializeControlAsync` | A control needs async setup or request context before rendering. | Implement it on the control; `DocumentOptions.Context` is passed to `InitializeControlAsync`. |
 | `ITransformer` | XML nodes must be conditionally rewritten, removed or repeated before controls are created. | Implement `Name` and `TransformAsync`, then register with `AddTransformer<TTransformer>()`. |
-| `IResourceResolver` | Image sources must be resolved from application-specific storage. | Register an `IResourceResolver` implementation after `AddPdfTemplateService`. |
+| `IResourceResolver` | Image sources must be resolved from application-specific storage. | Register an `IResourceResolver` implementation after `AddPapercraft`. |
 | `IParameterConverter<T>` | A custom control attribute needs custom parsing. | Set the converter on the control property with `ParameterAttribute.Converter`. |
+| `IPapercraftRenderBackend` | The application needs a custom output backend. | Register Core services with `AddPapercraftCore()` and add the backend to DI. |
 | `IControlFactory` | Advanced activation behavior is needed. | Replace the DI service only for unusual activation needs; most applications should use `AddControl<TControl>()`. |
 
 Source-checked registration notes:
 
-- `Generator` is registered as transient.
+- `PapercraftRenderer` and `PapercraftGenerator` are registered as transient.
 - `ITemplateData`, `IResourceResolver` and `IControlFactory` are registered as scoped services.
+- `ControlRegistry`, `ControlActivationCache`, `IPropertyAccessCache`, `SkPaintCache`, `ITextService` and `SkiaSharpDisplayListRenderer` are registered as singleton services.
 - Built-in transformer registrations are transient; custom transformers added with `AddTransformer<TTransformer>()` use the same path.
 - Functions added with `AddFunction<TFunction>()` are scoped by default, and the builder accepts another `ServiceLifetime`.
 - Control registration stores control metadata; a fresh control instance is created for template nodes through the control factory.
@@ -356,7 +397,7 @@ Source-checked registration notes:
 
 ## Advanced Infrastructure Interfaces
 
-These interfaces are public because controls and extension points use them.
+These interfaces are public because controls, renderers and extension points use them.
 Most applications should not replace them directly.
 
 | Interface | Use |
@@ -366,6 +407,39 @@ Most applications should not replace them directly.
 | `IImmediateCanvas` | Canvas exposed inside deferred drawing for page-specific information such as the current page and total pages. |
 | `ITextService` | Shared text measurement and drawing service used by text-based controls. Replacing it changes text behavior globally. |
 | `IPropertyAccessCache` | Expression-evaluation infrastructure that caches property access. It is not a normal application extension point. |
+
+## Compatibility Package And Legacy API
+
+Existing applications can keep the compatibility package during the additive migration:
+
+```shell
+dotnet add package X39.Solutions.PdfTemplate
+```
+
+The compatibility package keeps the legacy service registration and generator entry point available:
+
+```csharp
+using System.Globalization;
+using System.Xml;
+using Microsoft.Extensions.DependencyInjection;
+using X39.Solutions.PdfTemplate;
+
+services.AddPdfTemplateService();
+
+await using var scope = serviceProvider.CreateAsyncScope();
+using var generator = scope.ServiceProvider.GetRequiredService<Generator>();
+
+using var reader = XmlReader.Create(xmlTemplateStream);
+await using var output = File.Create("document.pdf");
+
+await generator.GeneratePdfAsync(
+    output,
+    reader,
+    CultureInfo.CurrentUICulture);
+```
+
+`Generator.GenerateBitmapsAsync(...)` remains the legacy SkiaSharp bitmap API.
+For new raster workflows, prefer the renderer-neutral `PapercraftRenderer.RenderRasterPagesAsync(...)`.
 
 ## When Template Authors Need Developer Help
 

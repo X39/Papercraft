@@ -5,6 +5,7 @@ using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
 using SkiaSharp;
 using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Controls;
 using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Attributes;
 using X39.Solutions.Papercraft.Data;
@@ -29,6 +30,24 @@ public class ServiceCollectionExtensionsTests
         var bitmaps = await generator.GenerateBitmapsAsync(xmlReader, CultureInfo.InvariantCulture);
 
         Dispose(bitmaps);
+    }
+
+    [Fact]
+    public void AddPdfTemplateServiceSupportsLegacyControlsNamespace()
+    {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddPdfTemplateService();
+        using var serviceProvider = serviceCollection.BuildServiceProvider();
+
+        var controlFactory = serviceProvider.GetRequiredService<IControlFactory>();
+        var control = controlFactory.Create(
+            Constants.LegacyControlsNamespace,
+            "text",
+            new Dictionary<string, string>(),
+            null,
+            CultureInfo.InvariantCulture);
+
+        Assert.IsType<TextControl>(control);
     }
 
     [Fact]

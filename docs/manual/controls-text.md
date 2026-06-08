@@ -97,7 +97,7 @@ When the padding should be visible, put the text inside a `border` with a backgr
 
 Use `weight="bold"` for bold text.
 Use `style="italic"` for italic text.
-`TextSample.NamedFontWeights`.
+Named weights such as `semiBold` are accepted by the font-weight converter.
 
 
 ```xml

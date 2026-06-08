@@ -339,6 +339,32 @@ public partial class DeferredCanvasMock
     }
 
     /// <summary>
+    /// Asserts all DrawText calls have estimated text bounds within the given bounds.
+    /// </summary>
+    [StackTraceHidden]
+    public void AssertAllEstimatedDrawTextBoundsWithin(Rectangle bounds, float tolerance = 1f)
+    {
+        var minX = bounds.Left - tolerance;
+        var minY = bounds.Top - tolerance;
+        var maxX = bounds.Right + tolerance;
+        var maxY = bounds.Bottom + tolerance;
+        for (var i = 0; i < _drawTextCalls.Count; i++)
+        {
+            var call = _drawTextCalls[i];
+            var height = call.TextStyle.FontSize * 1.25f;
+            var width = call.Text.Length * call.TextStyle.FontSize * 0.55f;
+            var left = call.X;
+            var top = call.Y - height;
+            var right = left + width;
+            var bottom = call.Y;
+            Assert.True(
+                left >= minX && right <= maxX &&
+                top >= minY && bottom <= maxY,
+                $"DrawText call #{i} ('{call.Text}') estimated bounds ({left}, {top}, {right}, {bottom}) are out of bounds {bounds}");
+        }
+    }
+
+    /// <summary>
     /// Asserts all DrawRect calls are within the given bounds (with tolerance).
     /// </summary>
     [StackTraceHidden]
@@ -453,5 +479,37 @@ public partial class DeferredCanvasMock
                 call.Rectangle.Top >= minY && call.Rectangle.Bottom <= maxY,
                 $"DrawRect call #{i} {call.Rectangle} with color {color} is out of bounds {bounds}");
         }
+    }
+
+    [StackTraceHidden]
+    public void AssertAnyDrawTextContainsNear(string text, float expectedX, float tolerance)
+    {
+        Assert.True(
+            _drawTextCalls.Any((c) => c.Text.Contains(text, StringComparison.Ordinal) && Math.Abs(c.X - expectedX) <= tolerance),
+            $"No DrawText call containing '{text}' was near x={expectedX}. Calls: [{string.Join(", ", _drawTextCalls.Select(c => $"'{c.Text}' at {c.X}"))}]");
+    }
+
+    [StackTraceHidden]
+    public void AssertDrawRectSpanAtLeast(float minimumWidth, float minimumHeight)
+    {
+        Assert.NotEmpty(_drawRectCalls);
+        var left = _drawRectCalls.Min((c) => c.Rectangle.Left);
+        var right = _drawRectCalls.Max((c) => c.Rectangle.Right);
+        var top = _drawRectCalls.Min((c) => c.Rectangle.Top);
+        var bottom = _drawRectCalls.Max((c) => c.Rectangle.Bottom);
+        Assert.True(right - left >= minimumWidth, $"Draw rectangles span only {right - left}px wide.");
+        Assert.True(bottom - top >= minimumHeight, $"Draw rectangles span only {bottom - top}px high.");
+    }
+
+    [StackTraceHidden]
+    public void AssertDrawLineSpanAtLeast(float minimumWidth, float minimumHeight)
+    {
+        Assert.NotEmpty(_drawLineCalls);
+        var left = _drawLineCalls.Min((c) => Math.Min(c.StartX, c.EndX));
+        var right = _drawLineCalls.Max((c) => Math.Max(c.StartX, c.EndX));
+        var top = _drawLineCalls.Min((c) => Math.Min(c.StartY, c.EndY));
+        var bottom = _drawLineCalls.Max((c) => Math.Max(c.StartY, c.EndY));
+        Assert.True(right - left >= minimumWidth, $"Draw lines span only {right - left}px wide.");
+        Assert.True(bottom - top >= minimumHeight, $"Draw lines span only {bottom - top}px high.");
     }
 }

@@ -141,7 +141,7 @@ using var generator = scope.ServiceProvider.GetRequiredService<Generator>();
 await generator.GeneratePdfAsync(output, reader, CultureInfo.CurrentUICulture);
 ```
 
-`AddPdfTemplateService()` also registers the new Papercraft facade, so applications can migrate
+`AddPdfTemplateService()` also registers the Papercraft renderer stack, so applications can migrate
 call sites before changing their service setup.
 
 Common extension points are documented in the

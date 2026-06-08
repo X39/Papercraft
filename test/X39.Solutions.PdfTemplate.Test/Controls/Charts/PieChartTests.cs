@@ -60,7 +60,9 @@ public class PieChartTests
         mock.AssertState();
         mock.AssertAllDrawLinesWithin(bounds);
         mock.AssertAllDrawTextWithin(bounds);
+        mock.AssertAllEstimatedDrawTextBoundsWithin(bounds);
         mock.AssertAnyDrawTextContains("Donut Chart");
+        mock.AssertAnyDrawTextContainsNear("Donut Chart", 217, 30);
     }
 
     [Fact]
@@ -270,6 +272,79 @@ public class PieChartTests
 
         mock.AssertState();
         mock.AssertAllDrawLinesWithin(bounds);
+    }
+
+    [Fact]
+    public void PieChart_OutsideLabels_KeepTextWithinBounds()
+    {
+        var chart = new PieChart { PieLabelPosition = EPieLabelPosition.Outside };
+        chart.Add(new ChartDataControl { Y = "45", Label = "Email" });
+        chart.Add(new ChartDataControl { Y = "35", Label = "Portal" });
+        chart.Add(new ChartDataControl { Y = "20", Label = "Phone" });
+
+        var (mock, pageSize) = RenderChart(chart, 360, 260);
+        var bounds = ChartBounds(pageSize);
+
+        mock.AssertState();
+        mock.AssertAnyDrawTextContains("Email");
+        mock.AssertAllEstimatedDrawTextBoundsWithin(bounds);
+    }
+
+    [Fact]
+    public void PieChart_InsideLabels_DrawsLabels()
+    {
+        var chart = new PieChart { PieLabelPosition = EPieLabelPosition.Inside };
+        chart.Add(new ChartDataControl { Y = "50", Label = "First" });
+        chart.Add(new ChartDataControl { Y = "50", Label = "Second" });
+
+        var (mock, _) = RenderChart(chart);
+
+        mock.AssertState();
+        mock.AssertAnyDrawTextContains("First");
+        mock.AssertAnyDrawTextContains("Second");
+    }
+
+    [Fact]
+    public void PieChart_LegendLabels_DrawsLegendMarkersAndText()
+    {
+        var chart = new PieChart { PieLabelPosition = EPieLabelPosition.Legend };
+        chart.Add(new ChartDataControl { Y = "50", Label = "First" });
+        chart.Add(new ChartDataControl { Y = "50", Label = "Second" });
+
+        var (mock, _) = RenderChart(chart);
+
+        mock.AssertState();
+        mock.AssertAnyDrawTextContains("First");
+        mock.AssertAnyDrawTextContains("Second");
+        mock.AssertDrawRectCountAtLeast(2);
+    }
+
+    [Fact]
+    public void PieChart_AutoLabels_FallsBackToLegendWhenOutsideLabelsWouldCrowdPie()
+    {
+        var chart = new PieChart { PieLabelPosition = EPieLabelPosition.Auto };
+        chart.Add(new ChartDataControl { Y = "50", Label = "Very long label A" });
+        chart.Add(new ChartDataControl { Y = "50", Label = "Very long label B" });
+
+        var (mock, _) = RenderChart(chart, 150, 120);
+
+        mock.AssertState();
+        mock.AssertDrawRectCountAtLeast(2);
+        mock.AssertAnyDrawTextContains("Very long label A");
+    }
+
+    [Fact]
+    public void PieChart_UsesMeaningfulAmountOfArrangedArea()
+    {
+        var chart = new PieChart { ShowLabels = false, ShowPercentages = false };
+        chart.Add(new ChartDataControl { Y = "45" });
+        chart.Add(new ChartDataControl { Y = "35" });
+        chart.Add(new ChartDataControl { Y = "20" });
+
+        var (mock, _) = RenderChart(chart, 400, 260);
+
+        mock.AssertState();
+        mock.AssertDrawLineSpanAtLeast(200, 150);
     }
 
     #endregion

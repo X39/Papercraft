@@ -126,6 +126,10 @@ A single oversized row is not split into smaller row fragments.
 This behavior is documented further in
 [A table breaks or overflows unexpectedly](troubleshooting.md#a-table-breaks-or-overflows-unexpectedly).
 
+The built-in `pageBreak` control advances body flow to the next page when the body is not already at a page boundary.
+The built-in `block` control also exposes `pageBreakBefore` and `pageBreakAfter` for the same kind of explicit page
+advance around a grouped block.
+
 ## Margin, Padding And Border
 
 Use `margin` to create space outside a control.
@@ -244,7 +248,9 @@ Use alignment for small placement decisions:
 - Keep a box near its content with `verticalAlignment="top"` when the parent offers more height than the box needs.
 - Leave `Stretch` as the default when the control should use the normal available space.
 
-If content needs real columns, use [Table control](controls-table.md) instead.
+If content needs tabular columns, use [Table control](controls-table.md).
+If content should flow through newsletter-style columns, use the built-in `columns` control listed in
+[Quick reference](quick-reference.md#additional-built-in-controls).
 If fixed page coordinates matter, use [Areas](areas.md).
 
 

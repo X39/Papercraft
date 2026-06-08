@@ -41,6 +41,9 @@ Built-in controls are listed in [Controls](controls.md).
 Focused pages currently include [Text control](controls-text.md), [Border control](controls-border.md),
 [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md)
 and [Table control](controls-table.md), plus [Chart controls](controls-chart.md).
+The current built-in registration also includes `block`, `paragraph`, `span`, `br`, `pageBreak`, `spacer`, `columns`,
+`checkbox`, `hyperlink`, `ul`, `ol`, `li` and `signature`; these are summarized in
+[Quick reference](quick-reference.md#additional-built-in-controls).
 
 Common causes:
 
@@ -69,8 +72,10 @@ Do not add a custom default namespace to normal templates:
 In this XML, `text` is read in `MyApp.PdfControls`, not in the built-in namespace.
 The result is usually an unknown-control error for `MyApp.PdfControls:text`.
 
-If the custom namespace is intentional, bind the built-in namespace to a prefix and use that prefix
-for built-in controls:
+Do not try to fix this with a namespace prefix.
+The XML reader rejects prefixed element names such as `default:text`, even if the prefix points at the current
+Papercraft namespace (`X39.Solutions.Papercraft`) or the legacy `X39.Solutions.PdfTemplate.Controls` namespace.
+This remains invalid:
 
 ```xml
 <template xmlns="MyApp.PdfControls"
@@ -82,7 +87,8 @@ for built-in controls:
 ```
 
 For normal authoring, remove the namespace declaration and use unprefixed control names.
-If a template needs an application-specific control, ask the application team which unprefixed element name they registered.
+If a template needs an application-specific control beside built-in controls, ask the application team which
+unprefixed element name they registered in the normal Papercraft control namespace.
 
 ## An Attribute Is Rejected
 
@@ -140,14 +146,15 @@ The [Template data](template-data.md) chapter covers simple variables and data-b
 If a text value still shows the `@` name, such as `@OrderNumber`, the XML reader did not find a matching variable.
 
 If an attribute value starts with `@` and the variable is missing, the evaluated attribute value becomes empty before
-behavior. This can later make the control reject the attribute if an empty value is not valid for that attribute type.
+control parameter binding. This can later make the control reject the attribute if an empty value is not valid for that
+attribute type.
 
 Common checks:
 
 - Compare the template name with the data name supplied by the application.
 - Check casing, spelling and underscores.
-- Do not use `@Customer.Name` for nested object fields. In text, the dot stops the variable name, so this is read as
-- Do not use a text value as an `@if` condition. Ask for a Boolean flag such as `HasOrderNumber`, or a Boolean
+- Do not use `@Customer.Name` for nested object fields. In text, the dot stops the variable name, so this is read as `@Customer` followed by literal `.Name`.
+- Do not use a text value as an `@if` condition. Ask for a Boolean flag such as `HasOrderNumber`, or a Boolean helper function.
 - For attributes such as `color="@AccentColor"`, confirm that the supplied value is a valid value for that attribute.
 - Keep a visible fallback label in normal text when missing data would otherwise be hard to notice.
 
@@ -186,8 +193,6 @@ For `@switch`:
 - Put `@default` last.
 - Use `@default` only once.
 - Give every `@case` a value or comparison.
-
-cover these cases.
 
 For `@for`:
 

@@ -24,6 +24,9 @@ services.AddPapercraft()
         .AddQrCodeControls();
 ```
 
+For a renderer-neutral or custom renderer setup, use `services.AddPapercraftCore().AddQrCodeControls()`.
+`services.AddPapercraftQrCodeControls()` is also available when you only want Core plus QR controls.
+
 ZXing barcodes:
 
 ```shell
@@ -37,6 +40,9 @@ using X39.Solutions.Papercraft.Controls.ZXing;
 services.AddPapercraft()
         .AddZxingBarcodeControls();
 ```
+
+For a renderer-neutral or custom renderer setup, use `services.AddPapercraftCore().AddZxingBarcodeControls()`.
+`services.AddPapercraftZxingBarcodeControls()` is also available when you only want Core plus barcode controls.
 
 Both packages register controls in the normal Papercraft control namespace, so templates use the same
 unprefixed XML style as built-in controls.
@@ -115,6 +121,10 @@ Available aliases:
 | `dataMatrix` | Data Matrix |
 | `pdf417` | PDF417 |
 | `aztec` | Aztec |
+
+Alias controls support the same `value`, sizing, color, `quietZone` and `gs1Format` attributes as `barcode`.
+Most aliases inherit the generic `50mm` by `15mm` default size; `dataMatrix` and `aztec` default to `25mm` by
+`25mm`, and `pdf417` defaults to `50mm` by `20mm`.
 
 Invalid payloads are rejected by the underlying encoder. For example, EAN and UPC formats require
 numeric values with the expected length and checksum behavior for that barcode type.

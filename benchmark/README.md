@@ -1,6 +1,6 @@
-# X39.Solutions.PdfTemplate benchmarks
+# Papercraft benchmarks
 
-This folder contains BenchmarkDotNet benchmarks focused on generator performance, especially control activation and parameter binding.
+This folder contains BenchmarkDotNet benchmarks focused on Papercraft generator and renderer performance, especially control activation and parameter binding.
 
 ## Run
 

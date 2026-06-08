@@ -108,7 +108,7 @@ In an attribute that starts with `@`, a missing variable becomes an empty attrib
 ```xml
 <template>
     <body>
-        <text color="@MissingColor">Color uses template data</text>
+        <text foreground="@MissingColor">Color uses template data</text>
     </body>
 </template>
 ```
@@ -164,7 +164,7 @@ Use a function when a value needs to be calculated or formatted by the applicati
 The exact function names and arguments depend on the application that generates the PDF.
 Ask the application team which functions are available for your templates.
 
-It assumes the application supplies a function named `statusLabel` and a variable named `PaymentStatus`.
+This example assumes the application supplies a function named `statusLabel` and a variable named `PaymentStatus`.
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -245,7 +245,7 @@ Use this pattern when the section should disappear unless the application says t
 `PurchaseOrder` is the text value to print.
 
 Do not write `@if PurchaseOrder` to mean "show this when PurchaseOrder has text".
-comparison operator must evaluate to a Boolean, not a text value.
+A condition without a comparison operator must evaluate to a Boolean, not a text value.
 For the template-language view of this task, see
 [Show optional values with @if](template-language.md#show-optional-values-with-if).
 
@@ -265,7 +265,7 @@ Use `@foreach` when the application supplies a list and the template should repe
 
 `Tasks` must be a collection.
 Each item is temporarily available as `Task` inside the block.
-[repeated table rows](controls-table.md#repeat-rows-from-data) sample uses the same simple-item pattern.
+The [repeated table rows](controls-table.md#repeat-rows-from-data) sample uses the same simple-item pattern.
 
 If each item needs several fields, ask for simple display values or helper functions until the application documents a
 supported multi-field item pattern for template authors.
@@ -292,7 +292,7 @@ Use simple values supplied by the application instead:
 If the application has nested customer or invoice objects, ask the application team to expose the fields you need as
 simple variables, or to provide a function that returns a ready-to-print value.
 `Customer.Name` is not read by text replacement.
-an attribute such as `color="@Customer.Color"` is evaluated as the exact variable name `Customer.Color`, not as a
+An attribute such as `color="@Customer.Color"` is evaluated as the exact variable name `Customer.Color`, not as a
 property lookup on `Customer`.
 For new templates, prefer simple names such as `CustomerColor` so text and attributes follow the same naming pattern.
 

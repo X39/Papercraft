@@ -195,7 +195,7 @@ Use one `th` row for the column labels and one `tr` row for each line item.
 Put visible padding, background color and bottom rules inside each `td`, usually with `border`.
 Right-align quantities, prices and totals with the `text` control.
 
-The full invoice preview uses the same structure in
+The full invoice preview uses the same structure:
 
 ```xml
 <table>

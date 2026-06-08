@@ -50,6 +50,9 @@ For explanations and rendered examples, follow the linked control pages.
 | Page number text. | [`pageNumber`](controls-page-number.md) | `mode`, `prefix`, `delimiter`, `suffix`, plus text styling attributes |
 | Rows and columns. | [`table`](controls-table.md), `th`, `tr`, `td` | `td width`, `td columnspan`, `padding`, `background` through nested `border` |
 | Line, bar or pie chart. | [`chart`](controls-chart.md), `lineChart`, `barChart`, `pieChart`, `data` | `width`, `height`, `title`, chart-specific attributes |
+| Rich text, links and line breaks. | `paragraph`, `span`, `br`, `hyperlink` | text styling attributes, `href`, `underline` |
+| Flow grouping, space and page breaks. | `block`, `spacer`, `pageBreak`, `columns` | `background`, `minHeight`, `pageBreakBefore`, `width`, `height`, `count`, `gap` |
+| Lists, checkboxes and signatures. | `ul`, `ol`, `li`, `checkbox`, `signature` | `marker`, `start`, `checked`, `size`, `label`, signature line attributes |
 | QR codes and barcodes. | Optional [`qrCode`, `barcode`, aliases](controls-barcode.md) | `value`, `size`, `format`, `width`, `height`, `quietZone`, colors |
 
 ## Shared Control Attributes
@@ -77,7 +80,7 @@ The manual uses lower-case or lower-camel-case names for readability.
 | `text`, `pageNumber` | `scale` | Number. Default `1`. |
 | `text`, `pageNumber` | `rotation` | Number, in degrees. Default `0`. |
 | `text`, `pageNumber` | `strokethickness` | Number. Default `1`. |
-| `text`, `pageNumber` | `letterspacing` | Font width or letter-spacing value. |
+| `text`, `pageNumber` | `letterspacing` | Number. |
 | `text`, `pageNumber` | `weight` | Number or names such as `normal`, `semiBold`, `bold`. |
 | `text`, `pageNumber` | `style` | `normal`, `upright`, `italic`, `oblique`. |
 | `text`, `pageNumber` | `fontfamily` | Font family name available to the renderer. |
@@ -137,6 +140,25 @@ Rows are kept whole; a large row moves to the next page instead of splitting.
 </table>
 ```
 
+## Additional Built-In Controls
+
+These controls are registered by the current Papercraft core service setup, but some do not yet have focused manual
+pages.
+
+| Control | Use | Key attributes and children |
+|---------|-----|-----------------------------|
+| `block` | Group stacked controls and optional background/page-break behavior. | `background`, `minHeight`, `pageBreakBefore`, `pageBreakAfter`, `keepTogether`, shared attributes; contains normal controls. `keepTogether` is parsed as a future pagination hint. |
+| `spacer` | Reserve empty space without drawing. | `width`, `height`, shared alignment attributes. |
+| `pageBreak` | Advance body flow to the next page when not already at a page boundary. | Shared attributes. |
+| `columns` | Flow whole child controls through multiple columns. | `count`, `gap`, `balance`, `ruleThickness` or `rule-thickness`, `ruleColor` or `rule-color`; `balance` is parsed as a future layout hint. |
+| `paragraph` | Rich text made from inline fragments. | Text styling attributes; contains `span` and `br`. |
+| `span` | Inline text fragment inside `paragraph`. | `text` or content, plus text styling overrides. |
+| `br` | Explicit line break inside `paragraph`. | No control-specific attributes. |
+| `hyperlink` | Visual hyperlink-style text. | `href`, `text` or content, `underline`, plus text styling attributes. |
+| `ul`, `ol`, `li` | Unordered and ordered lists. | `ul marker`; `ol start`, `markerFormat`; `indent`, `markerWidth`, `itemSpacing`; list children must be `li`. |
+| `checkbox` | Checkbox mark with plain label or child content. | `checked`, `size`, `label` or content, `gap`, `strokeColor`, `fill`, `checkColor`, `strokeThickness`. |
+| `signature` | Signature line with optional helper text. | `height`, `lineWidth`, `lineThickness`, `lineColor`, `label`, `subtext`, `textPlacement`, plus text styling attributes. |
+
 ## Charts
 
 Use `chart` as a wrapper when you want to stack one or more chart controls.
@@ -145,11 +167,15 @@ Each chart control contains `data` children.
 | Control | Attributes |
 |---------|------------|
 | `chart` | Shared attributes. Contains `lineChart`, `barChart` or `pieChart`. |
-| `lineChart`, `barChart`, `pieChart` | `width`, `height`, `title`, `show-grid`, `grid-color`, `axis-color`, `show-x-axis`, `show-y-axis`, `x-axis-label`, `y-axis-label`. |
+| `lineChart`, `barChart`, `pieChart` | `width`, `height`, `title`, `show-grid`, `grid-color`, `axis-color`, `show-x-axis`, `show-y-axis`, `x-axis-label`, `y-axis-label`, `show-data-labels`. |
 | `lineChart` | `line-thickness`, `line-color`, `show-points`, `point-size`. |
 | `barChart` | `orientation`, `bar-width`, `bar-spacing`, `bar-color`. |
-| `pieChart` | `start-angle`, `inner-radius`, `show-percentages`, `show-labels`. |
+| `pieChart` | `start-angle`, `inner-radius`, `show-percentages`, `show-labels`, `pie-label-position`. |
 | `data` | `x`, `y`, `x-label`, `y-label`, `label`, `color`. |
+
+`x-axis-label` and `y-axis-label` draw visible axis labels on line and bar charts.
+Explicit `data label`, `x-label` and `y-label` draw visible line or bar data labels.
+Numeric `y` value labels render when `show-data-labels="true"`.
 
 ```xml
 <chart>
@@ -221,6 +247,6 @@ Inside normal text and attributes, use `@VariableName`.
 | Alignment | `Left`, `Center`, `Right`, `Stretch`, `Top`, `Bottom`. | `horizontalAlignment="right"` |
 | Table width | Length, `auto`, star parts. | `30mm`, `auto`, `1*`, `2*` |
 | QR error correction | `L`, `M`, `Q`, `H`, or `Low`, `Medium`, `Quartile`, `High`. | `errorCorrection="Q"` |
-| Barcode format | `Code128`, `GS1-128`, `Code39`, `EAN13`, `DataMatrix`, `PDF417`, `Aztec`, and other supported ZXing formats. | `format="Code128"` |
+| Barcode format | `Aztec`, `Codabar`, `Code39`, `Code93`, `Code128`, `GS1-128`, `DataMatrix`, `EAN8`, `EAN13`, `ITF`, `PDF417`, `QRCode`, `UPCA`, `UPCE`. | `format="Code128"` |
 
 Previous: [Styles](styles.md) | [Manual home](index.md) | Next: [Controls](controls.md)

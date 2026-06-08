@@ -2,6 +2,7 @@ using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Attributes;
 using X39.Solutions.Papercraft.Controls.Base;
 using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Services.TextService;
 
 namespace X39.Solutions.Papercraft.Controls;
 
@@ -11,6 +12,28 @@ namespace X39.Solutions.Papercraft.Controls;
 [Control(Constants.ControlsNamespace)]
 public class PieChart : ChartBaseControl
 {
+    private const float MinimumRadius = 10f;
+    private const float LabelGap = 8f;
+    private const float LegendMarkerSize = 8f;
+    private const float LegendGap = 4f;
+    private const float ChartPadding = 6f;
+
+    /// <summary>
+    /// Creates a new pie chart.
+    /// </summary>
+    public PieChart()
+    {
+    }
+
+    /// <summary>
+    /// Creates a new pie chart.
+    /// </summary>
+    /// <param name="textService">The text service used to measure and render chart labels.</param>
+    [ControlConstructor]
+    public PieChart(ITextService textService) : base(textService)
+    {
+    }
+
     /// <summary>
     /// Starting angle in degrees (0 = top, 90 = right).
     /// </summary>
@@ -35,7 +58,12 @@ public class PieChart : ChartBaseControl
     [Parameter(Name = "show-labels")]
     public bool ShowLabels { get; set; } = true;
 
-    private const float TitleHeight = 30f;
+    /// <summary>
+    /// The label positioning mode.
+    /// </summary>
+    [Parameter(Name = "pie-label-position")]
+    public EPieLabelPosition PieLabelPosition { get; set; } = EPieLabelPosition.Outside;
+
     private const int CircleSegments = 60; // Number of segments to approximate circle
 
     /// <inheritdoc />
@@ -89,22 +117,42 @@ public class PieChart : ChartBaseControl
             return Size.Zero;
         }
 
-        // Calculate plot area
-        var titleOffset = string.IsNullOrEmpty(Title) ? 0f : TitleHeight;
+        var titleStyle = CreateTitleTextStyle();
+        var titleHeight = string.IsNullOrEmpty(Title)
+            ? 0f
+            : MeasureText(titleStyle, dpi, Title, chartWidth).Height + ChartPadding;
 
         // Render title
         if (!string.IsNullOrEmpty(Title))
         {
-            RenderTitle(canvas, dpi, chartWidth / 2, 5);
+            RenderTitle(canvas, dpi, chartWidth, 4f);
         }
 
-        // Calculate center and radius
-        var centerX = chartWidth / 2;
-        var centerY = titleOffset + (chartHeight - titleOffset) / 2;
-        // Reserve more space for labels when they are shown
-        var labelPadding = (ShowLabels || ShowPercentages) ? 80f : 20f;
-        var radius = Math.Min(chartWidth, chartHeight - titleOffset) / 2 - labelPadding;
-        radius = Math.Max(radius, 10f); // Ensure minimum viable radius
+        var contentArea = new Rectangle(
+            ChartPadding,
+            titleHeight + ChartPadding,
+            Math.Max(1f, chartWidth - ChartPadding * 2),
+            Math.Max(1f, chartHeight - titleHeight - ChartPadding * 2));
+        var labels = CreateSliceLabels(dpi, dataPoints, total, cultureInfo, contentArea.Width);
+        var labelMode = ResolvePieLabelPosition(labels, contentArea);
+        var legendSize = labelMode == EPieLabelPosition.Legend
+            ? MeasureLegend(labels)
+            : Size.Zero;
+        var pieArea = labelMode == EPieLabelPosition.Legend
+            ? new Rectangle(
+                contentArea.Left,
+                contentArea.Top,
+                Math.Max(1f, contentArea.Width - legendSize.Width - ChartPadding),
+                contentArea.Height)
+            : contentArea;
+
+        var centerX = pieArea.Left + pieArea.Width / 2;
+        var centerY = pieArea.Top + pieArea.Height / 2;
+        var radiusPadding = labelMode == EPieLabelPosition.Outside
+            ? GetOutsideLabelPadding(labels)
+            : ChartPadding;
+        var radius = Math.Min(pieArea.Width, pieArea.Height) / 2 - radiusPadding;
+        radius = Math.Max(radius, MinimumRadius);
 
         var innerRadiusPixels = InnerRadius.ToPixels(radius, dpi);
 
@@ -112,55 +160,156 @@ public class PieChart : ChartBaseControl
         var currentAngle = StartAngle - 90; // Adjust so 0 degrees is at top
         var colorIndex = 0;
 
-        foreach (var (_, y, control) in dataPoints)
+        for (var i = 0; i < dataPoints.Count; i++)
         {
+            var (_, y, control) = dataPoints[i];
             var sliceAngle = (float)((y / total) * 360);
             var color = control.Color ?? GetPaletteColor(colorIndex++);
 
             RenderSlice(canvas, centerX, centerY, radius, innerRadiusPixels, currentAngle, sliceAngle, color);
 
-            // Render label if enabled
-            if (ShowLabels || ShowPercentages)
-            {
-                var labelAngle = currentAngle + sliceAngle / 2;
-                var labelAngleRad = labelAngle * Math.PI / 180;
-                var labelRadius = radius + 15;
-                var labelX = centerX + (float)(labelRadius * Math.Cos(labelAngleRad));
-                var labelY = centerY + (float)(labelRadius * Math.Sin(labelAngleRad));
-
-                var label = string.Empty;
-                if (ShowLabels && !string.IsNullOrEmpty(control.Label))
-                    label = control.Label;
-                if (ShowPercentages)
-                {
-                    var percentage = (y / total) * 100;
-                    var percentText = string.Format(cultureInfo, "{0:F1}%", percentage);
-                    label = string.IsNullOrEmpty(label) ? percentText : $"{label} ({percentText})";
-                }
-
-                if (!string.IsNullOrEmpty(label))
-                {
-                    // Estimate text width (~6px per character at 10px font)
-                    var estimatedTextWidth = label.Length * 6f;
-                    var estimatedTextHeight = 10f;
-
-                    // Clamp label position to stay within chart bounds
-                    labelX = Math.Clamp(labelX, 2f, chartWidth - estimatedTextWidth - 2f);
-                    labelY = Math.Clamp(labelY, estimatedTextHeight + 2f, chartHeight - 2f);
-
-                    var textStyle = new TextStyle
-                    {
-                        Foreground = AxisColor,
-                        FontSize = 10f,
-                    };
-                    canvas.DrawText(textStyle, dpi, label, labelX, labelY);
-                }
-            }
+            if (labelMode is EPieLabelPosition.Outside or EPieLabelPosition.Inside)
+                RenderSliceLabel(canvas, dpi, labels[i], centerX, centerY, radius, currentAngle + sliceAngle / 2, labelMode, contentArea);
 
             currentAngle += sliceAngle;
         }
 
+        if (labelMode == EPieLabelPosition.Legend)
+            RenderLegend(canvas, dpi, labels, contentArea, legendSize);
+
         return Size.Zero;
+    }
+
+    private IReadOnlyList<SliceLabel> CreateSliceLabels(
+        float dpi,
+        IReadOnlyList<(double X, double Y, ChartDataControl Control)> dataPoints,
+        double total,
+        CultureInfo cultureInfo,
+        float maxWidth)
+    {
+        var style = CreateLabelTextStyle();
+        var labels = new List<SliceLabel>(dataPoints.Count);
+        for (var i = 0; i < dataPoints.Count; i++)
+        {
+            var (_, y, control) = dataPoints[i];
+            var label = string.Empty;
+            if (ShowLabels && !string.IsNullOrWhiteSpace(control.Label))
+                label = control.Label.Trim();
+            if (ShowPercentages)
+            {
+                var percentage = y / total * 100;
+                var percentText = string.Format(cultureInfo, "{0:F1}%", percentage);
+                label = string.IsNullOrEmpty(label) ? percentText : $"{label} ({percentText})";
+            }
+
+            labels.Add(
+                new SliceLabel(
+                    label,
+                    control.Color ?? GetPaletteColor(i),
+                    string.IsNullOrEmpty(label)
+                        ? Size.Zero
+                        : MeasureText(style, dpi, label, maxWidth)));
+        }
+
+        return labels;
+    }
+
+    private EPieLabelPosition ResolvePieLabelPosition(IReadOnlyCollection<SliceLabel> labels, Rectangle contentArea)
+    {
+        if (PieLabelPosition != EPieLabelPosition.Auto)
+            return PieLabelPosition;
+
+        if (!labels.Any((label) => !string.IsNullOrEmpty(label.Text)))
+            return EPieLabelPosition.Outside;
+
+        var outsidePadding = GetOutsideLabelPadding(labels);
+        var outsideRadius = Math.Min(contentArea.Width, contentArea.Height) / 2 - outsidePadding;
+        return outsideRadius >= Math.Min(contentArea.Width, contentArea.Height) * 0.2f
+            ? EPieLabelPosition.Outside
+            : EPieLabelPosition.Legend;
+    }
+
+    private static float GetOutsideLabelPadding(IReadOnlyCollection<SliceLabel> labels)
+    {
+        if (!labels.Any((label) => !string.IsNullOrEmpty(label.Text)))
+            return ChartPadding;
+
+        var widest = labels.Max((label) => label.Size.Width);
+        var tallest = labels.Max((label) => label.Size.Height);
+        return Math.Min(90f, Math.Max(ChartPadding + LabelGap, Math.Max(widest * 0.45f, tallest) + LabelGap));
+    }
+
+    private static Size MeasureLegend(IReadOnlyCollection<SliceLabel> labels)
+    {
+        var visibleLabels = labels.Where((label) => !string.IsNullOrEmpty(label.Text)).ToArray();
+        if (visibleLabels.Length == 0)
+            return Size.Zero;
+
+        return new Size(
+            visibleLabels.Max((label) => label.Size.Width) + LegendMarkerSize + LegendGap,
+            visibleLabels.Sum((label) => Math.Max(label.Size.Height, LegendMarkerSize) + LegendGap));
+    }
+
+    private void RenderSliceLabel(
+        IDeferredCanvas canvas,
+        float dpi,
+        SliceLabel label,
+        float centerX,
+        float centerY,
+        float radius,
+        float labelAngle,
+        EPieLabelPosition labelPosition,
+        Rectangle bounds)
+    {
+        if (string.IsNullOrEmpty(label.Text))
+            return;
+
+        var angleRad = labelAngle * Math.PI / 180;
+        var labelRadius = labelPosition == EPieLabelPosition.Inside
+            ? radius * 0.62f
+            : radius + LabelGap;
+        var labelCenterX = centerX + (float)(labelRadius * Math.Cos(angleRad));
+        var labelCenterY = centerY + (float)(labelRadius * Math.Sin(angleRad));
+        var labelX = labelCenterX - label.Size.Width / 2;
+        if (labelPosition == EPieLabelPosition.Outside)
+        {
+            var horizontalDirection = Math.Cos(angleRad);
+            if (horizontalDirection > 0.2)
+                labelX = labelCenterX;
+            else if (horizontalDirection < -0.2)
+                labelX = labelCenterX - label.Size.Width;
+        }
+
+        var position = ClampTextPosition(
+            new Point(labelX, labelCenterY - label.Size.Height / 2),
+            label.Size,
+            bounds);
+        DrawText(canvas, dpi, CreateLabelTextStyle(), label.Text, position.X, position.Y, bounds.Width);
+    }
+
+    private void RenderLegend(
+        IDeferredCanvas canvas,
+        float dpi,
+        IReadOnlyCollection<SliceLabel> labels,
+        Rectangle contentArea,
+        Size legendSize)
+    {
+        if (legendSize == Size.Zero)
+            return;
+
+        var style = CreateLabelTextStyle();
+        var x = contentArea.Right - legendSize.Width;
+        var y = contentArea.Top + Math.Max(0f, (contentArea.Height - legendSize.Height) / 2);
+        foreach (var label in labels)
+        {
+            if (string.IsNullOrEmpty(label.Text))
+                continue;
+
+            var rowHeight = Math.Max(label.Size.Height, LegendMarkerSize);
+            canvas.DrawRect(new Rectangle(x, y + (rowHeight - LegendMarkerSize) / 2, LegendMarkerSize, LegendMarkerSize), label.Color);
+            DrawText(canvas, dpi, style, label.Text, x + LegendMarkerSize + LegendGap, y, legendSize.Width);
+            y += rowHeight + LegendGap;
+        }
     }
 
     private void RenderSlice(
@@ -326,4 +475,6 @@ public class PieChart : ChartBaseControl
             }
         }
     }
+
+    private readonly record struct SliceLabel(string Text, Color Color, Size Size);
 }

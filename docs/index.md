@@ -1,6 +1,6 @@
-# X39.Solutions.PdfTemplate User Manual
+# Papercraft User Manual
 
-X39.Solutions.PdfTemplate creates PDF documents from XML templates. This documentation is intended for people who design those templates, including users who are not .NET developers.
+Papercraft creates PDF documents from XML templates. This documentation is intended for people who design those templates, including users who are not .NET developers.
 
 Use this manual when you need to understand how a document is structured, which XML elements are available, how values are inserted, and how layout options such as margins, tables, images, text and charts are expressed.
 

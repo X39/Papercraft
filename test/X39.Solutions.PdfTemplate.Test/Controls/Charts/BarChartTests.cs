@@ -63,7 +63,9 @@ public class BarChartTests
         mock.AssertAllDrawLinesWithin(bounds);
         mock.AssertAllDrawRectsWithin(bounds);
         mock.AssertAllDrawTextWithin(bounds);
+        mock.AssertAllEstimatedDrawTextBoundsWithin(bounds);
         mock.AssertAnyDrawTextContains("Revenue by Quarter");
+        mock.AssertAnyDrawTextContainsNear("Revenue by Quarter", 189, 30);
     }
 
     [Fact]
@@ -224,6 +226,77 @@ public class BarChartTests
         mock.AssertDrawLineCountAtLeast(14);
         // 2 bars
         mock.AssertDrawRectCountAtLeast(2);
+    }
+
+    [Fact]
+    public void BarChart_WithAxisLabels_DrawsAxisLabelText()
+    {
+        var chart = new BarChart
+        {
+            XAxisLabel = "Month",
+            YAxisLabel = "Open items",
+        };
+        chart.Add(new ChartDataControl { X = "0", Y = "10" });
+        chart.Add(new ChartDataControl { X = "1", Y = "20" });
+
+        var (mock, pageSize) = RenderChart(chart);
+        var bounds = ChartBounds(pageSize);
+
+        mock.AssertState();
+        mock.AssertAnyDrawTextContains("Month");
+        mock.AssertAnyDrawTextContains("Open items");
+        mock.AssertAllEstimatedDrawTextBoundsWithin(bounds);
+    }
+
+    [Fact]
+    public void BarChart_WithExplicitDataLabels_DrawsLabelsByDefault()
+    {
+        var chart = new BarChart
+        {
+            ShowGrid = false,
+            ShowXAxis = false,
+            ShowYAxis = false,
+        };
+        chart.Add(new ChartDataControl { X = "0", Y = "10", Label = "A" });
+        chart.Add(new ChartDataControl { X = "1", Y = "20", YLabel = "B" });
+
+        var (mock, _) = RenderChart(chart);
+
+        mock.AssertState();
+        mock.AssertAnyDrawTextContains("A");
+        mock.AssertAnyDrawTextContains("B");
+    }
+
+    [Fact]
+    public void BarChart_WithShowDataLabels_DrawsNumericValues()
+    {
+        var chart = new BarChart
+        {
+            ShowDataLabels = true,
+            ShowGrid = false,
+            ShowXAxis = false,
+            ShowYAxis = false,
+        };
+        chart.Add(new ChartDataControl { X = "0", Y = "10" });
+
+        var (mock, _) = RenderChart(chart);
+
+        mock.AssertState();
+        mock.AssertAnyDrawTextContains("10");
+    }
+
+    [Fact]
+    public void BarChart_UsesMeaningfulAmountOfArrangedArea()
+    {
+        var chart = new BarChart { ShowGrid = false };
+        chart.Add(new ChartDataControl { X = "0", Y = "12" });
+        chart.Add(new ChartDataControl { X = "1", Y = "19" });
+        chart.Add(new ChartDataControl { X = "2", Y = "7" });
+
+        var (mock, _) = RenderChart(chart, 400, 260);
+
+        mock.AssertState();
+        mock.AssertDrawRectSpanAtLeast(250, 100);
     }
 
     [Fact]

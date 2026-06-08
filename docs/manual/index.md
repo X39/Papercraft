@@ -1,4 +1,4 @@
-# X39.Solutions.PdfTemplate Manual
+# Papercraft Manual
 
 This manual is for template authors who design Papercraft PDF documents with XML templates.
 It explains the document concepts first, then points to small task examples and reference pages.

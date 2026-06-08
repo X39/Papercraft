@@ -36,7 +36,7 @@ Choose the smallest control that matches the document part:
 Use the [Quick reference](quick-reference.md) when you need a compact attribute table.
 Read [Control concepts](controls-concepts.md) first if you are unsure whether a control can contain other controls.
 
-## Built-In Controls
+## Documented Built-In Controls
 
 | Control | Use it for |
 |---------|------------|

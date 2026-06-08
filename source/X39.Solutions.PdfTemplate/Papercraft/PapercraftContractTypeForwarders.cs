@@ -101,6 +101,7 @@ using System.Runtime.CompilerServices;
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Data.EHorizontalAlignment))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Data.ELengthUnit))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Data.EOrientation))]
+[assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Data.EPieLabelPosition))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Data.EVerticalAlignment))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Data.Font))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Data.FontWeight))]

@@ -2,6 +2,7 @@ using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Abstraction.Controls;
 using X39.Solutions.Papercraft.Attributes;
 using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Services.TextService;
 
 namespace X39.Solutions.Papercraft.Controls.Base;
 
@@ -10,6 +11,24 @@ namespace X39.Solutions.Papercraft.Controls.Base;
 /// </summary>
 public abstract class ChartBaseControl : AlignableContentControl, IChart
 {
+    private const float TitleFontSize = 14f;
+    private const float LabelFontSize = 10f;
+    private const float AxisLabelFontSize = 11f;
+    private const float MinimumPadding = 6f;
+    private const float TextWidthFactor = 0.55f;
+    private const float TextHeightFactor = 1.25f;
+
+    private readonly ITextService? _textService;
+
+    /// <summary>
+    /// Creates a chart control.
+    /// </summary>
+    /// <param name="textService">Optional text service used for accurate label measurement and rendering.</param>
+    protected ChartBaseControl(ITextService? textService = null)
+    {
+        _textService = textService;
+    }
+
     /// <summary>
     /// Width of the chart.
     /// </summary>
@@ -69,6 +88,13 @@ public abstract class ChartBaseControl : AlignableContentControl, IChart
     /// </summary>
     [Parameter(Name = "y-axis-label")]
     public string YAxisLabel { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Whether to show automatic numeric value labels for line and bar chart data points.
+    /// Explicit data labels are drawn even when this is false.
+    /// </summary>
+    [Parameter(Name = "show-data-labels")]
+    public bool ShowDataLabels { get; set; }
 
     /// <summary>
     /// Default color palette for charts.
@@ -255,20 +281,204 @@ public abstract class ChartBaseControl : AlignableContentControl, IChart
     protected void RenderTitle(
         IDeferredCanvas canvas,
         float dpi,
-        float centerX,
+        float chartWidth,
         float y)
     {
         if (string.IsNullOrEmpty(Title))
             return;
 
-        var textStyle = new TextStyle
+        var textStyle = CreateTitleTextStyle();
+        var size = MeasureText(textStyle, dpi, Title, chartWidth);
+        DrawText(canvas, dpi, textStyle, Title, (chartWidth - size.Width) / 2, y, size.Width);
+    }
+
+    /// <summary>
+    /// Creates the default chart title text style.
+    /// </summary>
+    protected TextStyle CreateTitleTextStyle()
+        => new()
         {
             Foreground = AxisColor,
-            FontSize = 14f,
+            FontSize = TitleFontSize,
         };
 
-        canvas.DrawText(textStyle, dpi, Title, centerX, y);
+    /// <summary>
+    /// Creates the default chart label text style.
+    /// </summary>
+    protected TextStyle CreateLabelTextStyle()
+        => new()
+        {
+            Foreground = AxisColor,
+            FontSize = LabelFontSize,
+        };
+
+    /// <summary>
+    /// Creates the default chart axis label text style.
+    /// </summary>
+    protected TextStyle CreateAxisLabelTextStyle()
+        => new()
+        {
+            Foreground = AxisColor,
+            FontSize = AxisLabelFontSize,
+        };
+
+    /// <summary>
+    /// Measures chart text.
+    /// </summary>
+    protected Size MeasureText(TextStyle textStyle, float dpi, string text, float maxWidth)
+    {
+        if (string.IsNullOrEmpty(text))
+            return Size.Zero;
+
+        if (_textService is not null)
+            return _textService.Measure(textStyle, dpi, text.AsSpan(), Math.Max(1f, maxWidth));
+
+        return new Size(
+            Math.Min(maxWidth, text.Length * textStyle.FontSize * TextWidthFactor),
+            textStyle.FontSize * TextHeightFactor);
     }
+
+    /// <summary>
+    /// Draws chart text using top-left coordinates.
+    /// </summary>
+    protected void DrawText(
+        IDeferredCanvas canvas,
+        float dpi,
+        TextStyle textStyle,
+        string text,
+        float x,
+        float y,
+        float maxWidth)
+    {
+        if (string.IsNullOrEmpty(text))
+            return;
+
+        if (_textService is not null)
+        {
+            using var state = canvas.CreateState();
+            canvas.Translate(x, y);
+            _textService.Draw(canvas, textStyle, dpi, text.AsSpan(), Math.Max(1f, maxWidth));
+            return;
+        }
+
+        canvas.DrawText(textStyle, dpi, text, x, y + EstimateTextHeight(textStyle));
+    }
+
+    /// <summary>
+    /// Draws chart text centered around the provided point.
+    /// </summary>
+    protected void DrawCenteredText(
+        IDeferredCanvas canvas,
+        float dpi,
+        TextStyle textStyle,
+        string text,
+        float centerX,
+        float centerY,
+        float maxWidth)
+    {
+        var size = MeasureText(textStyle, dpi, text, maxWidth);
+        DrawText(canvas, dpi, textStyle, text, centerX - size.Width / 2, centerY - size.Height / 2, maxWidth);
+    }
+
+    /// <summary>
+    /// Clamps a top-left text position to stay inside the given bounds.
+    /// </summary>
+    protected Point ClampTextPosition(Point position, Size textSize, Rectangle bounds)
+    {
+        var maxX = Math.Max(bounds.Left, bounds.Right - textSize.Width);
+        var maxY = Math.Max(bounds.Top, bounds.Bottom - textSize.Height);
+        return new Point(
+            Math.Clamp(position.X, bounds.Left, maxX),
+            Math.Clamp(position.Y, bounds.Top, maxY));
+    }
+
+    /// <summary>
+    /// Calculates a plot area for axis-based charts.
+    /// </summary>
+    protected ChartPlotLayout CalculateAxisChartLayout(float dpi, float chartWidth, float chartHeight)
+    {
+        var titleStyle = CreateTitleTextStyle();
+        var axisStyle = CreateAxisLabelTextStyle();
+
+        var titleHeight = string.IsNullOrEmpty(Title)
+            ? 0f
+            : MeasureText(titleStyle, dpi, Title, chartWidth).Height + MinimumPadding;
+        var xAxisLabelHeight = string.IsNullOrEmpty(XAxisLabel)
+            ? 0f
+            : MeasureText(axisStyle, dpi, XAxisLabel, chartWidth).Height + MinimumPadding;
+        var yAxisLabelWidth = string.IsNullOrEmpty(YAxisLabel)
+            ? 0f
+            : MeasureText(axisStyle, dpi, YAxisLabel, chartHeight).Height + MinimumPadding;
+
+        var top = MinimumPadding + titleHeight;
+        var left = MinimumPadding + yAxisLabelWidth + (ShowYAxis ? 8f : 0f);
+        var right = MinimumPadding;
+        var bottom = MinimumPadding + xAxisLabelHeight + (ShowXAxis ? 8f : 0f);
+        var plotWidth = Math.Max(1f, chartWidth - left - right);
+        var plotHeight = Math.Max(1f, chartHeight - top - bottom);
+
+        return new ChartPlotLayout(
+            new Rectangle(left, top, plotWidth, plotHeight),
+            new Rectangle(0f, 0f, chartWidth, chartHeight),
+            titleHeight,
+            xAxisLabelHeight,
+            yAxisLabelWidth);
+    }
+
+    /// <summary>
+    /// Renders axis labels for a plot area.
+    /// </summary>
+    protected void RenderAxisLabels(IDeferredCanvas canvas, float dpi, ChartPlotLayout layout)
+    {
+        var textStyle = CreateAxisLabelTextStyle();
+        if (!string.IsNullOrEmpty(XAxisLabel))
+        {
+            var size = MeasureText(textStyle, dpi, XAxisLabel, layout.Bounds.Width);
+            DrawText(
+                canvas,
+                dpi,
+                textStyle,
+                XAxisLabel,
+                layout.PlotArea.Left + (layout.PlotArea.Width - size.Width) / 2,
+                layout.PlotArea.Bottom + MinimumPadding,
+                layout.Bounds.Width);
+        }
+
+        if (!string.IsNullOrEmpty(YAxisLabel))
+        {
+            var size = MeasureText(textStyle, dpi, YAxisLabel, layout.Bounds.Height);
+            DrawText(
+                canvas,
+                dpi,
+                textStyle with { Rotation = -90f },
+                YAxisLabel,
+                MinimumPadding,
+                layout.PlotArea.Top + (layout.PlotArea.Height + size.Width) / 2,
+                layout.Bounds.Height);
+        }
+    }
+
+    /// <summary>
+    /// Gets the visible label for a data point.
+    /// </summary>
+    protected string GetDataLabel(ChartDataControl control, double y, CultureInfo cultureInfo)
+    {
+        var valueLabel = y.ToString("G", cultureInfo);
+        if (!string.IsNullOrWhiteSpace(control.Label))
+            return ShowDataLabels ? $"{control.Label.Trim()}: {valueLabel}" : control.Label.Trim();
+        if (!string.IsNullOrWhiteSpace(control.YLabel))
+            return ShowDataLabels ? $"{control.YLabel.Trim()}: {valueLabel}" : control.YLabel.Trim();
+        if (!string.IsNullOrWhiteSpace(control.XLabel))
+            return ShowDataLabels ? $"{control.XLabel.Trim()}: {valueLabel}" : control.XLabel.Trim();
+        return ShowDataLabels ? valueLabel : string.Empty;
+    }
+
+    /// <summary>
+    /// Estimates a single-line text height for fallback drawing.
+    /// </summary>
+    protected static float EstimateTextHeight(TextStyle textStyle)
+        => textStyle.FontSize * TextHeightFactor;
+
 
     /// <summary>
     /// Gets a color from the palette by index.
@@ -281,4 +491,14 @@ public abstract class ChartBaseControl : AlignableContentControl, IChart
     /// <inheritdoc />
     public override bool CanAdd(Type type)
         => type.IsEquivalentTo(typeof(ChartDataControl));
+
+    /// <summary>
+    /// Layout information for an axis-based chart.
+    /// </summary>
+    protected readonly record struct ChartPlotLayout(
+        Rectangle PlotArea,
+        Rectangle Bounds,
+        float TitleHeight,
+        float XAxisLabelHeight,
+        float YAxisLabelWidth);
 }

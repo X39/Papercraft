@@ -37,9 +37,17 @@ public sealed class ControlRegistry
     public Type GetControlType(string @namespace, string name)
     {
         var key = Key(@namespace, name);
-        if (!_controls.TryGetValue(key, out var type))
-            throw new InvalidOperationException($"The control {@namespace}:{name} does not exist.");
-        return type;
+        if (_controls.TryGetValue(key, out var type))
+            return type;
+
+        if (NamesEqual(@namespace, Constants.LegacyControlsNamespace))
+        {
+            var fallbackKey = Key(Constants.ControlsNamespace, name);
+            if (_controls.TryGetValue(fallbackKey, out type))
+                return type;
+        }
+
+        throw new InvalidOperationException($"The control {@namespace}:{name} does not exist.");
     }
 
     /// <summary>
@@ -74,4 +82,7 @@ public sealed class ControlRegistry
 
     private static (string @namespace, string name) Key(string @namespace, string name)
         => (@namespace.ToUpper(CultureInfo.InvariantCulture), name.ToUpper(CultureInfo.InvariantCulture));
+
+    private static bool NamesEqual(string left, string right)
+        => string.Equals(left, right, StringComparison.OrdinalIgnoreCase);
 }

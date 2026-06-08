@@ -43,10 +43,10 @@ public sealed class ChartDocumentationSamples : DocumentationSampleBase
             <template>
                 <body>
                     <chart>
-                        <barChart height="55mm" title="Open items">
-                            <data x="0" y="12" color="#2563eb"/>
-                            <data x="1" y="19" color="#16a34a"/>
-                            <data x="2" y="7" color="#f59e0b"/>
+                        <barChart height="55mm" title="Open items" show-data-labels="true" x-axis-label="Queue">
+                            <data x="0" y="12" label="New" color="#2563eb"/>
+                            <data x="1" y="19" label="Review" color="#16a34a"/>
+                            <data x="2" y="7" label="Blocked" color="#f59e0b"/>
                         </barChart>
                     </chart>
                 </body>
@@ -63,7 +63,7 @@ public sealed class ChartDocumentationSamples : DocumentationSampleBase
             <template>
                 <body>
                     <chart>
-                        <pieChart height="60mm" title="Request mix">
+                        <pieChart height="60mm" title="Request mix" pie-label-position="Outside">
                             <data y="45" label="Email" color="#2563eb"/>
                             <data y="35" label="Portal" color="#16a34a"/>
                             <data y="20" label="Phone" color="#f59e0b"/>

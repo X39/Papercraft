@@ -127,7 +127,7 @@ Current implementation:
 - Regenerate the current documentation sample assets intentionally with:
 
 ```shell
-dotnet test test/X39.Solutions.PdfTemplate.Test/X39.Solutions.PdfTemplate.Test.csproj --framework net8.0 --filter FullyQualifiedName~X39.Solutions.PdfTemplate.Test.Samples.Documentation
+dotnet test test/X39.Solutions.PdfTemplate.Test/X39.Solutions.PdfTemplate.Test.csproj --framework net10.0 --filter FullyQualifiedName~X39.Solutions.PdfTemplate.Test.Samples.Documentation
 ```
 
 Future sample work:
@@ -369,7 +369,7 @@ from this roadmap and keep the change small.
 You are working in A:\dev\git\X39.Solutions.PdfTemplate.
 
 Goal:
-Extend the GitHub Pages end-user manual for X39.Solutions.PdfTemplate after a new supported behavior, recurring support
+Extend the GitHub Pages end-user manual for Papercraft after a new supported behavior, recurring support
 case or documentation gap appears. The manual is for non-developer template authors who design PDF documents with XML
 templates.
 
@@ -384,7 +384,8 @@ Required reading before editing:
 Read only if needed for your assignment:
 - test/X39.Solutions.PdfTemplate.Test/Samples/ReadMeSample.cs
 - test/X39.Solutions.PdfTemplate.Test/Samples/SampleBase.cs
-- source/X39.Solutions.PdfTemplate relevant files
+- source/X39.Solutions.Papercraft* relevant files
+- source/X39.Solutions.PdfTemplate compatibility bridge files when legacy behavior is involved
 - test/X39.Solutions.PdfTemplate.Test relevant tests
 
 Rules:
@@ -520,7 +521,7 @@ Status: done
 Source material:
 
 - README section: `Controls`.
-- Source files under `source/X39.Solutions.PdfTemplate/Controls`.
+- Source files under `source/X39.Solutions.Papercraft.Core/Controls`.
 - Tests under `test/X39.Solutions.PdfTemplate.Test/Controls`.
 
 Tasks:
@@ -583,13 +584,13 @@ Status: done
 Source material:
 
 - README sections: `Install`, `Generate a PDF`, `Interfaces`.
-- Source files under `source/X39.Solutions.PdfTemplate/Abstraction`.
+- Source files under `source/X39.Solutions.Papercraft.Core/Abstraction`.
 
 Tasks:
 
 - Move installation and generator setup into an appendix. Done in [Developer appendix](developer-integration.md).
 - Explain when a developer is needed. Done in [Developer appendix](developer-integration.md).
-- Document custom functions, controls, transformers and resource resolvers. Done in [Developer appendix](developer-integration.md); custom control guidance explains the built-in default namespace, custom default namespaces and prefixed references to built-in controls.
+- Document custom functions, controls, transformers and resource resolvers. Done in [Developer appendix](developer-integration.md); custom control guidance explains the built-in namespace, custom default namespaces and why prefixed built-in control elements are rejected.
 - Keep interface descriptions concise and link back to use cases. Done with the extension-point map in [Developer appendix](developer-integration.md), including source-checked wiring, lifetime, context and advanced infrastructure interface notes.
 
 Acceptance criteria:

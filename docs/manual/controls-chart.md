@@ -50,6 +50,7 @@ The default orientation is vertical.
 For horizontal bars, set `orientation="Horizontal"`; the shared values are listed in
 [Orientation values](layout-fundamentals.md#orientation-values).
 Set `color` on individual `data` elements when each bar should have its own color.
+Use `label` for short bar labels, and set `show-data-labels="true"` when numeric values should be drawn too.
 For color formats, see [Colors](layout-fundamentals.md#colors).
 
 
@@ -58,10 +59,10 @@ For color formats, see [Colors](layout-fundamentals.md#colors).
 <template>
     <body>
         <chart>
-            <barChart height="55mm" title="Open items">
-                <data x="0" y="12" color="#2563eb"/>
-                <data x="1" y="19" color="#16a34a"/>
-                <data x="2" y="7" color="#f59e0b"/>
+            <barChart height="55mm" title="Open items" show-data-labels="true" x-axis-label="Queue">
+                <data x="0" y="12" label="New" color="#2563eb"/>
+                <data x="1" y="19" label="Review" color="#16a34a"/>
+                <data x="2" y="7" label="Blocked" color="#f59e0b"/>
             </barChart>
         </chart>
     </body>
@@ -75,6 +76,7 @@ For color formats, see [Colors](layout-fundamentals.md#colors).
 Use `pieChart` when each value is part of one total.
 Pie chart slices need `y` values; `x` is optional.
 Use `label` when the slice name should be drawn, and keep labels short so they fit inside the chart area.
+Use `pie-label-position` to choose `Outside`, `Inside`, `Legend` or `Auto` placement.
 
 
 ```xml
@@ -82,7 +84,7 @@ Use `label` when the slice name should be drawn, and keep labels short so they f
 <template>
     <body>
         <chart>
-            <pieChart height="60mm" title="Request mix">
+            <pieChart height="60mm" title="Request mix" pie-label-position="Outside">
                 <data y="45" label="Email" color="#2563eb"/>
                 <data y="35" label="Portal" color="#16a34a"/>
                 <data y="20" label="Phone" color="#f59e0b"/>
@@ -131,6 +133,9 @@ attributes described in [Layout fundamentals](layout-fundamentals.md).
 | `axis-color` | Axis and title text color. | Any supported color, default black. |
 | `show-x-axis` | Show the horizontal axis on line and bar charts. | `true` or `false`, default `true`. |
 | `show-y-axis` | Show the vertical axis on line and bar charts. | `true` or `false`, default `true`. |
+| `x-axis-label` | Visible X-axis label for line and bar charts. | Text. |
+| `y-axis-label` | Visible Y-axis label for line and bar charts. | Text. |
+| `show-data-labels` | Show automatic numeric `y` labels for line and bar chart data. | `true` or `false`, default `false`. |
 
 `lineChart` also supports:
 
@@ -158,6 +163,7 @@ attributes described in [Layout fundamentals](layout-fundamentals.md).
 | `inner-radius` | Donut-hole radius. | Percent or length, default `0%`. |
 | `show-percentages` | Draw percentage text beside slices. | `true` or `false`, default `true`. |
 | `show-labels` | Draw slice labels from `data label`. | `true` or `false`, default `true`. |
+| `pie-label-position` | Where pie labels are placed. | `Outside`, `Inside`, `Legend` or `Auto`, default `Outside`. |
 
 `data` supports:
 
@@ -165,11 +171,13 @@ attributes described in [Layout fundamentals](layout-fundamentals.md).
 |-----------|------------|--------|
 | `x` | X value for line and bar charts. | Invariant numeric text. |
 | `y` | Y value or pie slice size. | Invariant numeric text. |
-| `label` | Visible pie slice label. | Short text. |
+| `label` | Visible pie slice, bar or line point label. | Short text. |
+| `x-label` | Fallback visible label for line or bar data. | Short text. |
+| `y-label` | Fallback visible label for line or bar data. | Short text. |
 | `color` | Color for a bar or pie slice. | Any supported color. |
 
-Do not rely on `x-axis-label`, `y-axis-label`, `x-label` or `y-label` for visible chart text.
-Use nearby `text` controls when the chart needs a visible axis title or caption.
+Explicit `data label`, `x-label` and `y-label` render on line and bar charts.
+Numeric `y` values render only when `show-data-labels="true"`.
 
 ## Allowed Children
 
@@ -184,7 +192,7 @@ Multiple charts inside one `chart` container are stacked vertically.
 - Putting `data` directly inside `chart`. Put `data` inside `lineChart`, `barChart` or `pieChart`.
 - Omitting chart `height`; the default may be too large or too small for the surrounding page section.
 - Using text labels as `x` or `y`. The chart parser expects numeric values.
-- Expecting bar or line charts to draw category labels from `label`, `x-label` or `y-label`.
+- Expecting long chart labels to fit in a small chart area. Use shorter labels or `pie-label-position="Legend"` for dense pie charts.
 - Using a chart when a small table would communicate the exact values more clearly.
 
 [Controls](controls.md) | [Manual home](index.md)

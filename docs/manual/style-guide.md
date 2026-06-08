@@ -86,7 +86,12 @@ Use this pattern for future control pages:
 - one page for images,
 - one page for page numbers,
 - one page for tables and table children,
-- one page for charts and chart data.
+- one page for charts and chart data,
+- one page for rich text, links and inline text,
+- one page for flow helpers such as blocks, spacers, page breaks and columns,
+- one page for lists and list items,
+- one page for form-like or signing helpers such as checkboxes and signatures,
+- one optional-control page for QR and barcode packages.
 
 Keep shared layout attributes in [Layout fundamentals](layout-fundamentals.md) and link to them from control pages.
 
@@ -95,6 +100,6 @@ Keep shared layout attributes in [Layout fundamentals](layout-fundamentals.md) a
 Use TODOs for uncertainty, not as a substitute for verification.
 A useful uncertainty note names the missing verification target, for example:
 
-`Verify accepted table column width syntax against source/X39.Solutions.PdfTemplate/Controls and table tests.`
+`Verify accepted table column width syntax against source/X39.Solutions.Papercraft.Core/Controls and test/X39.Solutions.PdfTemplate.Test/Controls.`
 
 [Manual home](index.md) | [Documentation roadmap](work-plan.md)

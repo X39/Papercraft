@@ -8,7 +8,7 @@ Papercraft is the new product name for the template-driven rendering engine that
 Maintainer implementation details are tracked in the
 [Papercraft architecture plan](papercraft-architecture-plan.md).
 
-The migration is additive. Existing applications can keep the current package and continue using:
+The migration is additive. Existing applications can keep the compatibility package and continue using:
 
 ```csharp
 services.AddPdfTemplateService();
@@ -16,18 +16,23 @@ using var generator = serviceProvider.GetRequiredService<Generator>();
 await generator.GeneratePdfAsync(output, reader, CultureInfo.CurrentUICulture);
 ```
 
-New code can use the Papercraft facade from the same compatibility package:
+New code should use the Papercraft facade package:
 
 ```csharp
+using X39.Solutions.Papercraft;
+
 services.AddPapercraft();
 var renderer = serviceProvider.GetRequiredService<PapercraftRenderer>();
 await renderer.GeneratePdfAsync(output, reader, CultureInfo.CurrentUICulture);
 ```
 
+The compatibility package also forwards the Papercraft facade entry points during the migration period,
+but new application projects should reference `X39.Solutions.Papercraft` directly.
+
 ## Package Direction
 
-The current package remains `X39.Solutions.PdfTemplate` during the compatibility period.
-The source tree now has the partial Papercraft split:
+The legacy compatibility package remains `X39.Solutions.PdfTemplate` during the compatibility period.
+The source tree now has the Papercraft package split:
 
 | Package | Purpose |
 |---------|---------|
@@ -60,7 +65,7 @@ Papercraft renderers expose capabilities before rendering.
 Call `ValidateAsync` when an application lets users choose output formats or renderer backends:
 
 ```csharp
-var result = await generator.ValidateAsync(
+var result = await renderer.ValidateAsync(
     reader,
     RenderTarget.Pdf,
     CultureInfo.CurrentUICulture);

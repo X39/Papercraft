@@ -2,6 +2,7 @@ using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Attributes;
 using X39.Solutions.Papercraft.Controls.Base;
 using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Services.TextService;
 
 namespace X39.Solutions.Papercraft.Controls;
 
@@ -11,6 +12,24 @@ namespace X39.Solutions.Papercraft.Controls;
 [Control(Constants.ControlsNamespace)]
 public class BarChart : ChartBaseControl
 {
+    private const float DataLabelGap = 3f;
+
+    /// <summary>
+    /// Creates a new bar chart.
+    /// </summary>
+    public BarChart()
+    {
+    }
+
+    /// <summary>
+    /// Creates a new bar chart.
+    /// </summary>
+    /// <param name="textService">The text service used to measure and render chart labels.</param>
+    [ControlConstructor]
+    public BarChart(ITextService textService) : base(textService)
+    {
+    }
+
     /// <summary>
     /// Orientation of the bars.
     /// </summary>
@@ -34,9 +53,6 @@ public class BarChart : ChartBaseControl
     /// </summary>
     [Parameter(Name = "bar-color")]
     public Color? BarColor { get; set; }
-
-    private const float TitleHeight = 30f;
-    private const float AxisPadding = 40f;
 
     /// <inheritdoc />
     protected override Size DoMeasure(float dpi, in Size fullPageSize, in Size framedPageSize, in Size remainingSize, CultureInfo cultureInfo)
@@ -86,17 +102,16 @@ public class BarChart : ChartBaseControl
         if (maxY < 0)
             maxY = 0;
 
-        // Calculate plot area
-        var titleOffset = string.IsNullOrEmpty(Title) ? 0f : TitleHeight;
-        var plotLeft = ShowYAxis ? AxisPadding : 10f;
-        var plotTop = titleOffset + 10f;
-        var plotWidth = chartWidth - plotLeft - 20f;
-        var plotHeight = chartHeight - plotTop - (ShowXAxis ? AxisPadding : 10f);
+        var layout = CalculateAxisChartLayout(dpi, chartWidth, chartHeight);
+        var plotLeft = layout.PlotArea.Left;
+        var plotTop = layout.PlotArea.Top;
+        var plotWidth = layout.PlotArea.Width;
+        var plotHeight = layout.PlotArea.Height;
 
         // Render title
         if (!string.IsNullOrEmpty(Title))
         {
-            RenderTitle(canvas, dpi, chartWidth / 2, 5);
+            RenderTitle(canvas, dpi, chartWidth, 4f);
         }
 
         // Render grid
@@ -104,6 +119,7 @@ public class BarChart : ChartBaseControl
 
         // Render axes
         RenderAxes(canvas, plotLeft, plotTop, plotWidth, plotHeight);
+        RenderAxisLabels(canvas, dpi, layout);
 
         // Calculate scaling
         var (scaleX, scaleY) = CalculateScaling(plotWidth, plotHeight, minX, maxX, minY, maxY);
@@ -113,11 +129,11 @@ public class BarChart : ChartBaseControl
 
         if (Orientation == EOrientation.Vertical)
         {
-            RenderVerticalBars(canvas, dpi, dataPoints, plotLeft, plotTop, plotWidth, plotHeight, minX, maxX, minY, maxY, scaleX, scaleY, barColor);
+            RenderVerticalBars(canvas, dpi, cultureInfo, dataPoints, plotLeft, plotTop, plotWidth, plotHeight, minX, maxX, minY, maxY, scaleX, scaleY, barColor);
         }
         else
         {
-            RenderHorizontalBars(canvas, dpi, dataPoints, plotLeft, plotTop, plotWidth, plotHeight, minX, maxX, minY, maxY, scaleX, scaleY, barColor);
+            RenderHorizontalBars(canvas, dpi, cultureInfo, dataPoints, plotLeft, plotTop, plotWidth, plotHeight, minX, maxX, minY, maxY, scaleX, scaleY, barColor);
         }
 
         return Size.Zero;
@@ -126,6 +142,7 @@ public class BarChart : ChartBaseControl
     private void RenderVerticalBars(
         IDeferredCanvas canvas,
         float dpi,
+        CultureInfo cultureInfo,
         List<(double X, double Y, ChartDataControl Control)> dataPoints,
         float plotLeft,
         float plotTop,
@@ -170,12 +187,15 @@ public class BarChart : ChartBaseControl
             canvas.DrawRect(
                 new Rectangle(barLeft, barTop, barWidthPixels, barHeight),
                 color);
+
+            RenderVerticalDataLabel(canvas, dpi, cultureInfo, control, y, barLeft, barTop, barWidthPixels, baselineY, plotLeft, plotTop, plotWidth, plotHeight);
         }
     }
 
     private void RenderHorizontalBars(
         IDeferredCanvas canvas,
         float dpi,
+        CultureInfo cultureInfo,
         List<(double X, double Y, ChartDataControl Control)> dataPoints,
         float plotLeft,
         float plotTop,
@@ -224,6 +244,73 @@ public class BarChart : ChartBaseControl
             canvas.DrawRect(
                 new Rectangle(barLeft, barTop, barWidth, barHeightPixels),
                 color);
+
+            RenderHorizontalDataLabel(canvas, dpi, cultureInfo, control, y, barLeft, barTop, barWidth, barHeightPixels, baselineX, plotLeft, plotTop, plotWidth, plotHeight);
         }
+    }
+
+    private void RenderVerticalDataLabel(
+        IDeferredCanvas canvas,
+        float dpi,
+        CultureInfo cultureInfo,
+        ChartDataControl control,
+        double y,
+        float barLeft,
+        float barTop,
+        float barWidth,
+        float baselineY,
+        float plotLeft,
+        float plotTop,
+        float plotWidth,
+        float plotHeight)
+    {
+        var label = GetDataLabel(control, y, cultureInfo);
+        if (string.IsNullOrEmpty(label))
+            return;
+
+        var style = CreateLabelTextStyle();
+        var size = MeasureText(style, dpi, label, plotWidth);
+        var labelX = barLeft + (barWidth - size.Width) / 2;
+        var labelY = y >= 0
+            ? barTop - size.Height - DataLabelGap
+            : baselineY + DataLabelGap;
+        var position = ClampTextPosition(
+            new Point(labelX, labelY),
+            size,
+            new Rectangle(plotLeft, plotTop, plotWidth, plotHeight));
+        DrawText(canvas, dpi, style, label, position.X, position.Y, plotWidth);
+    }
+
+    private void RenderHorizontalDataLabel(
+        IDeferredCanvas canvas,
+        float dpi,
+        CultureInfo cultureInfo,
+        ChartDataControl control,
+        double y,
+        float barLeft,
+        float barTop,
+        float barWidth,
+        float barHeight,
+        float baselineX,
+        float plotLeft,
+        float plotTop,
+        float plotWidth,
+        float plotHeight)
+    {
+        var label = GetDataLabel(control, y, cultureInfo);
+        if (string.IsNullOrEmpty(label))
+            return;
+
+        var style = CreateLabelTextStyle();
+        var size = MeasureText(style, dpi, label, plotWidth);
+        var labelX = y >= 0
+            ? barLeft + barWidth + DataLabelGap
+            : baselineX - size.Width - DataLabelGap;
+        var labelY = barTop + (barHeight - size.Height) / 2;
+        var position = ClampTextPosition(
+            new Point(labelX, labelY),
+            size,
+            new Rectangle(plotLeft, plotTop, plotWidth, plotHeight));
+        DrawText(canvas, dpi, style, label, position.X, position.Y, plotWidth);
     }
 }

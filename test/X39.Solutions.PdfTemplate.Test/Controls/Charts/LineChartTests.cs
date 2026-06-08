@@ -60,7 +60,9 @@ public class LineChartTests
         mock.AssertState();
         mock.AssertAllDrawLinesWithin(bounds);
         mock.AssertAllDrawTextWithin(bounds);
+        mock.AssertAllEstimatedDrawTextBoundsWithin(bounds);
         mock.AssertAnyDrawTextContains("Sales Trend");
+        mock.AssertAnyDrawTextContainsNear("Sales Trend", 211, 30);
     }
 
     [Fact]
@@ -261,6 +263,65 @@ public class LineChartTests
 
         mock.AssertState();
         mock.AssertAnyDrawLineWithColor(customColor);
+    }
+
+    [Fact]
+    public void LineChart_WithAxisLabels_DrawsAxisLabelText()
+    {
+        var chart = new LineChart
+        {
+            XAxisLabel = "Day",
+            YAxisLabel = "Orders",
+        };
+        chart.Add(new ChartDataControl { X = "0", Y = "10" });
+        chart.Add(new ChartDataControl { X = "1", Y = "20" });
+
+        var (mock, pageSize) = RenderChart(chart);
+        var bounds = ChartBounds(pageSize);
+
+        mock.AssertState();
+        mock.AssertAnyDrawTextContains("Day");
+        mock.AssertAnyDrawTextContains("Orders");
+        mock.AssertAllEstimatedDrawTextBoundsWithin(bounds);
+    }
+
+    [Fact]
+    public void LineChart_WithExplicitDataLabels_DrawsLabelsByDefault()
+    {
+        var chart = new LineChart
+        {
+            ShowGrid = false,
+            ShowXAxis = false,
+            ShowYAxis = false,
+            ShowPoints = false,
+        };
+        chart.Add(new ChartDataControl { X = "0", Y = "10", Label = "Start" });
+        chart.Add(new ChartDataControl { X = "1", Y = "20", XLabel = "End" });
+
+        var (mock, _) = RenderChart(chart);
+
+        mock.AssertState();
+        mock.AssertAnyDrawTextContains("Start");
+        mock.AssertAnyDrawTextContains("End");
+    }
+
+    [Fact]
+    public void LineChart_WithShowDataLabels_DrawsNumericValues()
+    {
+        var chart = new LineChart
+        {
+            ShowDataLabels = true,
+            ShowGrid = false,
+            ShowXAxis = false,
+            ShowYAxis = false,
+            ShowPoints = false,
+        };
+        chart.Add(new ChartDataControl { X = "0", Y = "10" });
+
+        var (mock, _) = RenderChart(chart);
+
+        mock.AssertState();
+        mock.AssertAnyDrawTextContains("10");
     }
 
     #endregion

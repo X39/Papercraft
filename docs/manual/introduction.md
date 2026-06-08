@@ -4,7 +4,7 @@
 
 ## What Is This?
 
-X39.Solutions.PdfTemplate is a template system for generating PDF documents from XML.
+Papercraft is a template system for generating PDF documents from XML.
 As a template author, you describe the visible document with XML elements and attributes.
 
 You usually work with three kinds of information:

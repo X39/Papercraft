@@ -3,8 +3,8 @@
 Previous: [Migration to Papercraft](migration-to-papercraft.md) | [Manual home](index.md)
 
 This page is the maintainer plan for the additive migration from
-`X39.Solutions.PdfTemplate` to Papercraft. It describes the current partial split and the
-remaining work needed before the Papercraft packages are the primary distribution path.
+`X39.Solutions.PdfTemplate` to Papercraft. It describes the current package split and the
+remaining release work needed before the Papercraft packages are the primary distribution path.
 
 ## Current Architecture Assessment
 
@@ -22,8 +22,9 @@ remaining work needed before the Papercraft packages are the primary distributio
 - `source/X39.Solutions.Papercraft` is the default facade package project. It references core plus the
   SkiaSharp renderer, exposes `AddPapercraft()`, and forwards the application-facing Papercraft
   types from core.
-- The compatibility bridge forwards Papercraft and legacy types where possible. Some legacy
-  namespace names still live in core to preserve existing API shape during the migration.
+- The compatibility bridge forwards Papercraft and legacy types where possible. Core also keeps
+  the legacy XML control namespace alias so existing templates continue to activate built-in controls
+  during the migration.
 - The default renderer supports PDF, single-page PNG stream output and renderer-neutral
   page-by-page PNG raster output. Legacy bitmap workflows can still use the SkiaSharp
   `GenerateBitmapsAsync(...)` compatibility path.
