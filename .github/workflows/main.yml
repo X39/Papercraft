@@ -7,12 +7,14 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 env:
   DOTNET_VERSION: 10.0.x
   CONFIGURATION: Release
   SOLUTION_FILE: X39.Solutions.PdfTemplate.sln
   PACKAGE_OUTPUT_DIRECTORY: artifacts/packages
+  NUGET_SOURCE: https://api.nuget.org/v3/index.json
 
 jobs:
   publish:
@@ -81,20 +83,26 @@ jobs:
             ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.snupkg
           if-no-files-found: error
 
-      - name: Publish packages to NuGet
-        shell: bash
-        run: |
-          shopt -s nullglob
-          packages=("$PACKAGE_OUTPUT_DIRECTORY"/*.nupkg)
+      - name: NuGet login
+        id: nuget_login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
 
-          if [ "${#packages[@]}" -eq 0 ]; then
-            echo "No NuGet packages found to publish." >&2
-            exit 1
-          fi
+      - name: Publish X39.Solutions.Papercraft.Core
+        run: dotnet nuget push "$PACKAGE_OUTPUT_DIRECTORY"/X39.Solutions.Papercraft.Core.[0-9]*.nupkg --source "$NUGET_SOURCE" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --skip-duplicate
 
-          for package in "${packages[@]}"; do
-            dotnet nuget push "$package" \
-              --source https://api.nuget.org/v3/index.json \
-              --api-key "${{ secrets.NUGET_API_KEY }}" \
-              --skip-duplicate
-          done
+      - name: Publish X39.Solutions.Papercraft.Rendering.SkiaSharp
+        run: dotnet nuget push "$PACKAGE_OUTPUT_DIRECTORY"/X39.Solutions.Papercraft.Rendering.SkiaSharp.[0-9]*.nupkg --source "$NUGET_SOURCE" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --skip-duplicate
+
+      - name: Publish X39.Solutions.Papercraft.Controls.QrCode
+        run: dotnet nuget push "$PACKAGE_OUTPUT_DIRECTORY"/X39.Solutions.Papercraft.Controls.QrCode.[0-9]*.nupkg --source "$NUGET_SOURCE" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --skip-duplicate
+
+      - name: Publish X39.Solutions.Papercraft.Controls.ZXing
+        run: dotnet nuget push "$PACKAGE_OUTPUT_DIRECTORY"/X39.Solutions.Papercraft.Controls.ZXing.[0-9]*.nupkg --source "$NUGET_SOURCE" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --skip-duplicate
+
+      - name: Publish X39.Solutions.Papercraft
+        run: dotnet nuget push "$PACKAGE_OUTPUT_DIRECTORY"/X39.Solutions.Papercraft.[0-9]*.nupkg --source "$NUGET_SOURCE" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --skip-duplicate
+
+      - name: Publish X39.Solutions.PdfTemplate
+        run: dotnet nuget push "$PACKAGE_OUTPUT_DIRECTORY"/X39.Solutions.PdfTemplate.[0-9]*.nupkg --source "$NUGET_SOURCE" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --skip-duplicate
