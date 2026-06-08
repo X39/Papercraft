@@ -37,18 +37,16 @@ Style nodes are the special case documented in [Styles](styles.md).
 ## A Control Is Unknown
 
 If the error says a control does not exist, check the element name first.
-Built-in controls are listed in [Controls](controls.md).
-Focused pages currently include [Text control](controls-text.md), [Border control](controls-border.md),
-[Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md)
-and [Table control](controls-table.md), plus [Chart controls](controls-chart.md).
-The current built-in registration also includes `block`, `paragraph`, `span`, `br`, `pageBreak`, `spacer`, `columns`,
-`checkbox`, `hyperlink`, `ul`, `ol`, `li` and `signature`; these are summarized in
-[Quick reference](quick-reference.md#additional-built-in-controls).
+Built-in controls are listed in [Controls](controls.md), and the compact attribute lookup is in
+[Quick reference](quick-reference.md).
+Optional QR and ZXing barcode controls require the package registration documented in
+[QR code control package](controls-qrcode.md) and [ZXing barcode control package](controls-zxing.md).
 
 Common causes:
 
 - A typo in the element name.
 - A custom control that the application has not registered.
+- An optional control package that the application has not installed or registered.
 - A template namespace change that prevents the built-in controls from being found.
 
 Developer setup and custom control registration belong in the
@@ -98,16 +96,9 @@ Each control accepts only the parameters implemented for that control.
 If an attribute seems to be accepted but has no visible effect, check the focused control page for that attribute.
 Do not treat ignored attributes as a general fallback behavior; unsupported attribute names are rejected.
 
-Check the focused control page for the supported attribute names:
-
-- [Text control](controls-text.md)
-- [Border control](controls-border.md)
-- [Image control](controls-image.md)
-- [Line control](controls-line.md)
-- [Page number control](controls-page-number.md)
-- [Table control](controls-table.md)
-- [Chart controls](controls-chart.md)
-
+Check [Controls](controls.md) and [Quick reference](quick-reference.md) for supported attribute names.
+For package controls, use [QR code control package](controls-qrcode.md) or
+[ZXing barcode control package](controls-zxing.md).
 For shared spacing, clipping and alignment attributes, see [Layout fundamentals](layout-fundamentals.md).
 
 ## A Length, Color Or Thickness Value Is Rejected

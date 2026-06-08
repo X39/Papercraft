@@ -53,7 +53,8 @@ For explanations and rendered examples, follow the linked control pages.
 | Rich text, links and line breaks. | `paragraph`, `span`, `br`, `hyperlink` | text styling attributes, `href`, `underline` |
 | Flow grouping, space and page breaks. | `block`, `spacer`, `pageBreak`, `columns` | `background`, `minHeight`, `pageBreakBefore`, `width`, `height`, `count`, `gap` |
 | Lists, checkboxes and signatures. | `ul`, `ol`, `li`, `checkbox`, `signature` | `marker`, `start`, `checked`, `size`, `label`, signature line attributes |
-| QR codes and barcodes. | Optional [`qrCode`, `barcode`, aliases](controls-barcode.md) | `value`, `size`, `format`, `width`, `height`, `quietZone`, colors |
+| QR codes. | Optional [`qrCode`](controls-qrcode.md) | `value`, `size`, `quietZone`, `errorCorrection`, colors |
+| 1D and 2D barcodes. | Optional [`barcode` and aliases](controls-zxing.md) | `value`, `format`, `width`, `height`, `quietZone`, `gs1Format`, colors |
 
 ## Shared Control Attributes
 
@@ -186,10 +187,11 @@ Numeric `y` value labels render when `show-data-labels="true"`.
 </chart>
 ```
 
-## Optional Barcodes
+## Optional Control Packages
 
-Barcode controls require optional package registration. `X39.Solutions.Papercraft.Controls.QrCode` adds `qrCode`.
-`X39.Solutions.Papercraft.Controls.ZXing` adds `barcode` and alias elements.
+QR and barcode controls require optional package registration.
+`X39.Solutions.Papercraft.Controls.QrCode` adds [`qrCode`](controls-qrcode.md).
+`X39.Solutions.Papercraft.Controls.ZXing` adds [`barcode` and alias elements](controls-zxing.md).
 
 | Control | Attributes |
 |---------|------------|

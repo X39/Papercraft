@@ -58,7 +58,7 @@ Generic barcode control with a format parameter:
 </barcode>
 ```
 
-Supported generic `format` values are `Aztec`, `Codabar`, `Code39`, `Code93`, `Code128`, `Gs1128`, `DataMatrix`, `Ean8`, `Ean13`, `Itf`, `Pdf417`, `QrCode`, `UpcA` and `UpcE`.
+Supported generic `format` values are `Aztec`, `Codabar`, `Code39`, `Code93`, `Code128`, `GS1-128`, `DataMatrix`, `EAN8`, `EAN13`, `ITF`, `PDF417`, `QRCode`, `UPCA` and `UPCE`.
 
 Common parameters:
 
@@ -71,10 +71,10 @@ Common parameters:
 | `foreground` | Bar/module color | `black` |
 | `background` | Background color | `transparent` |
 | `quietZone` | ZXing margin | `0` |
-| `gs1Format` | Enable GS1 encoding hints | `false`, forced for `Gs1128` |
+| `gs1Format` | Enable GS1 encoding hints | `false`, forced for `GS1-128` |
 
 ## Related Projects
 
 - [`X39.Solutions.Papercraft.Core`](../X39.Solutions.Papercraft.Core/README.md): control contracts used by this package.
 - [`X39.Solutions.Papercraft.Controls.QrCode`](../X39.Solutions.Papercraft.Controls.QrCode/README.md): dedicated QR package backed by `Net.Codecrete.QrCodeGenerator`.
-- [`../../docs/manual/controls-barcode.md`](../../docs/manual/controls-barcode.md): template-author barcode documentation.
+- [`../../docs/manual/controls-zxing.md`](../../docs/manual/controls-zxing.md): template-author ZXing barcode documentation.

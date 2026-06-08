@@ -10,7 +10,8 @@ applications can still consume it through the `X39.Solutions.PdfTemplate` compat
 A template author writes document parts as XML elements such as [`text`](controls-text.md),
 [`border`](controls-border.md), [`table`](controls-table.md), [`image`](controls-image.md),
 [`line`](controls-line.md), [`pageNumber`](controls-page-number.md),
-[chart controls](controls-chart.md) and optional [barcode controls](controls-barcode.md).
+[chart controls](controls-chart.md) and optional [`qrCode`](controls-qrcode.md) or
+[ZXing barcode controls](controls-zxing.md).
 
 Templates can also read values supplied by the application, such as `@CustomerName`,
 and can use template-language blocks such as [`@if`](template-language.md#conditions-with-if) and
@@ -52,7 +53,7 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 5. [Layout fundamentals](layout-fundamentals.md): available space, margin, padding, borders, alignment, lengths and colors.
 6. [Styles](styles.md): shared attributes with `template.style` and related style blocks.
 7. [Quick reference](quick-reference.md): compact lookup tables for sections, controls, attributes, value formats and transformer syntax.
-8. [Controls](controls.md): built-in XML controls such as [`text`](controls-text.md), [`border`](controls-border.md), [`image`](controls-image.md), [`line`](controls-line.md), [`table`](controls-table.md), [`pageNumber`](controls-page-number.md) and [charts](controls-chart.md), plus optional [barcode controls](controls-barcode.md). Focused pages now include [Control concepts](controls-concepts.md), [Text control](controls-text.md), [Border control](controls-border.md), [Image control](controls-image.md), [Line control](controls-line.md), [Page number control](controls-page-number.md), [Table control](controls-table.md), [Chart controls](controls-chart.md) and [Optional barcode controls](controls-barcode.md).
+8. [Controls](controls.md): source-backed index of the built-in Core controls, focused control references and optional QR/ZXing control package pages.
 9. [Transformers](transformers.md): the concept behind [`@if`](template-language.md#conditions-with-if), [`@switch`](template-language.md#choices-with-switch), [`@foreach`](template-language.md#lists-with-foreach), [`@for`](template-language.md#numeric-ranges-with-for), [`@var`](template-language.md#temporary-values-with-var) and [`@alternate`](template-language.md#alternating-values-with-alternate).
 10. [Template language](template-language.md): transformer starter syntax and task examples.
 11. [Complete examples](complete-examples.md): full document examples such as invoices, reports, table-heavy sheets, product sheets and dashboards.

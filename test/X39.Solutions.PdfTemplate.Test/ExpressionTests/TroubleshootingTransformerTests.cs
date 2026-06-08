@@ -20,7 +20,7 @@ public class TroubleshootingTransformerTests
                                 </template>
                                 """;
 
-        await Assert.ThrowsAsync<ArgumentException>(
+        await TransformerAssert.ThrowsDirectOrWrappedAsync<ArgumentException>(
             () => ReadAsync(template, new TemplateData(), [new Papercraft.Transformers.ForTransformer()])
         );
     }
@@ -38,7 +38,7 @@ public class TroubleshootingTransformerTests
         var templateData = new TemplateData();
         templateData.SetVariable("LineCount", 3);
 
-        await Assert.ThrowsAsync<ArgumentException>(
+        await TransformerAssert.ThrowsDirectOrWrappedAsync<ArgumentException>(
             () => ReadAsync(template, templateData, [new Papercraft.Transformers.ForEachTransformer()])
         );
     }

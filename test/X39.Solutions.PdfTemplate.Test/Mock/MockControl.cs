@@ -1,11 +1,12 @@
 using System.Globalization;
+using X39.Solutions.Papercraft;
 using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Attributes;
 using X39.Solutions.Papercraft.Data;
 
 namespace X39.Solutions.PdfTemplate.Test.Mock;
 
-[Control("X39.Solutions.PdfTemplate.Controls", "mock")]
+[Control(Constants.ControlsNamespace, "mock")]
 public class MockControl : IControl
 {
     private List<Length> _widths  = new();

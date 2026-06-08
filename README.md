@@ -8,7 +8,8 @@
 
 Papercraft is a template-driven document rendering engine for XML templates in .NET.
 The current default backend renders through SkiaSharp and supports PDF output, raster output,
-and built-in controls for text, borders, images, lines, tables, page numbers and charts.
+and built-in controls for text, rich text, borders, images, lines, tables, lists, page numbers,
+charts and related layout elements.
 
 The existing `X39.Solutions.PdfTemplate` package remains the compatibility bridge during the
 Papercraft migration. Existing users can keep `services.AddPdfTemplateService()` and `Generator`;
@@ -60,6 +61,8 @@ The source tree now follows this partial Papercraft package split:
 | `X39.Solutions.Papercraft` | Batteries-included facade for normal PDF users. |
 | `X39.Solutions.Papercraft.Core` | Renderer-neutral contracts plus the current shared parsing, layout, control, data and validation runtime. |
 | `X39.Solutions.Papercraft.Rendering.SkiaSharp` | SkiaSharp PDF/raster renderer and runtime services. |
+| `X39.Solutions.Papercraft.Controls.QrCode` | Optional QR code control package backed by `Net.Codecrete.QrCodeGenerator`. |
+| `X39.Solutions.Papercraft.Controls.ZXing` | Optional general barcode control package backed by `ZXing.Net`. |
 | `X39.Solutions.PdfTemplate` | Compatibility bridge for existing users and package metadata during the migration. |
 
 ## Project READMEs

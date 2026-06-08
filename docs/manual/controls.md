@@ -5,9 +5,10 @@ Previous: [Quick reference](quick-reference.md) | [Manual home](index.md) | Next
 ## What Is This?
 
 Controls are XML elements that measure, arrange and render document content.
-Common controls include [`text`](controls-text.md), [`border`](controls-border.md), [`image`](controls-image.md),
-[`line`](controls-line.md), [`pageNumber`](controls-page-number.md), [`table`](controls-table.md) and
-[chart controls](controls-chart.md). Optional packages add [barcode controls](controls-barcode.md).
+`AddPapercraftCore()`, `AddPapercraft()` and the legacy `AddPdfTemplateService()` register the built-in
+Papercraft Core controls listed on this page.
+Optional control packages add QR code and ZXing barcode controls only after the application installs and
+registers those packages.
 
 If you only need to check names, attributes and value formats, use the
 [Quick reference](quick-reference.md).
@@ -26,34 +27,50 @@ how to build a table and how to show page numbers.
 Choose the smallest control that matches the document part:
 
 - Use [`text`](controls-text.md) for words and values.
+- Use `paragraph`, `span`, `br` and `hyperlink` for rich text fragments and link-style text.
 - Use [`border`](controls-border.md) when content needs a surrounding box, background or border line.
+- Use `block`, `spacer`, `pageBreak` and `columns` for flow grouping, empty space, forced body breaks and multi-column flow.
 - Use [`line`](controls-line.md) for separators.
 - Use [`pageNumber`](controls-page-number.md) for current page and total page count text.
 - Use [`table`, `tr`, `td` and `th`](controls-table.md) for rows and columns.
+- Use `ul`, `ol`, `li`, `checkbox` and `signature` for lists, checklist marks and signature lines.
 - Use [`chart`, `lineChart`, `barChart` and `pieChart`](controls-chart.md) for compact data visuals.
-- Use optional [`qrCode`, `barcode` and barcode alias controls](controls-barcode.md) for QR codes and machine-readable labels.
+- Use optional [`qrCode`](controls-qrcode.md) for dedicated QR codes.
+- Use optional [`barcode` and ZXing alias controls](controls-zxing.md) for common 1D and 2D barcode formats.
 
 Use the [Quick reference](quick-reference.md) when you need a compact attribute table.
 Read [Control concepts](controls-concepts.md) first if you are unsure whether a control can contain other controls.
 
-## Documented Built-In Controls
+## Built-In Core Controls
 
-| Control | Use it for |
-|---------|------------|
-| [Control concepts](controls-concepts.md) | How controls, containers and child rules fit together. |
-| [`text`](controls-text.md) | Words, labels, headings and values. |
-| [`border`](controls-border.md) | Boxes, backgrounds and border lines around content. |
-| [`line`](controls-line.md) | Separators and simple rules. |
-| [`image`](controls-image.md) | Raster images loaded by the application. |
-| [`pageNumber`](controls-page-number.md) | Current page and total page count text. |
-| [`table`, `tr`, `td`, `th`](controls-table.md) | Rows, columns and table cells. |
-| [`chart`, `lineChart`, `barChart`, `pieChart`, `data`](controls-chart.md) | Line, bar and pie chart visuals. |
+These XML elements are registered by Papercraft Core.
+
+| Area | Controls | Use | Reference |
+|------|----------|-----|-----------|
+| Text | `text` | Plain text, labels, headings and values. | [Text control](controls-text.md) |
+| Rich text | `paragraph`, `span`, `br`, `hyperlink` | Inline text fragments, explicit line breaks and link-style text. | [Quick reference](quick-reference.md#additional-built-in-controls) |
+| Containers and flow | `border`, `block`, `spacer`, `pageBreak`, `columns` | Boxes, backgrounds, grouping, spacing, body page breaks and multi-column flow. | [Border control](controls-border.md), [Quick reference](quick-reference.md#additional-built-in-controls) |
+| Media and rules | `image`, `line` | Raster images and horizontal or vertical separator rules. | [Image control](controls-image.md), [Line control](controls-line.md) |
+| Page text | `pageNumber` | Current page number, total page count or both. | [Page number control](controls-page-number.md) |
+| Tables | `table`, `th`, `tr`, `td` | Table layout, repeated headers, rows and cells. | [Table control](controls-table.md) |
+| Lists and marks | `ul`, `ol`, `li`, `checkbox`, `signature` | Bulleted lists, numbered lists, checklist marks and signature lines. | [Quick reference](quick-reference.md#additional-built-in-controls) |
+| Charts | `chart`, `lineChart`, `barChart`, `pieChart`, `data` | Line, bar and pie chart visuals with XML data points. | [Chart controls](controls-chart.md) |
+
+Control names are matched case-insensitively by the runtime, but this manual uses the XML names shown above.
+Elements without an XML namespace are treated as built-in controls.
 
 ## Optional Control Packages
 
-| Control package | Use it for |
-|-----------------|------------|
-| [`X39.Solutions.Papercraft.Controls.QrCode`](controls-barcode.md) | `qrCode` controls backed by `Net.Codecrete.QrCodeGenerator`. |
-| [`X39.Solutions.Papercraft.Controls.ZXing`](controls-barcode.md) | Generic `barcode` plus common aliases such as `code128`, `ean13`, `dataMatrix`, `pdf417` and `aztec`. |
+The optional control packages are separate NuGet packages and separate manual pages.
+They depend on `X39.Solutions.Papercraft.Core`, but they are not registered automatically by Core,
+the Papercraft facade or the PdfTemplate compatibility package.
+
+| Package | Controls | Use | Reference |
+|---------|----------|-----|-----------|
+| `X39.Solutions.Papercraft.Controls.QrCode` | `qrCode` | Dedicated QR codes backed by `Net.Codecrete.QrCodeGenerator`. | [QR code package](controls-qrcode.md) |
+| `X39.Solutions.Papercraft.Controls.ZXing` | `barcode`, `code128`, `gs1-128`, `code39`, `code93`, `codabar`, `ean13`, `ean8`, `upcA`, `upcE`, `itf`, `dataMatrix`, `pdf417`, `aztec` | Generic and alias barcode controls backed by `ZXing.Net`. | [ZXing barcode package](controls-zxing.md) |
+
+The older [barcode overview](controls-barcode.md) remains as a compatibility entry point and points to the
+package-specific pages.
 
 Previous: [Quick reference](quick-reference.md) | [Manual home](index.md) | Next: [Transformers](transformers.md)

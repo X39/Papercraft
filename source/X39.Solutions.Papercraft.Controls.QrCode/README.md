@@ -64,4 +64,4 @@ Supported parameters:
 
 - [`X39.Solutions.Papercraft.Core`](../X39.Solutions.Papercraft.Core/README.md): control contracts used by this package.
 - [`X39.Solutions.Papercraft.Controls.ZXing`](../X39.Solutions.Papercraft.Controls.ZXing/README.md): optional package for general 1D and 2D barcode controls.
-- [`../../docs/manual/controls-barcode.md`](../../docs/manual/controls-barcode.md): template-author barcode documentation.
+- [`../../docs/manual/controls-qrcode.md`](../../docs/manual/controls-qrcode.md): template-author QR code documentation.

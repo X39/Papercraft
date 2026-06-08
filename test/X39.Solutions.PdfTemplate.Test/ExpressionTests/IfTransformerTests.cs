@@ -123,7 +123,7 @@ public class IfTransformerTests
             new[] {new Papercraft.Transformers.IfTransformer()});
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
-        await Assert.ThrowsAsync<ArgumentException>(() => templateReader.ReadAsync(xmlReader));
+        await TransformerAssert.ThrowsDirectOrWrappedAsync<ArgumentException>(() => templateReader.ReadAsync(xmlReader));
     }
 
     [Fact]
@@ -328,7 +328,7 @@ public class IfTransformerTests
             new[] { new Papercraft.Transformers.IfTransformer() });
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
-        await Assert.ThrowsAsync<ArgumentException>(() => templateReader.ReadAsync(xmlReader));
+        await TransformerAssert.ThrowsDirectOrWrappedAsync<ArgumentException>(() => templateReader.ReadAsync(xmlReader));
     }
 
     [Fact]
@@ -355,7 +355,7 @@ public class IfTransformerTests
             new[] { new Papercraft.Transformers.IfTransformer() });
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
-        await Assert.ThrowsAsync<ArgumentException>(() => templateReader.ReadAsync(xmlReader));
+        await TransformerAssert.ThrowsDirectOrWrappedAsync<ArgumentException>(() => templateReader.ReadAsync(xmlReader));
     }
 
     [Theory]

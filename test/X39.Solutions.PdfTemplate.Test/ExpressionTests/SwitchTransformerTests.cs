@@ -217,7 +217,7 @@ public class SwitchTransformerTests
         var data = new TemplateData();
         data.SetVariable("value", 1);
 
-        await Assert.ThrowsAsync<ArgumentException>(
+        await TransformerAssert.ThrowsDirectOrWrappedAsync<ArgumentException>(
             () => ReadAsync(
                 """
                 @switch value {
@@ -236,7 +236,7 @@ public class SwitchTransformerTests
         var data = new TemplateData();
         data.SetVariable("value", 1);
 
-        await Assert.ThrowsAsync<ArgumentException>(
+        await TransformerAssert.ThrowsDirectOrWrappedAsync<ArgumentException>(
             () => ReadAsync(
                 """
                 @switch value {
@@ -257,7 +257,7 @@ public class SwitchTransformerTests
         var data = new TemplateData();
         data.SetVariable("value", 1);
 
-        await Assert.ThrowsAsync<ArgumentException>(
+        await TransformerAssert.ThrowsDirectOrWrappedAsync<ArgumentException>(
             () => ReadAsync(
                 """
                 @switch value {
@@ -278,7 +278,7 @@ public class SwitchTransformerTests
         var data = new TemplateData();
         data.SetVariable("value", 1);
 
-        await Assert.ThrowsAsync<ArgumentException>(
+        await TransformerAssert.ThrowsDirectOrWrappedAsync<ArgumentException>(
             () => ReadAsync(
                 """
                 @switch value {
