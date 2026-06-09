@@ -48,29 +48,27 @@ public sealed class TableDocumentationSamples : DocumentationSampleBase
                 <body>
                     <table>
                         <tr>
-                            <td width="1*">
-                                <border
-                                    thickness="1pt"
-                                    color="#cbd5e1"
-                                    background="#f8fafc"
-                                    padding="2mm"
-                                    verticalAlignment="top">
-                                    <text fontsize="9" weight="bold">Bill to</text>
-                                    <text fontsize="8">Mira Lane</text>
-                                    <text fontsize="8">42 Market Street</text>
-                                </border>
+                            <td
+                                width="1*"
+                                borderThickness="1pt"
+                                borderColor="#cbd5e1"
+                                background="#f8fafc"
+                                padding="2mm"
+                                verticalAlignment="top">
+                                <text fontsize="9" weight="bold">Bill to</text>
+                                <text fontsize="8">Mira Lane</text>
+                                <text fontsize="8">42 Market Street</text>
                             </td>
-                            <td width="1*">
-                                <border
-                                    thickness="1pt"
-                                    color="#67e8f9"
-                                    background="#ecfeff"
-                                    padding="2mm"
-                                    verticalAlignment="top">
-                                    <text fontsize="9" weight="bold">Ship to</text>
-                                    <text fontsize="8">Warehouse North</text>
-                                    <text fontsize="8">Dock 3</text>
-                                </border>
+                            <td
+                                width="1*"
+                                borderThickness="1pt"
+                                borderColor="#67e8f9"
+                                background="#ecfeff"
+                                padding="2mm"
+                                verticalAlignment="top">
+                                <text fontsize="9" weight="bold">Ship to</text>
+                                <text fontsize="8">Warehouse North</text>
+                                <text fontsize="8">Dock 3</text>
                             </td>
                         </tr>
                     </table>

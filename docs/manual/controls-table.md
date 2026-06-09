@@ -8,6 +8,7 @@ The `table` control arranges content into rows and columns.
 It uses `th` for a table header row, `tr` for normal rows and `td` for cells.
 
 Table controls create the layout and can draw row or cell backgrounds and borders.
+The `table` element itself is layout-only; put visible fills and rules on `th`, `tr` or `td`.
 Use `td` padding for spacing inside cells.
 Use `border` inside a cell only when the cell content itself needs a separate boxed layout.
 
@@ -86,6 +87,7 @@ For page-break behavior and repeated headers, see
 
 Use one table row with two `td` cells when content should sit side by side.
 Give both cells the same star width, such as `width="1*"`, when the columns should share the available width equally.
+Use cell `background`, `borderThickness` and `borderColor` when the cell itself needs a visible box.
 
 
 ```xml
@@ -94,29 +96,27 @@ Give both cells the same star width, such as `width="1*"`, when the columns shou
     <body>
         <table>
             <tr>
-                <td width="1*">
-                    <border
-                        thickness="1pt"
-                        color="#cbd5e1"
-                        background="#f8fafc"
-                        padding="2mm"
-                        verticalAlignment="top">
-                        <text fontsize="9" weight="bold">Bill to</text>
-                        <text fontsize="8">Mira Lane</text>
-                        <text fontsize="8">42 Market Street</text>
-                    </border>
+                <td
+                    width="1*"
+                    borderThickness="1pt"
+                    borderColor="#cbd5e1"
+                    background="#f8fafc"
+                    padding="2mm"
+                    verticalAlignment="top">
+                    <text fontsize="9" weight="bold">Bill to</text>
+                    <text fontsize="8">Mira Lane</text>
+                    <text fontsize="8">42 Market Street</text>
                 </td>
-                <td width="1*">
-                    <border
-                        thickness="1pt"
-                        color="#67e8f9"
-                        background="#ecfeff"
-                        padding="2mm"
-                        verticalAlignment="top">
-                        <text fontsize="9" weight="bold">Ship to</text>
-                        <text fontsize="8">Warehouse North</text>
-                        <text fontsize="8">Dock 3</text>
-                    </border>
+                <td
+                    width="1*"
+                    borderThickness="1pt"
+                    borderColor="#67e8f9"
+                    background="#ecfeff"
+                    padding="2mm"
+                    verticalAlignment="top">
+                    <text fontsize="9" weight="bold">Ship to</text>
+                    <text fontsize="8">Warehouse North</text>
+                    <text fontsize="8">Dock 3</text>
                 </td>
             </tr>
         </table>

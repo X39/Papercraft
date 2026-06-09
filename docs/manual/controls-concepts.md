@@ -102,7 +102,7 @@ For the shared layout rules, see [Layout fundamentals](layout-fundamentals.md).
 
 - Putting `text` directly inside `table` instead of inside `td`.
 - Putting child controls inside `text`, `line`, `image` or `pageNumber`.
-- Expecting `table`, `tr` or `td` to draw borders by themselves.
+- Expecting `table` itself to draw borders. Use `background`, `borderThickness` and `borderColor` on `th`, `tr` or `td`.
 - Using a table when a single `border` would be enough.
 - Adding several layout changes at once instead of testing one small control at a time.
 
