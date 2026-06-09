@@ -48,7 +48,7 @@ For explanations and rendered examples, follow the linked control pages.
 | Image from template data or a resolver. | [`image`](controls-image.md) | `source`, `width`, `height` |
 | Horizontal or vertical separator. | [`line`](controls-line.md) | `length`, `thickness`, `orientation`, `color` |
 | Page number text. | [`pageNumber`](controls-page-number.md) | `mode`, `prefix`, `delimiter`, `suffix`, plus text styling attributes |
-| Rows and columns. | [`table`](controls-table.md), `th`, `tr`, `td` | `td width`, `td columnspan`, `padding`, `background` through nested `border` |
+| Rows and columns. | [`table`](controls-table.md), `th`, `tr`, `td` | `td width`, `td columnspan`, `padding`, `background`, `borderThickness`, `borderColor` |
 | Line, bar or pie chart. | [`chart`](controls-chart.md), `lineChart`, `barChart`, `pieChart`, `data` | `width`, `height`, `title`, chart-specific attributes |
 | Rich text, links and line breaks. | [`paragraph`, `span`, `br`, `hyperlink`](controls-rich-text.md) | text styling attributes, `href`, `underline` |
 | Flow grouping, space and page breaks. | [`block`, `spacer`, `pageBreak`, `columns`](controls-flow.md) | `background`, `minHeight`, `pageBreakBefore`, `width`, `height`, `count`, `gap` |
@@ -122,22 +122,23 @@ The manual uses lower-case or lower-camel-case names for readability.
 | Element | Parent | Children | Attributes |
 |---------|--------|----------|------------|
 | `table` | `body`, `border`, `td`, other containers. | `th`, `tr`. | Shared attributes. |
-| `th` | `table`. | `td`. | Shared attributes; repeats when the table spans pages. |
-| `tr` | `table`. | `td`. | Shared attributes. |
-| `td` | `th`, `tr`. | Any normal control. | `width`, `columnspan`, shared attributes. |
+| `th` | `table`. | `td`. | Shared attributes, `background`, `borderThickness`, `borderColor`; repeats when the table spans pages. |
+| `tr` | `table`. | `td`. | Shared attributes, `background`, `borderThickness`, `borderColor`. |
+| `td` | `th`, `tr`. | Any normal control. | `width`, `columnspan`, `background`, `borderThickness`, `borderColor`, shared attributes. |
 
 `td width` accepts fixed lengths, `auto` or star parts such as `1*` and `2*`.
 Rows are kept whole; a large row moves to the next page instead of splitting.
+Row and cell borders reserve layout space; use `padding` on `td` when content needs extra spacing.
 
 ```xml
 <table>
-    <th>
-        <td width="2*"><text weight="bold">Item</text></td>
-        <td width="25mm"><text weight="bold" horizontalAlignment="right">Total</text></td>
+    <th borderThickness="0 0 0 1pt" borderColor="#475569">
+        <td width="2*" padding="1mm"><text weight="bold">Item</text></td>
+        <td width="25mm" padding="1mm"><text weight="bold" horizontalAlignment="right">Total</text></td>
     </th>
-    <tr>
-        <td><text>@ItemName</text></td>
-        <td><text horizontalAlignment="right">@ItemTotal</text></td>
+    <tr background="#f8fafc">
+        <td padding="1mm"><text>@ItemName</text></td>
+        <td padding="1mm"><text horizontalAlignment="right">@ItemTotal</text></td>
     </tr>
 </table>
 ```

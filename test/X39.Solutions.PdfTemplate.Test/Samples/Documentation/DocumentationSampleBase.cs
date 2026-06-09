@@ -25,13 +25,16 @@ public abstract class DocumentationSampleBase : SampleBase
         string xml,
         DocumentOptions? documentOptions = null,
         Action<Generator>? configureGenerator = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        Action<PdfTemplateServiceBuilder>? configureServices = null)
     {
         var outputDirectory = GetSampleOutputDirectory();
         Directory.CreateDirectory(outputDirectory);
         DeleteStaleSampleFiles(outputDirectory, sampleName);
 
-        using var generator = CreateGenerator();
+        using var generator = configureServices is null
+            ? CreateGenerator()
+            : CreateGenerator(configureServices);
         configureGenerator?.Invoke(generator);
         await using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
         using var xmlReader = XmlReader.Create(xmlStream);

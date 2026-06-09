@@ -53,42 +53,36 @@ public sealed class CompleteExampleDocumentationSamples : DocumentationSampleBas
 
                     <text fontsize="11" weight="bold" margin="0 0 0 1mm">Line items</text>
                     <table>
-                        <th>
-                            <td width="2*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold">Description</text>
-                                </border>
+                        <th borderThickness="0 0 0 1pt" borderColor="#334155">
+                            <td width="2*" padding="1mm">
+                                <text weight="bold">Description</text>
                             </td>
-                            <td width="1*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold" horizontalAlignment="right">Qty</text>
-                                </border>
+                            <td width="1*" padding="1mm">
+                                <text weight="bold" horizontalAlignment="right">Qty</text>
                             </td>
-                            <td width="1*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold" horizontalAlignment="right">Amount</text>
-                                </border>
+                            <td width="1*" padding="1mm">
+                                <text weight="bold" horizontalAlignment="right">Amount</text>
                             </td>
                         </th>
                         @alternate on RowBackground with ["#ffffff", "#f8fafc"] {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text>Template design</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">1</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">450.00</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text>Template design</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">1</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">450.00</text></td>
                         </tr>
                         }
                         @alternate on RowBackground {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text>Review workshop</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">2</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">240.00</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text>Review workshop</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">2</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">240.00</text></td>
                         </tr>
                         }
                         @alternate on RowBackground {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text>Print-ready adjustments</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">1</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">275.00</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text>Print-ready adjustments</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">1</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">275.00</text></td>
                         </tr>
                         }
                     </table>
@@ -158,37 +152,31 @@ public sealed class CompleteExampleDocumentationSamples : DocumentationSampleBas
 
                     <text fontsize="11" weight="bold" margin="0 0 0 1mm">Highlights</text>
                     <table>
-                        <th>
-                            <td width="2*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold">Area</text>
-                                </border>
+                        <th borderThickness="0 0 0 1pt" borderColor="#334155">
+                            <td width="2*" padding="1mm">
+                                <text weight="bold">Area</text>
                             </td>
-                            <td width="2*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold">Status</text>
-                                </border>
+                            <td width="2*" padding="1mm">
+                                <text weight="bold">Status</text>
                             </td>
-                            <td width="1*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold" horizontalAlignment="right">Owner</text>
-                                </border>
+                            <td width="1*" padding="1mm">
+                                <text weight="bold" horizontalAlignment="right">Owner</text>
                             </td>
                         </th>
                         <tr>
-                            <td><border padding="1mm"><text>Warehouse</text></border></td>
-                            <td><border padding="1mm"><text>Picking time improved</text></border></td>
-                            <td><border padding="1mm"><text horizontalAlignment="right">Ava</text></border></td>
+                            <td padding="1mm"><text>Warehouse</text></td>
+                            <td padding="1mm"><text>Picking time improved</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">Ava</text></td>
+                        </tr>
+                        <tr background="#f8fafc">
+                            <td padding="1mm"><text>Support</text></td>
+                            <td padding="1mm"><text>Backlog unchanged</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">Noah</text></td>
                         </tr>
                         <tr>
-                            <td><border padding="1mm" background="#f8fafc"><text>Support</text></border></td>
-                            <td><border padding="1mm" background="#f8fafc"><text>Backlog unchanged</text></border></td>
-                            <td><border padding="1mm" background="#f8fafc"><text horizontalAlignment="right">Noah</text></border></td>
-                        </tr>
-                        <tr>
-                            <td><border padding="1mm"><text>Billing</text></border></td>
-                            <td><border padding="1mm"><text>All invoices sent</text></border></td>
-                            <td><border padding="1mm"><text horizontalAlignment="right">Mira</text></border></td>
+                            <td padding="1mm"><text>Billing</text></td>
+                            <td padding="1mm"><text>All invoices sent</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">Mira</text></td>
                         </tr>
                     </table>
 
@@ -257,116 +245,104 @@ public sealed class CompleteExampleDocumentationSamples : DocumentationSampleBas
 
                     <text fontsize="11" weight="bold" margin="0 0 0 1mm">Count detail</text>
                     <table>
-                        <th>
-                            <td width="14mm">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold">Zone</text>
-                                </border>
+                        <th borderThickness="0 0 0 1pt" borderColor="#334155">
+                            <td width="14mm" padding="1mm">
+                                <text weight="bold">Zone</text>
                             </td>
-                            <td width="2*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold">Item</text>
-                                </border>
+                            <td width="2*" padding="1mm">
+                                <text weight="bold">Item</text>
                             </td>
-                            <td width="17mm">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold" horizontalAlignment="right">Expected</text>
-                                </border>
+                            <td width="17mm" padding="1mm">
+                                <text weight="bold" horizontalAlignment="right">Expected</text>
                             </td>
-                            <td width="17mm">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold" horizontalAlignment="right">Counted</text>
-                                </border>
+                            <td width="17mm" padding="1mm">
+                                <text weight="bold" horizontalAlignment="right">Counted</text>
                             </td>
-                            <td width="14mm">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold" horizontalAlignment="right">Diff</text>
-                                </border>
+                            <td width="14mm" padding="1mm">
+                                <text weight="bold" horizontalAlignment="right">Diff</text>
                             </td>
-                            <td width="22mm">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold" horizontalAlignment="right">Status</text>
-                                </border>
+                            <td width="22mm" padding="1mm">
+                                <text weight="bold" horizontalAlignment="right">Status</text>
                             </td>
                         </th>
                         @alternate on RowBackground with ["#ffffff", "#f8fafc"] {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text>A1</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text>Sensor gateway</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">48</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">48</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">0</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">Ready</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text>A1</text></td>
+                            <td padding="1mm"><text>Sensor gateway</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">48</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">48</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">0</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">Ready</text></td>
                         </tr>
                         }
                         @alternate on RowBackground {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text>A2</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text>Mounting rail</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">30</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">28</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">-2</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">Review</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text>A2</text></td>
+                            <td padding="1mm"><text>Mounting rail</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">30</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">28</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">-2</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">Review</text></td>
                         </tr>
                         }
                         @alternate on RowBackground {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text>B1</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text>Setup card</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">80</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">80</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">0</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">Ready</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text>B1</text></td>
+                            <td padding="1mm"><text>Setup card</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">80</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">80</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">0</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">Ready</text></td>
                         </tr>
                         }
                         @alternate on RowBackground {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text>B2</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text>Power adapter</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">64</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">64</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">0</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">Ready</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text>B2</text></td>
+                            <td padding="1mm"><text>Power adapter</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">64</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">64</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">0</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">Ready</text></td>
                         </tr>
                         }
                         @alternate on RowBackground {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text>C1</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text>Wireless sensor</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">96</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">92</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">-4</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">Review</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text>C1</text></td>
+                            <td padding="1mm"><text>Wireless sensor</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">96</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">92</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">-4</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">Review</text></td>
                         </tr>
                         }
                         @alternate on RowBackground {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text>C2</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text>Label roll</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">12</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">12</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">0</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">Ready</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text>C2</text></td>
+                            <td padding="1mm"><text>Label roll</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">12</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">12</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">0</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">Ready</text></td>
                         </tr>
                         }
                         @alternate on RowBackground {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text>D1</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text>Battery pack</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">40</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">41</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">+1</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">Review</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text>D1</text></td>
+                            <td padding="1mm"><text>Battery pack</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">40</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">41</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">+1</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">Review</text></td>
                         </tr>
                         }
                         @alternate on RowBackground {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text>D2</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text>Shipping insert</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">75</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">75</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">0</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text horizontalAlignment="right">Ready</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text>D2</text></td>
+                            <td padding="1mm"><text>Shipping insert</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">75</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">75</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">0</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">Ready</text></td>
                         </tr>
                         }
                     </table>
@@ -422,29 +398,25 @@ public sealed class CompleteExampleDocumentationSamples : DocumentationSampleBas
 
                     <text fontsize="11" weight="bold" margin="0 5mm 0 1mm">Package contents</text>
                     <table>
-                        <th>
-                            <td width="2*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold">Item</text>
-                                </border>
+                        <th borderThickness="0 0 0 1pt" borderColor="#334155">
+                            <td width="2*" padding="1mm">
+                                <text weight="bold">Item</text>
                             </td>
-                            <td width="1*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold" horizontalAlignment="right">Qty</text>
-                                </border>
+                            <td width="1*" padding="1mm">
+                                <text weight="bold" horizontalAlignment="right">Qty</text>
                             </td>
                         </th>
                         <tr>
-                            <td><border padding="1mm"><text>Gateway unit</text></border></td>
-                            <td><border padding="1mm"><text horizontalAlignment="right">1</text></border></td>
+                            <td padding="1mm"><text>Gateway unit</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">1</text></td>
+                        </tr>
+                        <tr background="#f8fafc">
+                            <td padding="1mm"><text>Wireless sensors</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">2</text></td>
                         </tr>
                         <tr>
-                            <td><border padding="1mm" background="#f8fafc"><text>Wireless sensors</text></border></td>
-                            <td><border padding="1mm" background="#f8fafc"><text horizontalAlignment="right">2</text></border></td>
-                        </tr>
-                        <tr>
-                            <td><border padding="1mm"><text>Setup card</text></border></td>
-                            <td><border padding="1mm"><text horizontalAlignment="right">1</text></border></td>
+                            <td padding="1mm"><text>Setup card</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">1</text></td>
                         </tr>
                     </table>
 
@@ -527,29 +499,25 @@ public sealed class CompleteExampleDocumentationSamples : DocumentationSampleBas
 
                     <text fontsize="11" weight="bold" margin="0 1mm 0 1mm">Channel mix</text>
                     <table>
-                        <th>
-                            <td width="2*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold">Channel</text>
-                                </border>
+                        <th borderThickness="0 0 0 1pt" borderColor="#334155">
+                            <td width="2*" padding="1mm">
+                                <text weight="bold">Channel</text>
                             </td>
-                            <td width="1*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text weight="bold" horizontalAlignment="right">Share</text>
-                                </border>
+                            <td width="1*" padding="1mm">
+                                <text weight="bold" horizontalAlignment="right">Share</text>
                             </td>
                         </th>
                         <tr>
-                            <td><border padding="1mm"><text>Web</text></border></td>
-                            <td><border padding="1mm"><text horizontalAlignment="right">52%</text></border></td>
+                            <td padding="1mm"><text>Web</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">52%</text></td>
+                        </tr>
+                        <tr background="#f8fafc">
+                            <td padding="1mm"><text>Partners</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">31%</text></td>
                         </tr>
                         <tr>
-                            <td><border padding="1mm" background="#f8fafc"><text>Partners</text></border></td>
-                            <td><border padding="1mm" background="#f8fafc"><text horizontalAlignment="right">31%</text></border></td>
-                        </tr>
-                        <tr>
-                            <td><border padding="1mm"><text>Direct</text></border></td>
-                            <td><border padding="1mm"><text horizontalAlignment="right">17%</text></border></td>
+                            <td padding="1mm"><text>Direct</text></td>
+                            <td padding="1mm"><text horizontalAlignment="right">17%</text></td>
                         </tr>
                     </table>
                 </body>

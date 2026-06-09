@@ -48,6 +48,8 @@ the right logo or picture for each document.
 <image source="@LogoImage" width="32mm" height="18mm"/>
 ```
 
+![Rendered image sample](../assets/samples/image-from-template-data.png)
+
 The default resolver accepts base64 data and `data:image/...;base64,...` values.
 It does not load arbitrary file paths or internet URLs.
 If a template should use a file name, database key, storage key or URL, the application must provide that behavior.
@@ -64,23 +66,16 @@ When both `width` and `height` are set, the image is drawn into that rectangle.
 When one side is `auto`, `ImageControl` calculates that side from the bitmap aspect ratio.
 When both are `auto`, the bitmap's own pixel size is used.
 
-Use both dimensions when the image must occupy a fixed slot:
+Use both dimensions when the image must occupy a fixed slot, one dimension with `auto` when the image should keep
+its original shape, or a percentage width when the image should scale with the available space:
 
 ```xml
 <image source="@LogoImage" width="32mm" height="18mm"/>
+<image source="@LogoImage" width="45mm" height="auto"/>
+<image source="@LogoImage" width="100%" height="auto"/>
 ```
 
-Use one dimension with `auto` when the image should keep its original shape:
-
-```xml
-<image source="@ProductPhoto" width="45mm" height="auto"/>
-```
-
-Use a percentage width when the image should scale with the available space:
-
-```xml
-<image source="@BannerImage" width="100%" height="auto"/>
-```
+![Rendered image sizing sample](../assets/samples/image-sizing-options.png)
 
 ## Supported Attributes
 

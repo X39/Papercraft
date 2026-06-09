@@ -30,6 +30,24 @@ public sealed class TableCellControl : AlignableContentControl
     [Parameter]
     public ushort ColumnSpan { get; set; } = 1;
 
+    /// <summary>
+    /// The background color of the table cell.
+    /// </summary>
+    [Parameter]
+    public Color Background { get; set; } = Colors.Transparent;
+
+    /// <summary>
+    /// The thickness of the table cell border.
+    /// </summary>
+    [Parameter]
+    public Thickness BorderThickness { get; set; }
+
+    /// <summary>
+    /// The color of the table cell border.
+    /// </summary>
+    [Parameter]
+    public Color BorderColor { get; set; } = Colors.Transparent;
+
     private readonly List<float> _heights = new();
 
     /// <inheritdoc />
@@ -40,16 +58,18 @@ public sealed class TableCellControl : AlignableContentControl
         in Size remainingSize,
         CultureInfo cultureInfo)
     {
+        var borderOffset = TableBoxStyle.GetBorderOffset(BorderThickness, fullPageSize, dpi);
+        var childSize    = TableBoxStyle.Deflate(remainingSize, borderOffset);
         var width = 0F;
         var height = 0F;
         foreach (var control in Children)
         {
-            var size = control.Measure(dpi, fullPageSize, remainingSize, remainingSize, cultureInfo);
+            var size = control.Measure(dpi, fullPageSize, childSize, childSize, cultureInfo);
             width  =  Math.Max(width, size.Width);
             height += size.Height;
         }
 
-        return new Size(width, height);
+        return new Size(width, height) + borderOffset;
     }
 
     /// <inheritdoc />
@@ -60,31 +80,47 @@ public sealed class TableCellControl : AlignableContentControl
         in Size remainingSize,
         CultureInfo cultureInfo)
     {
+        var borderOffset = TableBoxStyle.GetBorderOffset(BorderThickness, fullPageSize, dpi);
+        var childSize    = TableBoxStyle.Deflate(remainingSize, borderOffset);
         _heights.Clear();
         var width = 0F;
         var height = 0F;
         foreach (var control in Children)
         {
-            var size = control.Arrange(dpi, fullPageSize, remainingSize, remainingSize, cultureInfo);
+            var size = control.Arrange(dpi, fullPageSize, childSize, childSize, cultureInfo);
             width  =  Math.Max(width, size.Width);
             height += size.Height;
             _heights.Add(size.Height);
         }
 
         if (HorizontalAlignment == EHorizontalAlignment.Stretch)
-            width = Math.Max(width, remainingSize.Width);
+            width = Math.Max(width, childSize.Width);
         if (VerticalAlignment == EVerticalAlignment.Stretch)
-            height = Math.Max(height, remainingSize.Height);
-        return new Size(Math.Min(width, framedPageSize.Width), height);
+            height = Math.Max(height, childSize.Height);
+
+        var result = new Size(width, height) + borderOffset;
+        return new Size(Math.Min(result.Width, remainingSize.Width), result.Height);
     }
 
     /// <inheritdoc />
     protected override Size DoRender(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
     {
+        TableBoxStyle.Draw(
+            canvas,
+            Arrangement,
+            ArrangementInner,
+            Background,
+            BorderThickness,
+            BorderColor,
+            parentSize,
+            dpi);
+
+        var border = BorderThickness.ToRectangle(parentSize, dpi);
         var additionalWidth  = 0F;
         var additionalHeight = 0F;
         using (canvas.CreateState())
         {
+            canvas.Translate(border.Left, border.Top);
             foreach (var (child, childHeight) in Children.Zip(_heights))
             {
                 var (width, height) =  child.Render(canvas, dpi, parentSize, cultureInfo);

@@ -27,6 +27,8 @@ This fragment mirrors the activation coverage in `ParagraphControlTests`:
 </paragraph>
 ```
 
+![Rendered rich text paragraph sample](../assets/samples/rich-text-paragraph.png)
+
 `paragraph` accepts only `span` and `br` children.
 Do not put `text`, `image`, `table` or other normal controls directly inside a paragraph.
 
@@ -40,6 +42,8 @@ This fragment mirrors `HyperlinkControlTests`:
     foreground="red"
     fontsize="14">View invoice</hyperlink>
 ```
+
+![Rendered hyperlink sample](../assets/samples/rich-text-hyperlink.png)
 
 The current renderer draws the visible text and optional underline.
 The `href` value is kept as control data; it does not create a PDF navigation annotation by itself.

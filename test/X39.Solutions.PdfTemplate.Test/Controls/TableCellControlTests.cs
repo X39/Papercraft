@@ -8,6 +8,53 @@ namespace X39.Solutions.PdfTemplate.Test.Controls;
 public class TableCellControlTests
 {
     [Fact]
+    public async Task XmlParametersAreApplied()
+    {
+        var control = await """
+                            <td
+                                background="red"
+                                borderThickness="1px 2px 3px 4px"
+                                borderColor="blue">
+                                  <mock width="100px" height="100px"/>
+                            </td>
+                            """.ToControl<TableCellControl>();
+
+        Assert.Equal(Colors.Red, control.Background);
+        Assert.Equal(new Thickness(1F, 2F, 3F, 4F), control.BorderThickness);
+        Assert.Equal(Colors.Blue, control.BorderColor);
+    }
+
+    [Fact]
+    public async Task BorderThicknessReservesSpaceAroundCellContent()
+    {
+        var control = await """
+                            <td
+                                horizontalAlignment="Left"
+                                verticalAlignment="Top"
+                                borderThickness="1px 2px 3px 4px"
+                                borderColor="red">
+                                  <mock width="10px" height="20px"/>
+                            </td>
+                            """.ToControl<TableCellControl>();
+        var pageSize   = new Size(100, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+
+        var measure = control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        var arrange = control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+
+        Assert.Equal(new Size(14, 26), measure);
+        Assert.Equal(new Size(14, 26), arrange);
+        mockCanvas.AssertState();
+        mockCanvas.AssertClip(new Rectangle(0, 0, 14, 26));
+        mockCanvas.AssertDrawRect(
+            (new Rectangle(0, 0, 1, 26), Colors.Red),
+            (new Rectangle(0, 0, 14, 2), Colors.Red),
+            (new Rectangle(11, 0, 3, 26), Colors.Red),
+            (new Rectangle(0, 22, 14, 4), Colors.Red));
+    }
+
+    [Fact]
     public async Task SingleCellContentMatchesSize()
     {
         var control = await """

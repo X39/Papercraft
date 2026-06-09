@@ -25,29 +25,33 @@ These fragments mirror `CheckboxControlTests` and `SignatureControlTests`:
 ```xml
 <checkbox
     checked="true"
-    size="8px"
+    size="5mm"
     label="Approved"
-    gap="3px"
-    strokeColor="red"
-    fill="blue"
-    checkColor="green"
-    strokeThickness="2px"/>
+    gap="2mm"
+    strokeColor="#dc2626"
+    fill="#dbeafe"
+    checkColor="#16a34a"
+    strokeThickness="1pt"/>
 
 <signature
-    height="30px"
-    lineWidth="60px"
-    lineThickness="2px"
-    lineColor="red"
+    height="16mm"
+    lineWidth="45mm"
+    lineThickness="1pt"
+    lineColor="#dc2626"
     label="Signed"
     subtext="Manager"
     textPlacement="Above"/>
 ```
+
+![Rendered checkbox and signature sample](../assets/samples/forms-checkbox-and-signature.png)
 
 `checkbox` can also use element text as its label:
 
 ```xml
 <checkbox>Element Label</checkbox>
 ```
+
+![Rendered checkbox element-label sample](../assets/samples/forms-checkbox-element-label.png)
 
 When `checkbox` has a non-empty `label`, the label text wins over child controls.
 Without a label, child controls render to the right of the checkbox square.

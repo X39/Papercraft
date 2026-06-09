@@ -48,6 +48,8 @@ Use `qrCode` for QR symbols. The value can be supplied as an attribute or as ele
 </qrCode>
 ```
 
+![Rendered QR code sample](../assets/samples/qrcode-basic.png)
+
 | Attribute | Values | Default |
 |-----------|--------|---------|
 | `value` | Text to encode. Element content can also supply the value. | Empty |

@@ -8,6 +8,40 @@ namespace X39.Solutions.PdfTemplate.Test.Controls;
 public class TableRowControlTests
 {
     [Fact]
+    public async Task RowXmlParametersAreApplied()
+    {
+        var control = await """
+                            <tr
+                                background="red"
+                                borderThickness="1px 2px 3px 4px"
+                                borderColor="blue">
+                                <td/>
+                            </tr>
+                            """.ToControl<TableRowControl>();
+
+        Assert.Equal(Colors.Red, control.Background);
+        Assert.Equal(new Thickness(1F, 2F, 3F, 4F), control.BorderThickness);
+        Assert.Equal(Colors.Blue, control.BorderColor);
+    }
+
+    [Fact]
+    public async Task HeaderXmlParametersAreApplied()
+    {
+        var control = await """
+                            <th
+                                background="red"
+                                borderThickness="1px 2px 3px 4px"
+                                borderColor="blue">
+                                <td/>
+                            </th>
+                            """.ToControl<TableHeaderControl>();
+
+        Assert.Equal(Colors.Red, control.Background);
+        Assert.Equal(new Thickness(1F, 2F, 3F, 4F), control.BorderThickness);
+        Assert.Equal(Colors.Blue, control.BorderColor);
+    }
+
+    [Fact]
     public async Task RowControlWith1CellAndStretchScalesToFullAvailableWidthAndCellContentHeight()
     {
         var control = await $$"""

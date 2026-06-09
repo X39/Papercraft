@@ -173,6 +173,159 @@ public class TableControlTest
     }
 
     [Fact]
+    public async Task RowBackgroundSpansArrangedRow()
+    {
+        var control = await $$"""
+                              <table>
+                                  <tr background="red">
+                                      <td><mock width="50px" height="10px"/></td>
+                                      <td><mock width="50px" height="10px"/></td>
+                                  </tr>
+                              </table>
+                              """.ToControl<TableControl>();
+        var pageSize   = new Size(100, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+
+        mockCanvas.AssertState();
+        mockCanvas.AssertDrawRect((new Rectangle(0, 0, 100, 10), Colors.Red));
+    }
+
+    [Fact]
+    public async Task CellBackgroundSpansArrangedCell()
+    {
+        var control = await $$"""
+                              <table>
+                                  <tr>
+                                      <td background="blue"><mock width="50px" height="10px"/></td>
+                                      <td><mock width="50px" height="10px"/></td>
+                                  </tr>
+                              </table>
+                              """.ToControl<TableControl>();
+        var pageSize   = new Size(100, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+
+        mockCanvas.AssertState();
+        mockCanvas.AssertDrawRect((new Rectangle(0, 0, 50, 10), Colors.Blue));
+    }
+
+    [Fact]
+    public async Task CellBackgroundRendersAfterRowBackground()
+    {
+        var control = await $$"""
+                              <table>
+                                  <tr background="red">
+                                      <td background="blue"><mock width="50px" height="10px"/></td>
+                                      <td><mock width="50px" height="10px"/></td>
+                                  </tr>
+                              </table>
+                              """.ToControl<TableControl>();
+        var pageSize   = new Size(100, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+
+        mockCanvas.AssertState();
+        mockCanvas.AssertDrawRect(
+            (new Rectangle(0, 0, 100, 10), Colors.Red),
+            (new Rectangle(0, 0, 50, 10), Colors.Blue));
+    }
+
+    [Fact]
+    public async Task RowBorderContributesToRowHeight()
+    {
+        var control = await $$"""
+                              <table>
+                                  <tr borderThickness="0 2px 0 3px" borderColor="red">
+                                      <td><mock width="100px" height="10px"/></td>
+                                  </tr>
+                              </table>
+                              """.ToControl<TableControl>();
+        var pageSize   = new Size(100, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        var arrangedSize = control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+
+        mockCanvas.AssertState();
+        Assert.Equal(new Size(100, 15), arrangedSize);
+        mockCanvas.AssertClip(0, new Rectangle(0, 0, 100, 15)); // table
+        mockCanvas.AssertClip(1, new Rectangle(0, 0, 100, 15)); // row
+        mockCanvas.AssertClip(2, new Rectangle(0, 2, 100, 10)); // row border offsets the cell content
+        mockCanvas.AssertDrawRect(
+            (new Rectangle(0, 0, 100, 2), Colors.Red),
+            (new Rectangle(0, 12, 100, 3), Colors.Red));
+    }
+
+    [Fact]
+    public async Task HeaderBorderContributesToRepeatedHeaderHeight()
+    {
+        var control = await $$"""
+                              <table>
+                                  <th borderThickness="0 0 0 10px" borderColor="red">
+                                      <td><mock width="100px" height="10px"/></td>
+                                  </th>
+                                  <tr>
+                                      <td><mock width="100px" height="80px"/></td>
+                                  </tr>
+                                  <tr>
+                                      <td><mock width="100px" height="20px"/></td>
+                                  </tr>
+                              </table>
+                              """.ToControl<TableControl>();
+        var pageSize   = new Size(100, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        var arrangedSize         = control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        var additionalRenderSize = control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+
+        mockCanvas.AssertState();
+        Assert.Equal(new Size(100, 120), arrangedSize);
+        Assert.Equal(new Size(0, 20), additionalRenderSize);
+        mockCanvas.AssertClip(0, new Rectangle(0, 0, 100, 140)); // table, including repeated header space
+        mockCanvas.AssertClip(1, new Rectangle(0, 0, 100, 20)); // initial table header
+        mockCanvas.AssertClip(5, new Rectangle(0, 100, 100, 20)); // repeated header
+        mockCanvas.AssertDrawRect(
+            (new Rectangle(0, 10, 100, 10), Colors.Red),
+            (new Rectangle(0, 110, 100, 10), Colors.Red));
+    }
+
+    [Fact]
+    public async Task PaddedCellClipDoesNotExtendIntoNextColumn()
+    {
+        var control = await $$"""
+                              <table>
+                                  <tr>
+                                      <td width="100px" padding="10px"><line thickness="10px" length="200px"/></td>
+                                      <td width="1*" padding="10px"><line thickness="10px" length="10px"/></td>
+                                  </tr>
+                              </table>
+                              """.ToControl<TableControl>();
+        var pageSize   = new Size(200, 200);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+        mockCanvas.AssertState();
+        mockCanvas.AssertAllClip((rectangle) => rectangle is {Width: > 0, Height: > 0});
+        mockCanvas.AssertClip(0, new Rectangle(0,   0, 200, 30)); // table
+        mockCanvas.AssertClip(1, new Rectangle(0,   0, 200, 30)); // tr
+        mockCanvas.AssertClip(2, new Rectangle(0,   0, 100, 30)); // first td
+        mockCanvas.AssertClip(4, new Rectangle(100, 0, 100, 30)); // second td
+    }
+
+    [Fact]
     public async Task RowHeightCorrectlyAdjustsForTableHeightExceedingPage()
     {
         var control = await $$"""
@@ -351,5 +504,34 @@ public class TableControlTest
         mockCanvas.AssertClip(10, new Rectangle(0, 110, 100, 45)); // third row cell
         mockCanvas.AssertClip(11, new Rectangle(0, 155, 100, 45)); // fourth row
         mockCanvas.AssertClip(12, new Rectangle(0, 155, 100, 45)); // fourth row cell
+    }
+
+    [Fact]
+    public async Task HeaderIsNotRepeatedWhenNextRowWouldNotFitBelowIt()
+    {
+        var control = await $$"""
+                                <table>
+                                    <th>
+                                        <td><mock width="100px" height="95px"/></td>
+                                    </th>
+                                    <tr>
+                                        <td><mock width="100px" height="10px"/></td>
+                                    </tr>
+                                </table>
+                              """.ToControl<TableControl>();
+        var pageSize   = new Size(100, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        var arrangedSize         = control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        var additionalRenderSize = control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+        mockCanvas.AssertState();
+
+        Assert.Equal(new Size(100, 105), arrangedSize);
+        Assert.Equal(new Size(0, 5), additionalRenderSize);
+        mockCanvas.AssertClip(0, new Rectangle(0, 0, 100, 110)); // table, including only the page-break gap
+        mockCanvas.AssertClip(1, new Rectangle(0, 0, 100, 95)); // initial table header
+        mockCanvas.AssertClip(2, new Rectangle(0, 0, 100, 95)); // initial header cell
+        mockCanvas.AssertClip(3, new Rectangle(0, 100, 100, 10)); // first row starts at the next page
+        mockCanvas.AssertClip(4, new Rectangle(0, 100, 100, 10)); // first row cell
     }
 }

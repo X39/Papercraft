@@ -43,6 +43,8 @@ For a simple separator, give the line a small `thickness`, a useful `length` and
 <line thickness="1pt" length="100%" color="#666666" margin="0 1mm"/>
 ```
 
+![Rendered horizontal separator sample](../assets/samples/line-horizontal-separator.png)
+
 ### Choose Length And Thickness
 
 Use `length` for how far the line travels.
@@ -155,11 +157,7 @@ and `verticalAlignment` attributes described in [Layout fundamentals](layout-fun
 ## Allowed Children
 
 `line` does not allow child controls or text content.
-Use it as a self-closing element:
-
-```xml
-<line thickness="1pt" length="100%" color="#666666"/>
-```
+Use it as a self-closing element, such as `<line thickness="1pt" length="100%" color="#666666"/>`.
 
 ## Common Mistakes
 

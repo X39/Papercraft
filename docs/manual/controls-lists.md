@@ -19,14 +19,18 @@ Use [`table`](controls-table.md) when the content needs rows and columns.
 These fragments mirror `ListControlTests`:
 
 ```xml
-<ul marker="circle" indent="10px" markerWidth="3px" itemSpacing="2px">
-    <li><text>First</text></li>
+<ul marker="circle" indent="8mm" markerWidth="4mm" itemSpacing="1mm">
+    <li><text fontsize="9">First</text></li>
+    <li><text fontsize="9">Second</text></li>
 </ul>
 
-<ol start="5" markerFormat="({0})" indent="12px" markerWidth="4px" itemSpacing="1px">
-    <li><text>First</text></li>
+<ol start="5" markerFormat="({0})" indent="10mm" markerWidth="7mm" itemSpacing="1mm">
+    <li><text fontsize="9">First</text></li>
+    <li><text fontsize="9">Second</text></li>
 </ol>
 ```
+
+![Rendered list marker sample](../assets/samples/lists-basic-markers.png)
 
 Lists accept only `li` children.
 Each `li` can contain normal controls:
@@ -34,13 +38,15 @@ Each `li` can contain normal controls:
 ```xml
 <ul>
     <li>
-        <text>Parent</text>
+        <text fontsize="9">Parent</text>
         <ol start="3">
-            <li><text>Nested</text></li>
+            <li><text fontsize="9">Nested</text></li>
         </ol>
     </li>
 </ul>
 ```
+
+![Rendered nested list sample](../assets/samples/lists-nested-items.png)
 
 ## Supported Controls
 

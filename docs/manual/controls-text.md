@@ -165,11 +165,8 @@ If both a `text` attribute and XML content are supplied, XML content is used as 
 ## Allowed Children
 
 `text` does not allow child controls.
-Write text directly between the opening and closing tags:
-
-```xml
-<text>Use this form for normal text.</text>
-```
+Write text directly between the opening and closing tags, such as
+`<text>Use this form for normal text.</text>`.
 
 Do not put controls inside `text`:
 use a surrounding `border`, table cell or another container control instead.

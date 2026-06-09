@@ -7,8 +7,9 @@
 The `table` control arranges content into rows and columns.
 It uses `th` for a table header row, `tr` for normal rows and `td` for cells.
 
-Table controls create the layout only.
-If the table needs visible grid lines, backgrounds or padding, put controls such as `border` and `text` inside the cells.
+Table controls create the layout and can draw row or cell backgrounds and borders.
+Use `td` padding for spacing inside cells.
+Use `border` inside a cell only when the cell content itself needs a separate boxed layout.
 
 ## When Should I Use This?
 
@@ -29,32 +30,26 @@ Each `th` or `tr` contains `td` cells.
 <template>
     <body>
         <table>
-            <th>
-                <td>
-                    <border thickness="0 0 0 1pt" color="#475569" padding="1mm">
-                        <text fontsize="9" weight="bold">Item</text>
-                    </border>
+            <th borderThickness="0 0 0 1pt" borderColor="#475569">
+                <td padding="1mm">
+                    <text fontsize="9" weight="bold">Item</text>
                 </td>
-                <td>
-                    <border thickness="0 0 0 1pt" color="#475569" padding="1mm">
-                        <text fontsize="9" weight="bold" horizontalAlignment="right">Qty</text>
-                    </border>
+                <td padding="1mm">
+                    <text fontsize="9" weight="bold" horizontalAlignment="right">Qty</text>
                 </td>
-                <td>
-                    <border thickness="0 0 0 1pt" color="#475569" padding="1mm">
-                        <text fontsize="9" weight="bold" horizontalAlignment="right">Total</text>
-                    </border>
+                <td padding="1mm">
+                    <text fontsize="9" weight="bold" horizontalAlignment="right">Total</text>
                 </td>
             </th>
             <tr>
-                <td><border padding="1mm"><text fontsize="9">Design</text></border></td>
-                <td><border padding="1mm"><text fontsize="9" horizontalAlignment="right">2</text></border></td>
-                <td><border padding="1mm"><text fontsize="9" horizontalAlignment="right">300.00</text></border></td>
+                <td padding="1mm"><text fontsize="9">Design</text></td>
+                <td padding="1mm"><text fontsize="9" horizontalAlignment="right">2</text></td>
+                <td padding="1mm"><text fontsize="9" horizontalAlignment="right">300.00</text></td>
             </tr>
             <tr>
-                <td><border padding="1mm"><text fontsize="9">Review</text></border></td>
-                <td><border padding="1mm"><text fontsize="9" horizontalAlignment="right">1</text></border></td>
-                <td><border padding="1mm"><text fontsize="9" horizontalAlignment="right">120.00</text></border></td>
+                <td padding="1mm"><text fontsize="9">Review</text></td>
+                <td padding="1mm"><text fontsize="9" horizontalAlignment="right">1</text></td>
+                <td padding="1mm"><text fontsize="9" horizontalAlignment="right">120.00</text></td>
             </tr>
         </table>
     </body>
@@ -71,9 +66,9 @@ when the table continues on a later page.
 
 ```xml
 <table>
-    <th>
-        <td><border padding="1mm"><text weight="bold">Item</text></border></td>
-        <td><border padding="1mm"><text weight="bold">Total</text></border></td>
+    <th borderThickness="0 0 0 1pt" borderColor="#475569">
+        <td padding="1mm"><text weight="bold">Item</text></td>
+        <td padding="1mm"><text weight="bold">Total</text></td>
     </th>
     <tr>
         <td><text>Design</text></td>
@@ -81,6 +76,8 @@ when the table continues on a later page.
     </tr>
 </table>
 ```
+
+![Rendered basic table sample](../assets/samples/table-basic-rows-and-columns.png)
 
 For page-break behavior and repeated headers, see
 [A table breaks or overflows unexpectedly](troubleshooting.md#a-table-breaks-or-overflows-unexpectedly).
@@ -152,20 +149,14 @@ For fixed and percent length formats, see [Lengths](layout-fundamentals.md#lengt
     <body>
         <table>
             <tr>
-                <td width="2*">
-                    <border background="#e0f2fe" padding="1mm">
-                        <text fontsize="9">Description uses 2*</text>
-                    </border>
+                <td width="2*" background="#e0f2fe" padding="1mm">
+                    <text fontsize="9">Description uses 2*</text>
                 </td>
-                <td width="1*">
-                    <border background="#fef3c7" padding="1mm">
-                        <text fontsize="9">Code uses 1*</text>
-                    </border>
+                <td width="1*" background="#fef3c7" padding="1mm">
+                    <text fontsize="9">Code uses 1*</text>
                 </td>
-                <td width="20mm">
-                    <border background="#dcfce7" padding="1mm">
-                        <text fontsize="9" horizontalAlignment="right">20 mm</text>
-                    </border>
+                <td width="20mm" background="#dcfce7" padding="1mm">
+                    <text fontsize="9" horizontalAlignment="right">20 mm</text>
                 </td>
             </tr>
         </table>
@@ -181,42 +172,39 @@ Use `horizontalAlignment="right"` on the `text` control inside a cell when numbe
 The table controls position the cell; the text control positions the text inside that cell.
 
 ```xml
-<td>
-    <border padding="1mm">
-        <text fontsize="9" horizontalAlignment="right">120.00</text>
-    </border>
+<td padding="1mm">
+    <text fontsize="9" horizontalAlignment="right">120.00</text>
 </td>
 ```
+
+![Rendered basic table sample](../assets/samples/table-basic-rows-and-columns.png)
 
 
 ## Create An Invoice Line-Item Table
 
 Use one `th` row for the column labels and one `tr` row for each line item.
-Put visible padding, background color and bottom rules inside each `td`, usually with `border`.
+Put visible padding on the `td` cells.
+Use `background`, `borderThickness` and `borderColor` on rows or cells when the table needs fills or rules.
 Right-align quantities, prices and totals with the `text` control.
 
 The full invoice preview uses the same structure:
 
 ```xml
 <table>
-    <th>
-        <td width="2*">
-            <border thickness="0 0 0 1pt"><text weight="bold">Description</text></border>
-        </td>
-        <td width="1*">
-            <border thickness="0 0 0 1pt"><text weight="bold" horizontalAlignment="right">Qty</text></border>
-        </td>
-        <td width="1*">
-            <border thickness="0 0 0 1pt"><text weight="bold" horizontalAlignment="right">Amount</text></border>
-        </td>
+    <th borderThickness="0 0 0 1pt" borderColor="#334155">
+        <td width="2*" padding="1mm"><text weight="bold">Description</text></td>
+        <td width="1*" padding="1mm"><text weight="bold" horizontalAlignment="right">Qty</text></td>
+        <td width="1*" padding="1mm"><text weight="bold" horizontalAlignment="right">Amount</text></td>
     </th>
     <tr>
-        <td><border padding="1mm"><text>Design package</text></border></td>
-        <td><border padding="1mm"><text horizontalAlignment="right">2</text></border></td>
-        <td><border padding="1mm"><text horizontalAlignment="right">690.00</text></border></td>
+        <td padding="1mm"><text>Design package</text></td>
+        <td padding="1mm"><text horizontalAlignment="right">2</text></td>
+        <td padding="1mm"><text horizontalAlignment="right">690.00</text></td>
     </tr>
 </table>
 ```
+
+![Rendered complete invoice preview](../assets/samples/complete-invoice-preview.png)
 
 For a full document shape, see the generated [Invoice example](complete-examples.md#invoice-example).
 If invoice rows come from application data, start with [Repeat rows from data](#repeat-rows-from-data) when each row
@@ -227,7 +215,7 @@ team for prepared simple values or helper functions until a supported nested-dat
 ## Alternate Row Colors
 
 Use `@alternate` to rotate through background colors.
-Because `td` does not draw a background by itself, put a `border` inside each cell and set its `background`.
+Set `background` on the row when the whole row should share the same fill.
 
 
 ```xml
@@ -235,34 +223,30 @@ Because `td` does not draw a background by itself, put a `border` inside each ce
 <template>
     <body>
         <table>
-            <th>
-                <td width="2*">
-                    <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                        <text fontsize="9" weight="bold">Task</text>
-                    </border>
+            <th borderThickness="0 0 0 1pt" borderColor="#334155">
+                <td width="2*" padding="1mm">
+                    <text fontsize="9" weight="bold">Task</text>
                 </td>
-                <td width="1*">
-                    <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                        <text fontsize="9" weight="bold" horizontalAlignment="right">Hours</text>
-                    </border>
+                <td width="1*" padding="1mm">
+                    <text fontsize="9" weight="bold" horizontalAlignment="right">Hours</text>
                 </td>
             </th>
             @alternate on RowBackground with ["#f8fafc", "#e2e8f0"] {
-            <tr>
-                <td><border background="@RowBackground" padding="1mm"><text fontsize="9">Draft</text></border></td>
-                <td><border background="@RowBackground" padding="1mm"><text fontsize="9" horizontalAlignment="right">3.5</text></border></td>
+            <tr background="@RowBackground">
+                <td padding="1mm"><text fontsize="9">Draft</text></td>
+                <td padding="1mm"><text fontsize="9" horizontalAlignment="right">3.5</text></td>
             </tr>
             }
             @alternate on RowBackground {
-            <tr>
-                <td><border background="@RowBackground" padding="1mm"><text fontsize="9">Revise</text></border></td>
-                <td><border background="@RowBackground" padding="1mm"><text fontsize="9" horizontalAlignment="right">1.0</text></border></td>
+            <tr background="@RowBackground">
+                <td padding="1mm"><text fontsize="9">Revise</text></td>
+                <td padding="1mm"><text fontsize="9" horizontalAlignment="right">1.0</text></td>
             </tr>
             }
             @alternate on RowBackground {
-            <tr>
-                <td><border background="@RowBackground" padding="1mm"><text fontsize="9">Approve</text></border></td>
-                <td><border background="@RowBackground" padding="1mm"><text fontsize="9" horizontalAlignment="right">0.5</text></border></td>
+            <tr background="@RowBackground">
+                <td padding="1mm"><text fontsize="9">Approve</text></td>
+                <td padding="1mm"><text fontsize="9" horizontalAlignment="right">0.5</text></td>
             </tr>
             }
         </table>
@@ -285,23 +269,19 @@ Keep the repeated block small: one loop, one row and the cells that belong to th
 <template>
     <body>
         <table>
-            <th>
-                <td width="2*">
-                    <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                        <text fontsize="9" weight="bold">Task from data</text>
-                    </border>
+            <th borderThickness="0 0 0 1pt" borderColor="#334155">
+                <td width="2*" padding="1mm">
+                    <text fontsize="9" weight="bold">Task from data</text>
                 </td>
-                <td width="1*">
-                    <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                        <text fontsize="9" weight="bold" horizontalAlignment="right">Status</text>
-                    </border>
+                <td width="1*" padding="1mm">
+                    <text fontsize="9" weight="bold" horizontalAlignment="right">Status</text>
                 </td>
             </th>
             @foreach TaskName in Tasks {
             @alternate on RowBackground with ["#ffffff", "#f1f5f9"] {
-            <tr>
-                <td><border background="@RowBackground" padding="1mm"><text fontsize="9">@TaskName</text></border></td>
-                <td><border background="@RowBackground" padding="1mm"><text fontsize="9" horizontalAlignment="right">Ready</text></border></td>
+            <tr background="@RowBackground">
+                <td padding="1mm"><text fontsize="9">@TaskName</text></td>
+                <td padding="1mm"><text fontsize="9" horizontalAlignment="right">Ready</text></td>
             </tr>
             }
             }
@@ -320,9 +300,16 @@ For current nested-data guidance, see [Template data](template-data.md#nested-da
 
 ## Supported Attributes
 
-`table`, `th` and `tr` do not add table-specific XML attributes.
-They support the shared `margin`, `padding`, `clip`, `horizontalAlignment` and `verticalAlignment` attributes
+`table` supports the shared `margin`, `padding`, `clip`, `horizontalAlignment` and `verticalAlignment` attributes
 described in [Layout fundamentals](layout-fundamentals.md).
+
+`th` and `tr` support those shared attributes plus:
+
+| Attribute | Use it for | Values |
+|-----------|------------|--------|
+| `background` | Fill behind the whole row. | Any supported color, default `transparent`. |
+| `borderThickness` | Width of the row border sides. | Any supported thickness value, default `0`. |
+| `borderColor` | Row border color. | Any supported color, default `transparent`. |
 
 `td` supports those shared attributes plus:
 
@@ -330,6 +317,9 @@ described in [Layout fundamentals](layout-fundamentals.md).
 |-----------|------------|--------|
 | `width` | Requested column width. | `auto`, any supported length or percent value, or star values such as `1*` and `2*`. |
 | `columnSpan` | Make one cell span more than one column. | Whole number, default `1`; source notes that `0` is ignored. |
+| `background` | Fill behind the cell. | Any supported color, default `transparent`. |
+| `borderThickness` | Width of the cell border sides. | Any supported thickness value, default `0`. |
+| `borderColor` | Cell border color. | Any supported color, default `transparent`. |
 
 ## Allowed Children
 
@@ -343,7 +333,7 @@ after a page break.
 
 ## Common Mistakes
 
-- Expecting `table`, `tr` or `td` to draw visible grid lines. Add `border` controls inside cells for lines and fills.
+- Expecting `table` itself to draw visible grid lines. Add `borderThickness` and `borderColor` to `th`, `tr` or `td`.
 - Putting `text` directly inside `table` or `tr`. Put visible content inside a `td`.
 - Forgetting that `th` is a table header row in this template language, not a header cell.
 - Using table layout for a single highlighted box. Use `border` for that.

@@ -296,7 +296,7 @@ public sealed class TableControl : AlignableContentControl
         {
             if (IsAtStartOfPage(canvas, parentSize.Height))
             {
-                if (headers.Length is not 0)
+                if (CanRenderRepeatedHeaders(headers, control, parentSize.Height))
                 {
                     (width, height) = RenderRepeatedHeaders(canvas, dpi, parentSize, cultureInfo, headers, renderControls);
                     additionalWidth  += width;
@@ -310,9 +310,12 @@ public sealed class TableControl : AlignableContentControl
                 {
                     canvas.Translate(0, remainingPageHeight);
                     additionalHeight += remainingPageHeight;
-                    (width, height) = RenderRepeatedHeaders(canvas, dpi, parentSize, cultureInfo, headers, renderControls);
-                    additionalWidth  += width;
-                    additionalHeight += height;
+                    if (CanRenderRepeatedHeaders(headers, control, parentSize.Height))
+                    {
+                        (width, height) = RenderRepeatedHeaders(canvas, dpi, parentSize, cultureInfo, headers, renderControls);
+                        additionalWidth  += width;
+                        additionalHeight += height;
+                    }
                 }
             }
 
@@ -323,6 +326,21 @@ public sealed class TableControl : AlignableContentControl
         }
 
         return new Size(additionalWidth, additionalHeight);
+    }
+
+    private static bool CanRenderRepeatedHeaders(
+        IReadOnlyCollection<TableHeaderControl> headers,
+        TableRowControl row,
+        float pageHeight)
+    {
+        if (headers.Count is 0)
+            return false;
+
+        var repeatedHeaderHeight = headers.Sum((header) => header.ArrangementOuter.Height);
+        if (row.ArrangementOuter.Height > pageHeight + PageBoundaryTolerance)
+            return true;
+
+        return repeatedHeaderHeight + row.ArrangementOuter.Height <= pageHeight + PageBoundaryTolerance;
     }
 
     private static bool IsAtStartOfPage(IDeferredCanvas canvas, float pageHeight)

@@ -111,6 +111,8 @@ Pie chart `data` elements need `y`; when `x` is omitted, the control can still r
 </lineChart>
 ```
 
+![Rendered line chart sample](../assets/samples/chart-line-trend.png)
+
 Invalid or missing values are ignored by the chart data parser.
 If no valid data remains, the chart renders a "No Data" message.
 For troubleshooting steps, see

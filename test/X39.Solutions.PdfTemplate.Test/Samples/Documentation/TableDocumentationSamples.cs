@@ -12,32 +12,26 @@ public sealed class TableDocumentationSamples : DocumentationSampleBase
             <template>
                 <body>
                     <table>
-                        <th>
-                            <td>
-                                <border thickness="0 0 0 1pt" color="#475569" padding="1mm">
-                                    <text fontsize="9" weight="bold">Item</text>
-                                </border>
+                        <th borderThickness="0 0 0 1pt" borderColor="#475569">
+                            <td padding="1mm">
+                                <text fontsize="9" weight="bold">Item</text>
                             </td>
-                            <td>
-                                <border thickness="0 0 0 1pt" color="#475569" padding="1mm">
-                                    <text fontsize="9" weight="bold" horizontalAlignment="right">Qty</text>
-                                </border>
+                            <td padding="1mm">
+                                <text fontsize="9" weight="bold" horizontalAlignment="right">Qty</text>
                             </td>
-                            <td>
-                                <border thickness="0 0 0 1pt" color="#475569" padding="1mm">
-                                    <text fontsize="9" weight="bold" horizontalAlignment="right">Total</text>
-                                </border>
+                            <td padding="1mm">
+                                <text fontsize="9" weight="bold" horizontalAlignment="right">Total</text>
                             </td>
                         </th>
                         <tr>
-                            <td><border padding="1mm"><text fontsize="9">Design</text></border></td>
-                            <td><border padding="1mm"><text fontsize="9" horizontalAlignment="right">2</text></border></td>
-                            <td><border padding="1mm"><text fontsize="9" horizontalAlignment="right">300.00</text></border></td>
+                            <td padding="1mm"><text fontsize="9">Design</text></td>
+                            <td padding="1mm"><text fontsize="9" horizontalAlignment="right">2</text></td>
+                            <td padding="1mm"><text fontsize="9" horizontalAlignment="right">300.00</text></td>
                         </tr>
                         <tr>
-                            <td><border padding="1mm"><text fontsize="9">Review</text></border></td>
-                            <td><border padding="1mm"><text fontsize="9" horizontalAlignment="right">1</text></border></td>
-                            <td><border padding="1mm"><text fontsize="9" horizontalAlignment="right">120.00</text></border></td>
+                            <td padding="1mm"><text fontsize="9">Review</text></td>
+                            <td padding="1mm"><text fontsize="9" horizontalAlignment="right">1</text></td>
+                            <td padding="1mm"><text fontsize="9" horizontalAlignment="right">120.00</text></td>
                         </tr>
                     </table>
                 </body>
@@ -94,20 +88,14 @@ public sealed class TableDocumentationSamples : DocumentationSampleBase
                 <body>
                     <table>
                         <tr>
-                            <td width="2*">
-                                <border background="#e0f2fe" padding="1mm">
-                                    <text fontsize="9">Description uses 2*</text>
-                                </border>
+                            <td width="2*" background="#e0f2fe" padding="1mm">
+                                <text fontsize="9">Description uses 2*</text>
                             </td>
-                            <td width="1*">
-                                <border background="#fef3c7" padding="1mm">
-                                    <text fontsize="9">Code uses 1*</text>
-                                </border>
+                            <td width="1*" background="#fef3c7" padding="1mm">
+                                <text fontsize="9">Code uses 1*</text>
                             </td>
-                            <td width="20mm">
-                                <border background="#dcfce7" padding="1mm">
-                                    <text fontsize="9" horizontalAlignment="right">20 mm</text>
-                                </border>
+                            <td width="20mm" background="#dcfce7" padding="1mm">
+                                <text fontsize="9" horizontalAlignment="right">20 mm</text>
                             </td>
                         </tr>
                     </table>
@@ -124,34 +112,30 @@ public sealed class TableDocumentationSamples : DocumentationSampleBase
             <template>
                 <body>
                     <table>
-                        <th>
-                            <td width="2*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text fontsize="9" weight="bold">Task</text>
-                                </border>
+                        <th borderThickness="0 0 0 1pt" borderColor="#334155">
+                            <td width="2*" padding="1mm">
+                                <text fontsize="9" weight="bold">Task</text>
                             </td>
-                            <td width="1*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text fontsize="9" weight="bold" horizontalAlignment="right">Hours</text>
-                                </border>
+                            <td width="1*" padding="1mm">
+                                <text fontsize="9" weight="bold" horizontalAlignment="right">Hours</text>
                             </td>
                         </th>
                         @alternate on RowBackground with ["#f8fafc", "#e2e8f0"] {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text fontsize="9">Draft</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text fontsize="9" horizontalAlignment="right">3.5</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text fontsize="9">Draft</text></td>
+                            <td padding="1mm"><text fontsize="9" horizontalAlignment="right">3.5</text></td>
                         </tr>
                         }
                         @alternate on RowBackground {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text fontsize="9">Revise</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text fontsize="9" horizontalAlignment="right">1.0</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text fontsize="9">Revise</text></td>
+                            <td padding="1mm"><text fontsize="9" horizontalAlignment="right">1.0</text></td>
                         </tr>
                         }
                         @alternate on RowBackground {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text fontsize="9">Approve</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text fontsize="9" horizontalAlignment="right">0.5</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text fontsize="9">Approve</text></td>
+                            <td padding="1mm"><text fontsize="9" horizontalAlignment="right">0.5</text></td>
                         </tr>
                         }
                     </table>
@@ -168,23 +152,19 @@ public sealed class TableDocumentationSamples : DocumentationSampleBase
             <template>
                 <body>
                     <table>
-                        <th>
-                            <td width="2*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text fontsize="9" weight="bold">Task from data</text>
-                                </border>
+                        <th borderThickness="0 0 0 1pt" borderColor="#334155">
+                            <td width="2*" padding="1mm">
+                                <text fontsize="9" weight="bold">Task from data</text>
                             </td>
-                            <td width="1*">
-                                <border thickness="0 0 0 1pt" color="#334155" padding="1mm">
-                                    <text fontsize="9" weight="bold" horizontalAlignment="right">Status</text>
-                                </border>
+                            <td width="1*" padding="1mm">
+                                <text fontsize="9" weight="bold" horizontalAlignment="right">Status</text>
                             </td>
                         </th>
                         @foreach TaskName in Tasks {
                         @alternate on RowBackground with ["#ffffff", "#f1f5f9"] {
-                        <tr>
-                            <td><border background="@RowBackground" padding="1mm"><text fontsize="9">@TaskName</text></border></td>
-                            <td><border background="@RowBackground" padding="1mm"><text fontsize="9" horizontalAlignment="right">Ready</text></border></td>
+                        <tr background="@RowBackground">
+                            <td padding="1mm"><text fontsize="9">@TaskName</text></td>
+                            <td padding="1mm"><text fontsize="9" horizontalAlignment="right">Ready</text></td>
                         </tr>
                         }
                         }

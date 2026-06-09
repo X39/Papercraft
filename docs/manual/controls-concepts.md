@@ -63,11 +63,8 @@ Common leaf controls include `text`, `line`, `image` and `pageNumber`.
 
 Write the value directly in the element text or attributes:
 
-```xml
-<text>Total</text>
-<line thickness="1pt" length="100%"/>
-<pageNumber format="Page {0} of {1}"/>
-```
+For example, use `<text>Total</text>`, `<line thickness="1pt" length="100%"/>` or
+`<pageNumber mode="CurrentTotal" prefix="Page " delimiter=" of "/>`.
 
 If a leaf control needs a box, background, margin group or table cell, put the leaf inside a container.
 

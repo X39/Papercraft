@@ -1,10 +1,19 @@
 using SkiaSharp;
+using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Data;
 
 namespace X39.Solutions.PdfTemplate.Test.Samples.Documentation;
 
 [Collection("Samples")]
 public sealed class ImageDocumentationSamples : DocumentationSampleBase
 {
+    private static DocumentOptions ImageSizingDocumentOptions { get; } = new()
+    {
+        PageWidthInMillimeters = 100,
+        PageHeightInMillimeters = 120,
+        Margin = new Thickness(new Length(5, ELengthUnit.Millimeters)),
+    };
+
     [Fact]
     public Task Image_FromTemplateData()
         => RenderDocumentationSampleAsync(
@@ -22,6 +31,30 @@ public sealed class ImageDocumentationSamples : DocumentationSampleBase
                 </body>
             </template>
             """,
+            configureGenerator: (generator) =>
+                generator.TemplateData.SetVariable("LogoImage", CreateLogoDataUri()));
+
+    [Fact]
+    public Task Image_SizingOptions()
+        => RenderDocumentationSampleAsync(
+            "image-sizing-options",
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <template>
+                <body>
+                    <image source="@LogoImage" width="32mm" height="18mm"/>
+
+                    <spacer height="2mm"/>
+
+                    <image source="@LogoImage" width="45mm" height="auto"/>
+
+                    <spacer height="2mm"/>
+
+                    <image source="@LogoImage" width="100%" height="auto"/>
+                </body>
+            </template>
+            """,
+            ImageSizingDocumentOptions,
             configureGenerator: (generator) =>
                 generator.TemplateData.SetVariable("LogoImage", CreateLogoDataUri()));
 

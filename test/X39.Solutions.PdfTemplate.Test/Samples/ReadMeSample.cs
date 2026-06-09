@@ -56,121 +56,111 @@ public class ReadMeSample : SampleBase
                          </table>
                          
                          <table>
-                            <th>
+                            <th borderThickness="0 0 0 1pt" borderColor="black">
                                 <td>
-                                    <border color="black" thickness="0 0 0 1pt">
-                                        <text>#</text>
-                                    </border>
+                                    <text>#</text>
                                 </td>
                                 <td>
-                                    <border color="black" thickness="0 0 0 1pt">
-                                        <text>Product</text>
-                                    </border>
+                                    <text>Product</text>
                                 </td>
                                 <td>
-                                    <border color="black" thickness="0 0 0 1pt">
-                                        <text horizontalAlignment="right">Price</text>
-                                    </border>
+                                    <text horizontalAlignment="right">Price</text>
                                 </td>
                                 <td>
-                                    <border color="black" thickness="0 0 0 1pt">
-                                        <text horizontalAlignment="right">Quantity</text>
-                                    </border>
+                                    <text horizontalAlignment="right">Quantity</text>
                                 </td>
                                 <td>
-                                    <border color="black" thickness="0 0 0 1pt">
-                                        <text horizontalAlignment="right">Total</text>
-                                    </border>
+                                    <text horizontalAlignment="right">Total</text>
                                 </td>
                             </th>
                             @alternate on value with ["#f0f0f0", "#ffffff"] {
-                            <tr>
-                                <td><border background="@value"><text>1</text></border></td>
-                                <td><border background="@value"><text>Fancy shirt</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">100.00 $</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">1</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">100.00 $</text></border></td>
+                            <tr background="@value">
+                                <td><text>1</text></td>
+                                <td><text>Fancy shirt</text></td>
+                                <td><text horizontalAlignment="right">100.00 $</text></td>
+                                <td><text horizontalAlignment="right">1</text></td>
+                                <td><text horizontalAlignment="right">100.00 $</text></td>
                             </tr>
                             }
                             @alternate on value {
-                            <tr>
-                                <td><border background="@value"><text>2</text></border></td>
-                                <td><border background="@value"><text>Shoes</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">50.00 $</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">2</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">100.00 $</text></border></td>
+                            <tr background="@value">
+                                <td><text>2</text></td>
+                                <td><text>Shoes</text></td>
+                                <td><text horizontalAlignment="right">50.00 $</text></td>
+                                <td><text horizontalAlignment="right">2</text></td>
+                                <td><text horizontalAlignment="right">100.00 $</text></td>
                             </tr>
                             }
                             @alternate on value {
-                            <tr>
-                                <td><border background="@value"><text>3</text></border></td>
-                                <td><border background="@value"><text>Jeans</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">74.99 $</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">1</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">74.99 $</text></border></td>
+                            <tr background="@value">
+                                <td><text>3</text></td>
+                                <td><text>Jeans</text></td>
+                                <td><text horizontalAlignment="right">74.99 $</text></td>
+                                <td><text horizontalAlignment="right">1</text></td>
+                                <td><text horizontalAlignment="right">74.99 $</text></td>
                             </tr>
                             }
                             @alternate on value {
-                            <tr>
-                                <td><border background="@value"><text>4</text></border></td>
-                                <td><border background="@value"><text>Hat</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">24.99 $</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">1</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">24.99 $</text></border></td>
+                            <tr background="@value">
+                                <td><text>4</text></td>
+                                <td><text>Hat</text></td>
+                                <td><text horizontalAlignment="right">24.99 $</text></td>
+                                <td><text horizontalAlignment="right">1</text></td>
+                                <td><text horizontalAlignment="right">24.99 $</text></td>
                             </tr>
                             }
                             @alternate on value {
-                            <tr>
-                                <td><border background="@value"><text>5</text></border></td>
-                                <td><border background="@value"><text>Watch</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">200.00 $</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">1</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">200.00 $</text></border></td>
+                            <tr background="@value">
+                                <td><text>5</text></td>
+                                <td><text>Watch</text></td>
+                                <td><text horizontalAlignment="right">200.00 $</text></td>
+                                <td><text horizontalAlignment="right">1</text></td>
+                                <td><text horizontalAlignment="right">200.00 $</text></td>
                             </tr>
                             }
                             @alternate on value {
-                            <tr>
-                                <td><border background="@value"><text>6</text></border></td>
-                                <td><border background="@value"><text>Exquisite Fountain Pen</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">300.00 $</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">1</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">300.00 $</text></border></td>
+                            <tr background="@value">
+                                <td><text>6</text></td>
+                                <td><text>Exquisite Fountain Pen</text></td>
+                                <td><text horizontalAlignment="right">300.00 $</text></td>
+                                <td><text horizontalAlignment="right">1</text></td>
+                                <td><text horizontalAlignment="right">300.00 $</text></td>
                             </tr>
                             }
                             @alternate on value {
-                            <tr>
-                                <td><border background="@value"><text>7</text></border></td>
-                                <td><border background="@value"><text>Leather-bound Notebook</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">70.00 $</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">3</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">210.00 $</text></border></td>
+                            <tr background="@value">
+                                <td><text>7</text></td>
+                                <td><text>Leather-bound Notebook</text></td>
+                                <td><text horizontalAlignment="right">70.00 $</text></td>
+                                <td><text horizontalAlignment="right">3</text></td>
+                                <td><text horizontalAlignment="right">210.00 $</text></td>
                             </tr>
                             }
                             @alternate on value {
-                            <tr>
-                                <td><border background="@value"><text>8</text></border></td>
-                                <td><border background="@value"><text>Vintage Vinyl Records</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">45.00 $</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">5</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">225.00 $</text></border></td>
+                            <tr background="@value">
+                                <td><text>8</text></td>
+                                <td><text>Vintage Vinyl Records</text></td>
+                                <td><text horizontalAlignment="right">45.00 $</text></td>
+                                <td><text horizontalAlignment="right">5</text></td>
+                                <td><text horizontalAlignment="right">225.00 $</text></td>
                             </tr>
                             }
                             @alternate on value {
-                            <tr>
-                                <td><border background="@value"><text>9</text></border></td>
-                                <td><border background="@value"><text>Retro Game Console</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">120.00 $</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">1</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">120.00 $</text></border></td>
+                            <tr background="@value">
+                                <td><text>9</text></td>
+                                <td><text>Retro Game Console</text></td>
+                                <td><text horizontalAlignment="right">120.00 $</text></td>
+                                <td><text horizontalAlignment="right">1</text></td>
+                                <td><text horizontalAlignment="right">120.00 $</text></td>
                             </tr>
                             }
                             @alternate on value {
-                            <tr>
-                                <td><border background="@value"><text>10</text></border></td>
-                                <td><border background="@value"><text>Handcrafted Chess Set</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">150.00 $</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">1</text></border></td>
-                                <td><border background="@value"><text horizontalAlignment="right">150.00 $</text></border></td>
+                            <tr background="@value">
+                                <td><text>10</text></td>
+                                <td><text>Handcrafted Chess Set</text></td>
+                                <td><text horizontalAlignment="right">150.00 $</text></td>
+                                <td><text horizontalAlignment="right">1</text></td>
+                                <td><text horizontalAlignment="right">150.00 $</text></td>
                             </tr>
                             }
                         </table>

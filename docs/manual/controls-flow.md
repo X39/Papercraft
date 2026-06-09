@@ -23,22 +23,24 @@ Use [`table`](controls-table.md) instead when the content is tabular rows and ce
 These fragments mirror `BlockControlTests`, `FlowControlTests` and `ColumnsControlTests`:
 
 ```xml
-<block background="#f8fafc" minHeight="12px" pageBreakAfter="true" padding="2px">
-    <text>Grouped content</text>
+<block background="#f8fafc" minHeight="12px" padding="2px">
+    <text fontsize="9">Grouped content</text>
 </block>
 
-<spacer height="8mm"/>
+<spacer height="4mm"/>
 
-<pageBreak/>
-
-<columns count="3" gap="7px" ruleThickness="2px" ruleColor="red">
-    <text>First item</text>
-    <text>Second item</text>
+<columns count="3" gap="7px" ruleThickness="2px" ruleColor="#dc2626">
+    <text fontsize="8">First item</text>
+    <text fontsize="8">Second item</text>
+    <text fontsize="8">Third item</text>
 </columns>
 ```
 
+![Rendered flow helper sample](../assets/samples/flow-block-spacer-columns.png)
+
 `block` and `columns` can contain normal controls.
 `spacer` and `pageBreak` are leaf controls and should not contain child controls.
+Use `<pageBreak/>`, `pageBreakBefore` or `pageBreakAfter` when a flow section should move to another page.
 
 ## Supported Controls
 

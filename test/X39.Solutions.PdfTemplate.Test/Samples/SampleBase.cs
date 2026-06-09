@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using X39.Solutions.Papercraft;
 using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Rendering.SkiaSharp;
 using X39.Solutions.PdfTemplate.Test.Mock;
@@ -12,9 +13,16 @@ public abstract class SampleBase : IAsyncDisposable
     private readonly List<ServiceProvider> _serviceProviders = new();
 
     public Generator CreateGenerator(params IFunction[] functions)
+        => CreateGenerator(
+            (builder) => builder.AddControl<MockControl>(),
+            functions);
+
+    public Generator CreateGenerator(Action<PdfTemplateServiceBuilder> configureServices, params IFunction[] functions)
     {
+        ArgumentNullException.ThrowIfNull(configureServices);
+
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddPdfTemplateService((builder) => builder.AddControl<MockControl>());
+        serviceCollection.AddPdfTemplateService(configureServices);
         foreach (var function in functions)
         {
             serviceCollection.AddSingleton<IFunction>(function);

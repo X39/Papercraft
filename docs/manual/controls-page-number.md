@@ -70,6 +70,8 @@ Use `suffix` for text after the final number.
 <pageNumber mode="CurrentTotal" prefix="Page " delimiter=" of "/>
 ```
 
+![Rendered page number footer sample](../assets/samples/page-number-footer.png)
+
 For a one-page document, this prints `Page 1 of 1`.
 
 Spaces are not added automatically.
@@ -142,11 +144,8 @@ and `verticalAlignment` attributes described in [Layout fundamentals](layout-fun
 ## Allowed Children
 
 `pageNumber` does not allow child controls or text content.
-Use it as a self-closing element:
-
-```xml
-<pageNumber mode="CurrentTotal" prefix="Page " delimiter=" of "/>
-```
+Use it as a self-closing element, such as
+`<pageNumber mode="CurrentTotal" prefix="Page " delimiter=" of "/>`.
 
 Put nearby labels in `prefix`, `delimiter` or `suffix`, or place separate `text` controls next to it in a footer,
 area or table cell.
