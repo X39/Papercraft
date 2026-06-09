@@ -37,8 +37,9 @@ Style nodes are the special case documented in [Styles](styles.md).
 ## A Control Is Unknown
 
 If the error says a control does not exist, check the element name first.
-Built-in controls are listed in [Controls](controls.md), and the compact attribute lookup is in
-[Quick reference](quick-reference.md).
+Built-in controls are listed in [Controls](controls.md), with focused pages for [Rich text](controls-rich-text.md),
+[Flow helpers](controls-flow.md), [Lists](controls-lists.md) and [Form and signing](controls-forms.md) controls.
+The compact attribute lookup is in [Quick reference](quick-reference.md).
 Optional QR and ZXing barcode controls require the package registration documented in
 [QR code control package](controls-qrcode.md) and [ZXing barcode control package](controls-zxing.md).
 
@@ -96,7 +97,8 @@ Each control accepts only the parameters implemented for that control.
 If an attribute seems to be accepted but has no visible effect, check the focused control page for that attribute.
 Do not treat ignored attributes as a general fallback behavior; unsupported attribute names are rejected.
 
-Check [Controls](controls.md) and [Quick reference](quick-reference.md) for supported attribute names.
+Check [Controls](controls.md), the focused control pages and [Quick reference](quick-reference.md) for supported
+attribute names.
 For package controls, use [QR code control package](controls-qrcode.md) or
 [ZXing barcode control package](controls-zxing.md).
 For shared spacing, clipping and alignment attributes, see [Layout fundamentals](layout-fundamentals.md).

@@ -249,8 +249,7 @@ Use alignment for small placement decisions:
 - Leave `Stretch` as the default when the control should use the normal available space.
 
 If content needs tabular columns, use [Table control](controls-table.md).
-If content should flow through newsletter-style columns, use the built-in `columns` control listed in
-[Quick reference](quick-reference.md#additional-built-in-controls).
+If content should flow through newsletter-style columns, use the built-in [`columns`](controls-flow.md) control.
 If fixed page coordinates matter, use [Areas](areas.md).
 
 

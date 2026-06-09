@@ -78,7 +78,7 @@ Use relative links so pages render correctly on GitHub Pages.
 Keep [Controls](controls.md) as the controls landing page and shared orientation point.
 Split detailed built-in control references into separate pages when each control is documented.
 
-Use this pattern for future control pages:
+Use this pattern for control pages:
 
 - one page for text,
 - one page for border and shared box styling,
@@ -91,7 +91,7 @@ Use this pattern for future control pages:
 - one page for flow helpers such as blocks, spacers, page breaks and columns,
 - one page for lists and list items,
 - one page for form-like or signing helpers such as checkboxes and signatures,
-- one optional-control page for QR and barcode packages.
+- separate optional-control pages for QR and ZXing barcode packages.
 
 Keep shared layout attributes in [Layout fundamentals](layout-fundamentals.md) and link to them from control pages.
 

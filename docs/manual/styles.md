@@ -84,9 +84,10 @@ A style cannot make an unsupported attribute valid.
 Use the focused control pages to check attribute names:
 [Text](controls-text.md), [Border](controls-border.md), [Line](controls-line.md),
 [Image](controls-image.md), [Page number](controls-page-number.md), [Table](controls-table.md) and
-[Chart](controls-chart.md).
-Use [Quick reference](quick-reference.md) for the compact attribute list, including newer built-in controls and
-registered optional controls.
+[Chart](controls-chart.md), plus [Rich text](controls-rich-text.md), [Flow helpers](controls-flow.md),
+[Lists](controls-lists.md), [Form and signing](controls-forms.md), [QR code](controls-qrcode.md) and
+[ZXing barcode](controls-zxing.md) controls.
+Use [Quick reference](quick-reference.md) for the compact attribute list.
 
 ## What Cannot Be Styled?
 
