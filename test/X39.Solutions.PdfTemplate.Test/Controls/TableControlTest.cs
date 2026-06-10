@@ -150,6 +150,32 @@ public class TableControlTest
     }
 
     [Fact]
+    public async Task UnbreakableTextInNarrowCellIsRenderedForClipping()
+    {
+        const string text = "thisdoesnotappearontheoutputdocumentviually";
+        var control = await $$"""
+                              <table>
+                                  <tr>
+                                      <td width="1*" background="red"></td>
+                                      <td width="2*" background="green"></td>
+                                      <td width="Auto" background="yellow"></td>
+                                      <td width="1cm" background="cyan"><text>{{text}}</text></td>
+                                      <td width="2cm" background="wheat"></td>
+                                  </tr>
+                              </table>
+                              """.ToControl<TableControl>();
+        var pageSize   = new Size(200, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+
+        mockCanvas.AssertState();
+        mockCanvas.AssertAnyDrawTextContains(text);
+    }
+
+    [Fact]
     public async Task RightAlignedContentIsNotClippedAway()
     {
         var control = await $$"""
