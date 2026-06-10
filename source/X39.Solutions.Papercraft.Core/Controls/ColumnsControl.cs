@@ -32,12 +32,6 @@ public sealed class ColumnsControl : AlignableContentControl
     public Length Gap { get; set; } = new(5F, ELengthUnit.Millimeters);
 
     /// <summary>
-    /// Parsed future balancing hint. Balancing is not implemented in this staged control.
-    /// </summary>
-    [Parameter]
-    public bool Balance { get; set; }
-
-    /// <summary>
     /// The thickness of vertical rules drawn between columns.
     /// </summary>
     [Parameter]

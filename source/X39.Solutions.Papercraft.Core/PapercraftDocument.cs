@@ -95,6 +95,10 @@ public sealed class PapercraftDocument
             case ClipCommand:
                 features.Add(RendererFeatures.Clipping);
                 break;
+            case LinkAnnotationCommand:
+                features.Add(RendererFeatures.LinkAnnotations);
+                features.Add(RendererFeatures.AbsolutePositioning);
+                break;
         }
     }
 }

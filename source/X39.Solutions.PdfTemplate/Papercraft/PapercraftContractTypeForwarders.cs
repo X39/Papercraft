@@ -39,6 +39,7 @@ using System.Runtime.CompilerServices;
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Display.DrawLineCommand))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Display.DrawRectangleCommand))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Display.DrawTextCommand))]
+[assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Display.LinkAnnotationCommand))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Display.PopStateCommand))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Display.PushStateCommand))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Display.TranslateCommand))]

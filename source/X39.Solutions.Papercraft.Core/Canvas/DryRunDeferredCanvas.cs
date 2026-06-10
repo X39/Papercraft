@@ -47,6 +47,10 @@ internal sealed class DryRunDeferredCanvas : IDeferredCanvas
     {
     }
 
+    public void DrawLinkAnnotation(string uri, Rectangle rectangle)
+    {
+    }
+
     public void DrawRect(Rectangle rectangle, Color color)
     {
     }

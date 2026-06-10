@@ -33,4 +33,22 @@ public static class CanvasExtensions
     {
         self.Clip(new Rectangle(x, y, width, height));
     }
+
+    /// <inheritdoc cref="IDrawableCanvas.DrawLinkAnnotation"/>
+    /// <param name="self">The <see cref="IDrawableCanvas"/> to operate on.</param>
+    /// <param name="uri">The target URI.</param>
+    /// <param name="x">The x-coordinate of the rectangle.</param>
+    /// <param name="y">The y-coordinate of the rectangle.</param>
+    /// <param name="width">The width of the rectangle.</param>
+    /// <param name="height">The height of the rectangle.</param>
+    public static void DrawLinkAnnotation(
+        this IDrawableCanvas self,
+        string uri,
+        float x,
+        float y,
+        float width,
+        float height)
+    {
+        self.DrawLinkAnnotation(uri, new Rectangle(x, y, width, height));
+    }
 }

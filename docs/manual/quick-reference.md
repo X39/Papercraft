@@ -51,7 +51,7 @@ For explanations and rendered examples, follow the linked control pages.
 | Rows and columns. | [`table`](controls-table.md), `th`, `tr`, `td` | `td width`, `td columnspan`, `padding`, `background`, `borderThickness`, `borderColor` |
 | Line, bar or pie chart. | [`chart`](controls-chart.md), `lineChart`, `barChart`, `pieChart`, `data` | `width`, `height`, `title`, chart-specific attributes |
 | Rich text, links and line breaks. | [`paragraph`, `span`, `br`, `hyperlink`](controls-rich-text.md) | text styling attributes, `decoration`, `href`, `underline` |
-| Flow grouping, space and page breaks. | [`block`, `spacer`, `pageBreak`, `columns`](controls-flow.md) | `background`, `minHeight`, `pageBreakBefore`, `width`, `height`, `count`, `gap` |
+| Flow grouping, space and page breaks. | [`block`, `spacer`, `pageBreak`, `columns`](controls-flow.md) | `background`, `minHeight`, `pageBreakBefore`, `pageBreakAfter`, `width`, `height`, `count`, `gap` |
 | Lists. | [`ul`, `ol`, `li`](controls-lists.md) | `marker`, `start`, `markerFormat`, `indent`, `markerWidth`, `itemSpacing` |
 | Checkboxes and signatures. | [`checkbox`, `signature`](controls-forms.md) | `checked`, `size`, `label`, signature line attributes |
 | QR codes. | Optional [`qrCode`](controls-qrcode.md) | `value`, `size`, `quietZone`, `errorCorrection`, colors |
@@ -151,14 +151,14 @@ pages.
 
 | Control | Use | Key attributes and children |
 |---------|-----|-----------------------------|
-| [`block`](controls-flow.md) | Group stacked controls and optional background/page-break behavior. | `background`, `minHeight`, `pageBreakBefore`, `pageBreakAfter`, `keepTogether`, shared attributes; contains normal controls. `keepTogether` is parsed as a future pagination hint. |
+| [`block`](controls-flow.md) | Group stacked controls with keep-together behavior and optional background/page-break behavior. | `background`, `minHeight`, `pageBreakBefore`, `pageBreakAfter`, shared attributes; contains normal controls. Oversized blocks render in normal flow. |
 | [`spacer`](controls-flow.md) | Reserve empty space without drawing. | `width`, `height`, shared alignment attributes. |
 | [`pageBreak`](controls-flow.md) | Advance body flow to the next page when not already at a page boundary. | Shared attributes. |
-| [`columns`](controls-flow.md) | Flow whole child controls through multiple columns. | `count`, `gap`, `balance`, `ruleThickness` or `rule-thickness`, `ruleColor` or `rule-color`; `balance` is parsed as a future layout hint. |
+| [`columns`](controls-flow.md) | Flow whole child controls through multiple columns. | `count`, `gap`, `ruleThickness` or `rule-thickness`, `ruleColor` or `rule-color`. |
 | [`paragraph`](controls-rich-text.md) | Rich text made from inline fragments. | Text styling attributes; contains `span` and `br`. |
 | [`span`](controls-rich-text.md) | Inline text fragment inside `paragraph`. | `text` or content, plus text styling overrides. |
 | [`br`](controls-rich-text.md) | Explicit line break inside `paragraph`. | No control-specific attributes. |
-| [`hyperlink`](controls-rich-text.md) | Visual hyperlink-style text. | `href`, `text` or content, `underline`, `decoration`, plus text styling attributes. |
+| [`hyperlink`](controls-rich-text.md) | Hyperlink-style text with clickable PDF link annotations. | `href`, `text` or content, `underline`, `decoration`, plus text styling attributes. Raster output keeps the visual text only. |
 | [`ul`, `ol`, `li`](controls-lists.md) | Unordered and ordered lists. | `ul marker`; `ol start`, `markerFormat`; `indent`, `markerWidth`, `itemSpacing`; list children must be `li`. |
 | [`checkbox`](controls-forms.md) | Checkbox mark with plain label or child content. | `checked`, `size`, `label` or content, `gap`, `strokeColor`, `fill`, `checkColor`, `strokeThickness`. |
 | [`signature`](controls-forms.md) | Signature line with optional helper text. | `height`, `lineWidth`, `lineThickness`, `lineColor`, `label`, `subtext`, `textPlacement`, plus text styling attributes. |

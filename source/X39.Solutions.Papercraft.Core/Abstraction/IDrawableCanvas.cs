@@ -59,6 +59,13 @@ public interface IDrawableCanvas
     void DrawText(TextStyle textStyle, float dpi, string text, float x, float y);
 
     /// <summary>
+    ///     Adds a clickable URI link annotation over the specified rectangle.
+    /// </summary>
+    /// <param name="uri">The target URI.</param>
+    /// <param name="rectangle">The clickable rectangle.</param>
+    void DrawLinkAnnotation(string uri, Rectangle rectangle);
+
+    /// <summary>
     ///     Draws a rectangle on the canvas at the coordinates specified
     ///     by <see cref="Rectangle.Left"/> and <see cref="Rectangle.Top"/>.
     /// </summary>

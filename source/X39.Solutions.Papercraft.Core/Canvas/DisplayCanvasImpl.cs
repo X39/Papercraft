@@ -44,6 +44,13 @@ internal sealed class DisplayCanvasImpl : IImmediateCanvas
         _displayList.Add(new DrawTextCommand(ToDisplay(textStyle), dpi, text, x, y));
     }
 
+    public void DrawLinkAnnotation(string uri, Rectangle rectangle)
+    {
+        if (string.IsNullOrWhiteSpace(uri) || rectangle is { Width: <= 0F } or { Height: <= 0F })
+            return;
+        _displayList.Add(new LinkAnnotationCommand(uri, ToDisplay(rectangle)));
+    }
+
     public void DrawRect(Rectangle rectangle, Color color)
     {
         if (color.Alpha is 0)

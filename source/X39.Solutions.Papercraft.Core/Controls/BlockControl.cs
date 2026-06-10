@@ -15,7 +15,7 @@ public sealed class BlockControl : AlignableContentControl
     private const float PageBoundaryTolerance = 0.001F;
 
     private readonly List<Size> _arrangedChildSizes = new();
-    private float _pageBreakBeforeAdditionalHeight;
+    private float _preRenderAdditionalHeight;
 
     /// <summary>
     /// The optional background fill for the block.
@@ -40,12 +40,6 @@ public sealed class BlockControl : AlignableContentControl
     /// </summary>
     [Parameter]
     public bool PageBreakAfter { get; set; }
-
-    /// <summary>
-    /// Parsed future pagination hint. Full keep-together layout behavior is not implemented here.
-    /// </summary>
-    [Parameter]
-    public bool KeepTogether { get; set; }
 
     /// <inheritdoc />
     public override bool CanAdd(Type type) => true;
@@ -75,17 +69,27 @@ public sealed class BlockControl : AlignableContentControl
     protected override Size PreRender(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
     {
         var baseAdditionalSize = base.PreRender(canvas, dpi, parentSize, cultureInfo);
-        _pageBreakBeforeAdditionalHeight = CalculatePageBreakAdditionalHeight(
+        _preRenderAdditionalHeight = CalculatePageBreakAdditionalHeight(
             canvas,
             parentSize.Height,
             PageBreakBefore);
-        if (_pageBreakBeforeAdditionalHeight > 0F)
-            canvas.Translate(0F, _pageBreakBeforeAdditionalHeight);
+        if (_preRenderAdditionalHeight > 0F)
+            canvas.Translate(0F, _preRenderAdditionalHeight);
+
+        var keepTogetherAdditionalHeight = CalculateKeepTogetherAdditionalHeight(
+            canvas,
+            parentSize.Height,
+            ArrangementOuter.Height);
+        if (keepTogetherAdditionalHeight > 0F)
+        {
+            canvas.Translate(0F, keepTogetherAdditionalHeight);
+            _preRenderAdditionalHeight += keepTogetherAdditionalHeight;
+        }
 
         if (!Clip)
             return baseAdditionalSize with
             {
-                Height = baseAdditionalSize.Height + _pageBreakBeforeAdditionalHeight,
+                Height = baseAdditionalSize.Height + _preRenderAdditionalHeight,
             };
 
         var dryRunCanvas = DryRunDeferredCanvas.From(canvas);
@@ -99,7 +103,7 @@ public sealed class BlockControl : AlignableContentControl
 
         return new Size(
             Math.Max(baseAdditionalSize.Width, contentAdditionalSize.Width),
-            baseAdditionalSize.Height + _pageBreakBeforeAdditionalHeight + contentAdditionalSize.Height);
+            baseAdditionalSize.Height + _preRenderAdditionalHeight + contentAdditionalSize.Height);
     }
 
     /// <inheritdoc />
@@ -113,7 +117,7 @@ public sealed class BlockControl : AlignableContentControl
             renderBackground: true);
         return new Size(
             contentAdditionalSize.Width,
-            _pageBreakBeforeAdditionalHeight + contentAdditionalSize.Height);
+            _preRenderAdditionalHeight + contentAdditionalSize.Height);
     }
 
     private Size MeasureOrArrangeChildren(
@@ -195,6 +199,27 @@ public sealed class BlockControl : AlignableContentControl
 
         var usedHeight = canvas.GetUsedPageHeight(pageHeight);
         if (usedHeight <= PageBoundaryTolerance)
+            return 0F;
+
+        var remainingPageHeight = canvas.GetRemainingPageHeight(pageHeight);
+        return remainingPageHeight <= PageBoundaryTolerance
+            ? 0F
+            : remainingPageHeight;
+    }
+
+    private static float CalculateKeepTogetherAdditionalHeight(
+        IDeferredCanvas canvas,
+        float pageHeight,
+        float blockHeight)
+    {
+        if (pageHeight <= 0F || blockHeight <= 0F || blockHeight > pageHeight + PageBoundaryTolerance)
+            return 0F;
+
+        var usedHeight = canvas.GetUsedPageHeight(pageHeight);
+        if (usedHeight <= PageBoundaryTolerance)
+            return 0F;
+
+        if (usedHeight + blockHeight <= pageHeight + PageBoundaryTolerance)
             return 0F;
 
         var remainingPageHeight = canvas.GetRemainingPageHeight(pageHeight);

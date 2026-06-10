@@ -6,6 +6,7 @@ using X39.Solutions.Papercraft;
 using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Controls;
 using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Exceptions;
 using X39.Solutions.PdfTemplate.Test.Mock;
 
 namespace X39.Solutions.PdfTemplate.Test.Controls;
@@ -24,7 +25,6 @@ public class BlockControlTests
                                 minHeight="12px"
                                 pageBreakBefore="true"
                                 pageBreakAfter="true"
-                                keepTogether="true"
                                 padding="2px"
                                 margin="3px"
                                 clip="false"
@@ -38,13 +38,26 @@ public class BlockControlTests
         Assert.Equal(new Length(12F, ELengthUnit.Pixel), control.MinHeight);
         Assert.True(control.PageBreakBefore);
         Assert.True(control.PageBreakAfter);
-        Assert.True(control.KeepTogether);
         Assert.Equal(new Thickness(2F), control.Padding);
         Assert.Equal(new Thickness(3F), control.Margin);
         Assert.False(control.Clip);
         Assert.Equal(EHorizontalAlignment.Right, control.HorizontalAlignment);
         Assert.Equal(EVerticalAlignment.Bottom, control.VerticalAlignment);
         Assert.Single(control.Children);
+    }
+
+    [Fact]
+    public async Task XmlRejectsRemovedKeepTogetherAttribute()
+    {
+        var exception = await Assert.ThrowsAsync<FailedToCreateControlException>(
+            async () => await """
+                              <block keepTogether="true">
+                                  <mock width="10px" height="20px"/>
+                              </block>
+                              """.ToControl<BlockControl>());
+
+        var parameterException = Assert.IsType<ControlParameterIsNotExistingException>(exception.InnerException);
+        Assert.Contains("KEEPTOGETHER", parameterException.MissingParameters);
     }
 
     [Fact]
@@ -157,6 +170,44 @@ public class BlockControlTests
         canvas.AssertDrawLine(
             (Colors.Black, 1F, 0F, 0F, 1F, 1F),
             (Colors.Magenta, 1F, 0F, 100F, 1F, 101F));
+    }
+
+    [Fact]
+    public void BlockThatFitsEmptyPageMovesAsWholeWhenRemainingPageSpaceIsInsufficient()
+    {
+        var control = CreateBlock();
+        control.Add(new DrawingControl(new Size(10F, 20F), Colors.Black));
+        control.Add(new DrawingControl(new Size(10F, 20F), Colors.Magenta));
+        var canvas = CreateCanvas();
+        canvas.Translate(0F, 70F);
+
+        control.Arrange(Dpi, PageSize, PageSize, PageSize, CultureInfo.InvariantCulture);
+        var additionalSize = control.Render(canvas, Dpi, PageSize, CultureInfo.InvariantCulture);
+
+        Assert.Equal(new Size(0F, 30F), additionalSize);
+        Assert.Equal(new Point(0F, 70F), canvas.Translation);
+        canvas.AssertDrawLine(
+            (Colors.Black, 1F, 0F, 100F, 1F, 101F),
+            (Colors.Magenta, 1F, 0F, 120F, 1F, 121F));
+    }
+
+    [Fact]
+    public void OversizedBlockRendersWithoutKeepTogetherPageAdvance()
+    {
+        var control = CreateBlock();
+        control.Add(new DrawingControl(new Size(10F, 60F), Colors.Black));
+        control.Add(new DrawingControl(new Size(10F, 60F), Colors.Magenta));
+        var canvas = CreateCanvas();
+        canvas.Translate(0F, 70F);
+
+        control.Arrange(Dpi, PageSize, PageSize, PageSize, CultureInfo.InvariantCulture);
+        var additionalSize = control.Render(canvas, Dpi, PageSize, CultureInfo.InvariantCulture);
+
+        Assert.Equal(Size.Zero, additionalSize);
+        Assert.Equal(new Point(0F, 70F), canvas.Translation);
+        canvas.AssertDrawLine(
+            (Colors.Black, 1F, 0F, 70F, 1F, 71F),
+            (Colors.Magenta, 1F, 0F, 130F, 1F, 131F));
     }
 
     [Fact]

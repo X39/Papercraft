@@ -84,6 +84,9 @@ public sealed class SkiaSharpDisplayListRenderer
                     text.X,
                     text.Y);
                 break;
+            case LinkAnnotationCommand link:
+                canvas.DrawUrlAnnotation(ToSkRect(link.Rectangle), link.Uri);
+                break;
             case DrawImageCommand image:
                 DrawImage(canvas, image);
                 break;

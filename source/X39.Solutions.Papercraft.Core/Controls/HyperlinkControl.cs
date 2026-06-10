@@ -11,6 +11,8 @@ namespace X39.Solutions.Papercraft.Controls;
 [Control(Constants.ControlsNamespace, "hyperlink")]
 public sealed class HyperlinkControl : TextBaseControl
 {
+    private const float PageBoundaryTolerance = 0.001F;
+
     private bool _underline = true;
 
     /// <summary>
@@ -59,6 +61,65 @@ public sealed class HyperlinkControl : TextBaseControl
     protected override Size DoRender(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
     {
         var text = GetText().Trim();
-        return RenderText(canvas, dpi, text, parentSize.Height);
+        var additionalSize = RenderText(canvas, dpi, text, parentSize.Height);
+        RenderLinkAnnotations(canvas, dpi, text, parentSize.Height);
+        return additionalSize;
+    }
+
+    private void RenderLinkAnnotations(IDeferredCanvas canvas, float dpi, string text, float pageHeight)
+    {
+        var uri = Href.Trim();
+        if (string.IsNullOrWhiteSpace(uri)
+            || TextService is not ITextLayoutService textLayoutService)
+            return;
+
+        var layout = textLayoutService.Layout(TextStyle, dpi, text.AsSpan(), ArrangementInner.Width);
+        var additionalHeight = 0F;
+        foreach (var line in layout)
+        {
+            var lineAdditionalHeight = CalculateLinePaginationAdditionalHeight(
+                canvas.Translation.Y + line.Top + additionalHeight,
+                line.Height,
+                pageHeight);
+            additionalHeight += lineAdditionalHeight;
+
+            if (string.IsNullOrWhiteSpace(line.Text))
+                continue;
+
+            canvas.DrawLinkAnnotation(
+                uri,
+                new Rectangle(
+                    line.X,
+                    line.Top + additionalHeight,
+                    line.Width,
+                    line.Height));
+        }
+    }
+
+    private static float CalculateLinePaginationAdditionalHeight(
+        float absoluteLineTop,
+        float lineHeight,
+        float pageHeight)
+    {
+        if (pageHeight <= 0F || lineHeight <= 0F || lineHeight > pageHeight + PageBoundaryTolerance)
+            return 0F;
+
+        var usedHeight = GetUsedPageHeight(absoluteLineTop, pageHeight);
+        if (usedHeight <= PageBoundaryTolerance)
+            return 0F;
+
+        if (usedHeight + lineHeight <= pageHeight + PageBoundaryTolerance)
+            return 0F;
+
+        var remainingPageHeight = pageHeight - usedHeight;
+        return remainingPageHeight <= PageBoundaryTolerance
+            ? 0F
+            : remainingPageHeight;
+    }
+
+    private static float GetUsedPageHeight(float y, float pageHeight)
+    {
+        var multiplier = (int)(y / pageHeight);
+        return y - multiplier * pageHeight;
     }
 }

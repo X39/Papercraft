@@ -34,6 +34,13 @@ internal sealed class ImmediateCanvasImpl : IImmediateCanvas
     public void DrawText(TextStyle textStyle, float dpi, string text, float x, float y)
         => SkiaTextDecorationRenderer.DrawText(_canvas, _paintCache, textStyle, dpi, text, x, y);
 
+    public void DrawLinkAnnotation(string uri, Rectangle rectangle)
+    {
+        if (string.IsNullOrWhiteSpace(uri) || rectangle is { Width: <= 0F } or { Height: <= 0F })
+            return;
+        _canvas.DrawUrlAnnotation(rectangle.ToSkRect(), uri);
+    }
+
     public void DrawRect(Rectangle rectangle, Color color)
         => _canvas.DrawRect(rectangle.ToSkRect(), _paintCache.Get(color));
 

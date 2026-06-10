@@ -11,7 +11,7 @@ Use `hyperlink` when a single link-style text control is enough.
 ## When Should I Use This?
 
 Use `paragraph` when a line needs mixed text styling, such as a normal label followed by a bold value.
-Use `hyperlink` when the template should draw link-styled text with a target stored in `href`.
+Use `hyperlink` when the template should draw link-styled text and create a clickable PDF link from `href`.
 
 Use [`text`](controls-text.md) instead when all words in the control share one style.
 
@@ -45,8 +45,8 @@ This fragment mirrors `HyperlinkControlTests`:
 
 ![Rendered hyperlink sample](../assets/samples/rich-text-hyperlink.png)
 
-The current renderer draws the visible text and optional underline.
-The `href` value is kept as control data; it does not create a PDF navigation annotation by itself.
+PDF output creates clickable URI annotations for the visible link text. Raster output keeps the visible text and optional
+underline, but cannot carry clickable PDF annotations.
 
 ## Supported Controls
 
@@ -55,7 +55,7 @@ The `href` value is kept as control data; it does not create a PDF navigation an
 | `paragraph` | `span`, `br` | Rich text paragraph with inline runs and explicit line breaks. |
 | `span` | None | Inline text run inside `paragraph`. |
 | `br` | None | Explicit line break inside `paragraph`. |
-| `hyperlink` | None | Link-style text with optional underline and an `href` value. |
+| `hyperlink` | None | Link-style text with optional underline and a clickable PDF `href` target. |
 
 ## Supported Attributes
 
@@ -73,7 +73,7 @@ For shared `margin`, `padding`, `clip`, `horizontalAlignment` and `verticalAlign
 
 - Putting normal block controls inside `paragraph`. Use `span` and `br` only.
 - Expecting `span` or `br` to render on their own outside `paragraph`.
-- Expecting `href` to create a clickable PDF link. The current control renders visual link text.
+- Expecting raster image output to contain clickable links. Only PDF output carries link annotations.
 - Using `paragraph` for simple text that can be handled by [`text`](controls-text.md).
 
 Previous: [Text control](controls-text.md) | [Controls](controls.md) | Next: [Flow helper controls](controls-flow.md)

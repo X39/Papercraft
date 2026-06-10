@@ -2,6 +2,7 @@ using System.Globalization;
 using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Controls;
 using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Exceptions;
 using X39.Solutions.PdfTemplate.Test.Mock;
 
 namespace X39.Solutions.PdfTemplate.Test.Controls;
@@ -18,7 +19,6 @@ public class ColumnsControlTests
                             <columns
                                 count="3"
                                 gap="7px"
-                                balance="true"
                                 ruleThickness="2px"
                                 ruleColor="red"
                                 padding="1px"
@@ -32,7 +32,6 @@ public class ColumnsControlTests
 
         Assert.Equal(3, control.ColumnCount);
         Assert.Equal(new Length(7F, ELengthUnit.Pixel), control.Gap);
-        Assert.True(control.Balance);
         Assert.Equal(new Length(2F, ELengthUnit.Pixel), control.RuleThickness);
         Assert.Equal(Colors.Red, control.RuleColor);
         Assert.Equal(new Thickness(1F), control.Padding);
@@ -41,6 +40,20 @@ public class ColumnsControlTests
         Assert.Equal(EHorizontalAlignment.Right, control.HorizontalAlignment);
         Assert.Equal(EVerticalAlignment.Bottom, control.VerticalAlignment);
         Assert.IsType<MockControl>(Assert.Single(control.Children));
+    }
+
+    [Fact]
+    public async Task XmlRejectsRemovedBalanceAttribute()
+    {
+        var exception = await Assert.ThrowsAsync<FailedToCreateControlException>(
+            async () => await """
+                              <columns balance="true">
+                                  <mock width="10px" height="20px"/>
+                              </columns>
+                              """.ToControl<ColumnsControl>());
+
+        var parameterException = Assert.IsType<ControlParameterIsNotExistingException>(exception.InnerException);
+        Assert.Contains("BALANCE", parameterException.MissingParameters);
     }
 
     [Fact]

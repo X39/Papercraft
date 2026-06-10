@@ -76,6 +76,11 @@ public static class RendererFeatures
     public const string AbsolutePositioning = "layout.absolute-positioning";
 
     /// <summary>
+    /// Clickable link annotation support.
+    /// </summary>
+    public const string LinkAnnotations = "pdf.link-annotations";
+
+    /// <summary>
     /// Gets the feature name for a render output kind.
     /// </summary>
     /// <param name="outputKind">The render output kind.</param>

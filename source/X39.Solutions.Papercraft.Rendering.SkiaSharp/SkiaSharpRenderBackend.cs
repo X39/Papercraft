@@ -26,6 +26,7 @@ public sealed class SkiaSharpRenderBackend : IPapercraftRenderBackend
             [RendererFeatures.Fonts] = RendererSupportLevel.Supported,
             [RendererFeatures.Color] = RendererSupportLevel.Supported,
             [RendererFeatures.AbsolutePositioning] = RendererSupportLevel.Supported,
+            [RendererFeatures.LinkAnnotations] = RendererSupportLevel.Supported,
         },
         "Default Papercraft backend. Supports PDF, single-page PNG stream output and page-by-page PNG raster output through SkiaSharp.");
 
@@ -58,6 +59,22 @@ public sealed class SkiaSharpRenderBackend : IPapercraftRenderBackend
         {
             cancellationToken.ThrowIfCancellationRequested();
             var validation = Capabilities.ValidateTarget(target);
+            if (target.OutputKind is RendererOutputKind.RasterImage
+                && document.FeatureUses.Any((q) => q.Feature == RendererFeatures.LinkAnnotations))
+            {
+                validation = RenderValidationResult.Combine(
+                    validation,
+                    new RenderValidationResult(
+                        new[]
+                        {
+                            new RenderDiagnostic(
+                                RenderDiagnosticCodes.DegradedFeature,
+                                RendererSupportLevel.Degraded,
+                                RendererFeatures.LinkAnnotations,
+                                $"Renderer '{Capabilities.DisplayName}' ignores clickable link annotations for raster image output.",
+                                "Raster image output preserves the visible hyperlink text but cannot carry PDF URI annotations."),
+                        }));
+            }
             PapercraftActivity.SetValidation(activity, validation);
             return ValueTask.FromResult(validation);
         }

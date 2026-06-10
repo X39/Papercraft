@@ -86,6 +86,14 @@ internal sealed class DeferredCanvasImpl : IDeferredCanvas
         _drawActions.Add((canvas) => canvas.DrawText(textStyle, dpi, text, x, y));
     }
 
+    public void DrawLinkAnnotation(string uri, Rectangle rectangle)
+    {
+        if (string.IsNullOrWhiteSpace(uri) || rectangle is { Width: <= 0F } or { Height: <= 0F })
+            return;
+        _displayList.Add(new LinkAnnotationCommand(uri, ToDisplay(rectangle)));
+        _drawActions.Add((canvas) => canvas.DrawLinkAnnotation(uri, rectangle));
+    }
+
     public void DrawImage(byte[] bytes, Rectangle rectangle)
     {
         _displayList.Add(new DrawImageCommand(bytes, ToDisplay(rectangle)));

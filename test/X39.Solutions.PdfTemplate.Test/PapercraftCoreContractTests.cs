@@ -146,6 +146,7 @@ public sealed class PapercraftCoreContractTests
             new object[] { typeof(DisplayTextStyle) },
             new object[] { typeof(DisplayFont) },
             new object[] { typeof(DisplayFontStyle) },
+            new object[] { typeof(LinkAnnotationCommand) },
             new object[] { typeof(PapercraftDocument) },
             new object[] { typeof(PapercraftPage) },
             new object[] { typeof(PapercraftGenerator) },
@@ -303,6 +304,7 @@ public sealed class PapercraftCoreContractTests
         Assert.Contains(featureUses, (q) => q.Feature == RendererFeatures.Transparency);
         Assert.Contains(featureUses, (q) => q.Feature == RendererFeatures.Fonts);
         Assert.Contains(featureUses, (q) => q.Feature == RendererFeatures.Images);
+        Assert.Contains(featureUses, (q) => q.Feature == RendererFeatures.LinkAnnotations);
         Assert.All(featureUses, (q) => Assert.Null(q.Location));
     }
 
@@ -352,10 +354,11 @@ public sealed class PapercraftCoreContractTests
         list.Add(new ClipCommand(new DisplayRectangle(3, 4, 5, 6)));
         list.Add(new DrawLineCommand(new DisplayColor(7, 8, 9), 1, 2, 3, 4, 5));
         list.Add(new DrawTextCommand(textStyle, 96, "text", 10, 20));
+        list.Add(new LinkAnnotationCommand("https://example.test", new DisplayRectangle(2, 3, 4, 5)));
         list.Add(new DrawRectangleCommand(new DisplayRectangle(1, 2, 3, 4), new DisplayColor(10, 11, 12)));
         list.Add(new DrawImageCommand(bytes, new DisplayRectangle(5, 6, 7, 8)));
 
-        Assert.Equal(6, list.Commands.Count);
+        Assert.Equal(7, list.Commands.Count);
         Assert.All(list.Commands, (command) => Assert.Equal("X39.Solutions.Papercraft.Core", command.GetType().Assembly.GetName().Name));
     }
 
@@ -374,6 +377,7 @@ public sealed class PapercraftCoreContractTests
                 0,
                 0));
         displayList.Add(new DrawImageCommand(new byte[] { 1, 2, 3 }, new DisplayRectangle(0, 0, 1, 1)));
+        displayList.Add(new LinkAnnotationCommand("https://example.test", new DisplayRectangle(0, 0, 1, 1)));
 
         return new PapercraftDocument(
             new[]

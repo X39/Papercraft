@@ -16,6 +16,10 @@ public partial class DeferredCanvasMock : IDeferredCanvas, IImmediateCanvas
         float X,
         float Y);
 
+    private record struct LinkAnnotationCall(
+        string Uri,
+        Rectangle Rectangle);
+
     private record struct DrawLineCall(
         Color Color,
         float Thickness,
@@ -69,6 +73,7 @@ public partial class DeferredCanvasMock : IDeferredCanvas, IImmediateCanvas
 
     public int DrawLineCount => _drawLineCalls.Count;
     public int DrawTextCount => _drawTextCalls.Count;
+    public int LinkAnnotationCount => _linkAnnotationCalls.Count;
     public int DrawRectCount => _drawRectCalls.Count;
     public int DrawBitmapCount => _drawBitmapCalls.Count;
     public int ClipCount     => _clipCalls.Count;
@@ -76,6 +81,7 @@ public partial class DeferredCanvasMock : IDeferredCanvas, IImmediateCanvas
     private readonly Stack<State>       _stateStack    = new(new State().MakeEnumerable());
     private readonly List<DrawLineCall> _drawLineCalls = new();
     private readonly List<DrawTextCall> _drawTextCalls = new();
+    private readonly List<LinkAnnotationCall> _linkAnnotationCalls = new();
     private readonly List<DrawRectCall> _drawRectCalls = new();
     private readonly List<DrawBitmapCall> _drawBitmapCalls = new();
     private readonly List<Rectangle>    _clipCalls     = new();
@@ -136,6 +142,12 @@ public partial class DeferredCanvasMock : IDeferredCanvas, IImmediateCanvas
                 text,
                 x + Translation.X,
                 y + Translation.Y));
+    }
+
+    public void DrawLinkAnnotation(string uri, Rectangle rectangle)
+    {
+        rectangle += Translation;
+        _linkAnnotationCalls.Add(new LinkAnnotationCall(uri, rectangle));
     }
 
     public void DrawRect(Rectangle rectangle, Color color)
@@ -214,6 +226,27 @@ public partial class DeferredCanvasMock
         foreach (var (actual, callExpected) in zipped)
         {
             var expected = new DrawTextCall(callExpected.textStyle, callExpected.text, callExpected.x, callExpected.y);
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [StackTraceHidden]
+    public void AssertLinkAnnotation(string uri, Rectangle rectangle)
+    {
+        Assert.NotEmpty(_linkAnnotationCalls);
+        var actual = _linkAnnotationCalls.First();
+        var expected = new LinkAnnotationCall(uri, rectangle);
+        Assert.Equal(expected, actual);
+    }
+
+    [StackTraceHidden]
+    public void AssertLinkAnnotation(params (string uri, Rectangle rectangle)[] linkAnnotationCalls)
+    {
+        Assert.Equal(linkAnnotationCalls.Length, _linkAnnotationCalls.Count);
+        var zipped = _linkAnnotationCalls.Zip(linkAnnotationCalls);
+        foreach (var (actual, callExpected) in zipped)
+        {
+            var expected = new LinkAnnotationCall(callExpected.uri, callExpected.rectangle);
             Assert.Equal(expected, actual);
         }
     }
