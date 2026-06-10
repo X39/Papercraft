@@ -46,6 +46,32 @@ public class TextControlTests : IDisposable
         mock.AssertAllClip((rectangle) => rectangle is {Width: > 0, Height: > 0});
     }
 
+    [Fact]
+    public void RenderMovesLineToNextPageWhenLineWouldBePartiallyClipped()
+    {
+        var pageBounds = new Size(100, 100);
+        var canvas = new DeferredCanvasMock{ActualPageSize = pageBounds, PageSize = pageBounds};
+        var control = new TextControl(new FixedTextLayoutService())
+        {
+            Text = "first\nsecond",
+            HorizontalAlignment = EHorizontalAlignment.Left,
+            VerticalAlignment = EVerticalAlignment.Top,
+        };
+        var textStyle = control.GetTextStyle();
+        canvas.Translate(new Point(0F, 95F));
+
+        control.Measure(90, pageBounds, pageBounds, pageBounds, CultureInfo.InvariantCulture);
+        control.Arrange(90, pageBounds, pageBounds, pageBounds, CultureInfo.InvariantCulture);
+        var additionalSize = control.Render(canvas, 90, pageBounds, CultureInfo.InvariantCulture);
+
+        Assert.Equal(new Size(0F, 5F), additionalSize);
+        canvas.AssertState();
+        canvas.AssertClip(new Rectangle(0F, 95F, 10F, 25F));
+        canvas.AssertDrawText(
+            (textStyle, "first", 0F, 108F),
+            (textStyle, "second", 0F, 118F));
+    }
+
     [Theory]
     [InlineData("underline", TextDecoration.Underline)]
     [InlineData("strikeThrough", TextDecoration.StrikeThrough)]

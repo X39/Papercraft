@@ -1,5 +1,6 @@
 using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Attributes;
+using X39.Solutions.Papercraft.Canvas;
 using X39.Solutions.Papercraft.Controls.Base;
 using X39.Solutions.Papercraft.Data;
 
@@ -103,6 +104,26 @@ public sealed class TableCellControl : AlignableContentControl
     }
 
     /// <inheritdoc />
+    protected override Size PreRender(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
+    {
+        var baseAdditionalSize = base.PreRender(canvas, dpi, parentSize, cultureInfo);
+        if (!Clip)
+            return baseAdditionalSize;
+
+        var dryRunCanvas = DryRunDeferredCanvas.From(canvas);
+        dryRunCanvas.Translate(ArrangementInner);
+        var contentAdditionalSize = RenderChildren(
+            dryRunCanvas,
+            dpi,
+            parentSize,
+            cultureInfo);
+
+        return new Size(
+            Math.Max(baseAdditionalSize.Width, contentAdditionalSize.Width),
+            baseAdditionalSize.Height + contentAdditionalSize.Height);
+    }
+
+    /// <inheritdoc />
     protected override Size DoRender(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
     {
         TableBoxStyle.Draw(
@@ -115,6 +136,15 @@ public sealed class TableCellControl : AlignableContentControl
             parentSize,
             dpi);
 
+        return RenderChildren(canvas, dpi, parentSize, cultureInfo);
+    }
+
+    private Size RenderChildren(
+        IDeferredCanvas canvas,
+        float dpi,
+        in Size parentSize,
+        CultureInfo cultureInfo)
+    {
         var border = BorderThickness.ToRectangle(parentSize, dpi);
         var additionalWidth  = 0F;
         var additionalHeight = 0F;
@@ -126,7 +156,7 @@ public sealed class TableCellControl : AlignableContentControl
                 var (width, height) =  child.Render(canvas, dpi, parentSize, cultureInfo);
                 additionalWidth     += width;
                 additionalHeight    += height;
-                canvas.Translate(0, childHeight);
+                canvas.Translate(0, childHeight + height);
             }
         }
         return new Size(additionalWidth, additionalHeight);

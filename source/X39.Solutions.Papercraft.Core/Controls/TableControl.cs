@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Attributes;
+using X39.Solutions.Papercraft.Canvas;
 using X39.Solutions.Papercraft.Controls.Base;
 using X39.Solutions.Papercraft.Data;
 
@@ -266,9 +267,9 @@ public sealed class TableControl : AlignableContentControl
     /// <inheritdoc />
     protected override Size PreRender(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
     {
-        using var state = canvas.CreateState();
-        canvas.Translate(ArrangementInner);
-        return RenderTable(canvas, dpi, parentSize, cultureInfo, renderControls: false);
+        var dryRunCanvas = DryRunDeferredCanvas.From(canvas);
+        dryRunCanvas.Translate(ArrangementInner);
+        return RenderTable(dryRunCanvas, dpi, parentSize, cultureInfo, renderControls: true);
     }
 
     /// <inheritdoc />

@@ -1,5 +1,6 @@
 using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Attributes;
+using X39.Solutions.Papercraft.Canvas;
 using X39.Solutions.Papercraft.Controls.Base;
 using X39.Solutions.Papercraft.Data;
 
@@ -172,17 +173,54 @@ public abstract class TableRowControlBase : AlignableContentControl
     }
 
     /// <inheritdoc />
-    protected override Size DoRender(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
+    protected override Size PreRender(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
     {
-        TableBoxStyle.Draw(
-            canvas,
-            Arrangement,
-            ArrangementInner,
-            Background,
-            BorderThickness,
-            BorderColor,
+        var baseAdditionalSize = base.PreRender(canvas, dpi, parentSize, cultureInfo);
+        if (!Clip)
+            return baseAdditionalSize;
+
+        var dryRunCanvas = DryRunDeferredCanvas.From(canvas);
+        dryRunCanvas.Translate(ArrangementInner);
+        var contentAdditionalSize = RenderCells(
+            dryRunCanvas,
+            dpi,
             parentSize,
-            dpi);
+            cultureInfo,
+            renderBox: false);
+
+        return new Size(
+            Math.Max(baseAdditionalSize.Width, contentAdditionalSize.Width),
+            baseAdditionalSize.Height + contentAdditionalSize.Height);
+    }
+
+    /// <inheritdoc />
+    protected override Size DoRender(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
+        => RenderCells(
+            canvas,
+            dpi,
+            parentSize,
+            cultureInfo,
+            renderBox: true);
+
+    private Size RenderCells(
+        IDeferredCanvas canvas,
+        float dpi,
+        in Size parentSize,
+        CultureInfo cultureInfo,
+        bool renderBox)
+    {
+        if (renderBox)
+        {
+            TableBoxStyle.Draw(
+                canvas,
+                Arrangement,
+                ArrangementInner,
+                Background,
+                BorderThickness,
+                BorderColor,
+                parentSize,
+                dpi);
+        }
 
         var borderOffset = TableBoxStyle.GetBorderOffset(BorderThickness, parentSize, dpi);
         var border       = BorderThickness.ToRectangle(parentSize, dpi);
@@ -208,7 +246,7 @@ public abstract class TableRowControlBase : AlignableContentControl
                 localCellIndex      += control.ColumnSpan;
                 var (width, height) =  control.Render(canvas, dpi, parentSize, cultureInfo);
                 additionalWidth     += width;
-                additionalHeight    += height;
+                additionalHeight    =  Math.Max(additionalHeight, height);
                 canvas.Translate(widthAvailable, 0);
             }
         }

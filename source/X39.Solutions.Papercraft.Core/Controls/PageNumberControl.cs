@@ -109,11 +109,13 @@ public sealed class PageNumberControl : TextBaseControl
     protected override Size DoRender(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
     {
         canvas.Defer(
-            (immediateCanvas) => RenderText(
-                immediateCanvas,
-                dpi,
-                GetText(immediateCanvas.PageNumber, immediateCanvas.TotalPages)
-            )
+            (immediateCanvas) =>
+            {
+                _ = RenderText(
+                    immediateCanvas,
+                    dpi,
+                    GetText(immediateCanvas.PageNumber, immediateCanvas.TotalPages));
+            }
         );
         return Size.Zero;
     }

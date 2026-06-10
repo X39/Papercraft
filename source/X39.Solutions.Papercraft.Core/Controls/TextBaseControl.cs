@@ -11,6 +11,8 @@ namespace X39.Solutions.Papercraft.Controls;
 /// </summary>
 public abstract class TextBaseControl : AlignableControl
 {
+    private const float PageBoundaryTolerance = 0.001F;
+
     /// <summary>
     /// The text service passed in the constructor.
     /// </summary>
@@ -219,10 +221,26 @@ public abstract class TextBaseControl : AlignableControl
     }
 
     /// <inheritdoc />
+    protected override Size PreRender(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
+    {
+        var baseAdditionalSize = base.PreRender(canvas, dpi, parentSize, cultureInfo);
+        var layout = GetTextLayout(dpi, GetText().Trim());
+        if (layout is null)
+            return baseAdditionalSize;
+
+        var additionalHeight = CalculatePaginationAdditionalHeight(
+            canvas.Translation.Y + ArrangementInner.Top,
+            parentSize.Height,
+            layout);
+        return new Size(
+            baseAdditionalSize.Width,
+            baseAdditionalSize.Height + additionalHeight);
+    }
+
+    /// <inheritdoc />
     protected override Size DoRender(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
     {
-        RenderText(canvas, dpi, GetText().Trim());
-        return Size.Zero;
+        return RenderText(canvas, dpi, GetText().Trim(), parentSize.Height);
     }
 
     /// <summary>
@@ -231,8 +249,86 @@ public abstract class TextBaseControl : AlignableControl
     /// <param name="canvas">The drawable canvas on which to render the text.</param>
     /// <param name="dpi">The dots per inch value.</param>
     /// <param name="text">The text to render.</param>
-    protected void RenderText(IDrawableCanvas canvas, float dpi, string text)
+    /// <param name="pageHeight">The height of the current pageable area.</param>
+    /// <returns>Additional vertical space inserted to keep rendered lines whole.</returns>
+    protected Size RenderText(IDrawableCanvas canvas, float dpi, string text, float pageHeight = 0F)
     {
+        if (canvas is IDeferredCanvas deferredCanvas
+            && GetTextLayout(dpi, text) is { } layout)
+        {
+            return RenderPaginatedText(deferredCanvas, dpi, layout, pageHeight);
+        }
+
         TextService.Draw(canvas, TextStyle, dpi, text.AsSpan(), ArrangementInner.Width);
+        return Size.Zero;
+    }
+
+    private IReadOnlyList<TextLineLayout>? GetTextLayout(float dpi, string text)
+        => TextService is ITextLayoutService textLayoutService
+            ? textLayoutService.Layout(TextStyle, dpi, text.AsSpan(), ArrangementInner.Width)
+            : null;
+
+    private Size RenderPaginatedText(
+        IDeferredCanvas canvas,
+        float dpi,
+        IReadOnlyList<TextLineLayout> layout,
+        float pageHeight)
+    {
+        var additionalHeight = 0F;
+        foreach (var line in layout)
+        {
+            var lineAdditionalHeight = CalculateLinePaginationAdditionalHeight(
+                canvas.Translation.Y + line.Top + additionalHeight,
+                line.Height,
+                pageHeight);
+            additionalHeight += lineAdditionalHeight;
+            canvas.DrawText(TextStyle, dpi, line.Text, line.X, line.BaselineY + additionalHeight);
+        }
+
+        return new Size(0F, additionalHeight);
+    }
+
+    private static float CalculatePaginationAdditionalHeight(
+        float absoluteTextTop,
+        float pageHeight,
+        IReadOnlyList<TextLineLayout> layout)
+    {
+        var additionalHeight = 0F;
+        foreach (var line in layout)
+        {
+            additionalHeight += CalculateLinePaginationAdditionalHeight(
+                absoluteTextTop + line.Top + additionalHeight,
+                line.Height,
+                pageHeight);
+        }
+
+        return additionalHeight;
+    }
+
+    private static float CalculateLinePaginationAdditionalHeight(
+        float absoluteLineTop,
+        float lineHeight,
+        float pageHeight)
+    {
+        if (pageHeight <= 0F || lineHeight <= 0F || lineHeight > pageHeight + PageBoundaryTolerance)
+            return 0F;
+
+        var usedHeight = GetUsedPageHeight(absoluteLineTop, pageHeight);
+        if (usedHeight <= PageBoundaryTolerance)
+            return 0F;
+
+        if (usedHeight + lineHeight <= pageHeight + PageBoundaryTolerance)
+            return 0F;
+
+        var remainingPageHeight = pageHeight - usedHeight;
+        return remainingPageHeight <= PageBoundaryTolerance
+            ? 0F
+            : remainingPageHeight;
+    }
+
+    private static float GetUsedPageHeight(float y, float pageHeight)
+    {
+        var multiplier = (int)(y / pageHeight);
+        return y - multiplier * pageHeight;
     }
 }

@@ -59,8 +59,6 @@ public sealed class HyperlinkControl : TextBaseControl
     protected override Size DoRender(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
     {
         var text = GetText().Trim();
-        RenderText(canvas, dpi, text);
-
-        return Size.Zero;
+        return RenderText(canvas, dpi, text, parentSize.Height);
     }
 }

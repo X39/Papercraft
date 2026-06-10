@@ -518,6 +518,48 @@ public class TableControlTest
     }
 
     [Fact]
+    public void OversizedRowExpandsTableClipWhenNestedCellTextMovesToNextPage()
+    {
+        var textControl = new TextControl(new FixedTextLayoutService())
+        {
+            Text = "cell",
+            HorizontalAlignment = EHorizontalAlignment.Left,
+            VerticalAlignment = EVerticalAlignment.Top,
+        };
+        var cell = new TableCellControl
+        {
+            HorizontalAlignment = EHorizontalAlignment.Left,
+            VerticalAlignment = EVerticalAlignment.Top,
+        };
+        cell.Add(new SpacerControl { Height = 95F });
+        cell.Add(textControl);
+        var row = new TableRowControl
+        {
+            HorizontalAlignment = EHorizontalAlignment.Left,
+            VerticalAlignment = EVerticalAlignment.Top,
+        };
+        row.Add(cell);
+        var control = new TableControl
+        {
+            HorizontalAlignment = EHorizontalAlignment.Left,
+            VerticalAlignment = EVerticalAlignment.Top,
+        };
+        control.Add(row);
+        var pageSize = new Size(100, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+        var textStyle = textControl.GetTextStyle();
+
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        var additionalRenderSize = control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+
+        Assert.Equal(new Size(0F, 105F), additionalRenderSize);
+        mockCanvas.AssertState();
+        mockCanvas.AssertClip(0, new Rectangle(0F, 0F, 100F, 210F));
+        mockCanvas.AssertDrawText(textStyle, "cell", 0F, 208F);
+    }
+
+    [Fact]
     public async Task HeaderIsRepeatedWhenPreviousRowEndsExactlyAtPageBoundary()
     {
         var control = await $$"""
