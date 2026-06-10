@@ -51,7 +51,11 @@ public class TextControlTests : IDisposable
     {
         var pageBounds = new Size(100, 100);
         var canvas = new DeferredCanvasMock{ActualPageSize = pageBounds, PageSize = pageBounds};
-        var control = new TextControl(new FixedTextLayoutService())
+        var control = new TextControl(
+            new FixedTextLayoutService(
+                lineHeight: 15F,
+                baselineOffset: 10F,
+                lineTopOffset: -5F))
         {
             Text = "first\nsecond",
             HorizontalAlignment = EHorizontalAlignment.Left,
@@ -64,12 +68,12 @@ public class TextControlTests : IDisposable
         control.Arrange(90, pageBounds, pageBounds, pageBounds, CultureInfo.InvariantCulture);
         var additionalSize = control.Render(canvas, 90, pageBounds, CultureInfo.InvariantCulture);
 
-        Assert.Equal(new Size(0F, 5F), additionalSize);
+        Assert.Equal(new Size(0F, 10F), additionalSize);
         canvas.AssertState();
-        canvas.AssertClip(new Rectangle(0F, 95F, 10F, 25F));
+        canvas.AssertClip(new Rectangle(0F, 95F, 10F, 40F));
         canvas.AssertDrawText(
-            (textStyle, "first", 0F, 108F),
-            (textStyle, "second", 0F, 118F));
+            (textStyle, "first", 0F, 115F),
+            (textStyle, "second", 0F, 130F));
     }
 
     [Theory]

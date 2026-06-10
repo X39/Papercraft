@@ -150,17 +150,49 @@ internal class TextService : ITextLayoutService
             var (divided, _) = DivideAndConquer(trimmedFullLine, skPaint, maxWidth, out var width);
             left             = divided;
             right            = right[(left.Length + fullLine.Length - trimmedFullLine.Length)..];
+            var lineText = left.ToString();
+            var baselineY = y - skPaint.FontMetrics.Ascent;
+            var (lineTop, lineHeight) = GetRenderedLineBounds(textStyle, skPaint, lineText, width, baselineY);
             lines.Add(
                 new TextLineLayout(
-                    left.ToString(),
+                    lineText,
                     0F,
-                    y - skPaint.FontMetrics.Ascent,
-                    y,
-                    height,
+                    baselineY,
+                    lineTop,
+                    lineHeight,
                     width));
             y += height * textStyle.LineHeight;
         }
 
         return lines;
+    }
+
+    private static (float Top, float Height) GetRenderedLineBounds(
+        TextStyle textStyle,
+        SKPaint skPaint,
+        string text,
+        float width,
+        float baselineY)
+    {
+        var textBounds = new SKRect();
+        _ = skPaint.MeasureText(text, ref textBounds);
+        var top = baselineY + textBounds.Top;
+        var bottom = baselineY + textBounds.Bottom;
+
+        foreach (var decorationLine in SkiaTextDecorationRenderer.GetDecorationLines(
+                     textStyle,
+                     skPaint,
+                     width,
+                     0F,
+                     baselineY))
+        {
+            var halfThickness = decorationLine.Thickness / 2F;
+            top = Math.Min(top, decorationLine.StartY - halfThickness);
+            bottom = Math.Max(bottom, decorationLine.StartY + halfThickness);
+        }
+
+        return bottom > top
+            ? (top, bottom - top)
+            : (baselineY, 0F);
     }
 }

@@ -8,12 +8,18 @@ internal sealed class FixedTextLayoutService : ITextLayoutService
 {
     private readonly float _lineHeight;
     private readonly float _baselineOffset;
+    private readonly float _lineTopOffset;
     private readonly float _width;
 
-    public FixedTextLayoutService(float lineHeight = 10F, float baselineOffset = 8F, float width = 10F)
+    public FixedTextLayoutService(
+        float lineHeight = 10F,
+        float baselineOffset = 8F,
+        float lineTopOffset = 0F,
+        float width = 10F)
     {
         _lineHeight = lineHeight;
         _baselineOffset = baselineOffset;
+        _lineTopOffset = lineTopOffset;
         _width = width;
     }
 
@@ -54,7 +60,7 @@ internal sealed class FixedTextLayoutService : ITextLayoutService
                 lines[i],
                 0F,
                 top + _baselineOffset,
-                top,
+                top + _lineTopOffset,
                 _lineHeight,
                 _width);
         }

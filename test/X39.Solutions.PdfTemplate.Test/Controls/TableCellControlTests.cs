@@ -79,7 +79,11 @@ public class TableCellControlTests
     {
         var pageBounds = new Size(100, 100);
         var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageBounds, PageSize = pageBounds};
-        var textControl = new TextControl(new FixedTextLayoutService())
+        var textControl = new TextControl(
+            new FixedTextLayoutService(
+                lineHeight: 15F,
+                baselineOffset: 10F,
+                lineTopOffset: -5F))
         {
             Text = "cell",
             HorizontalAlignment = EHorizontalAlignment.Left,
@@ -98,10 +102,10 @@ public class TableCellControlTests
         control.Arrange(90, pageBounds, pageBounds, pageBounds, CultureInfo.InvariantCulture);
         var additionalSize = control.Render(mockCanvas, 90, pageBounds, CultureInfo.InvariantCulture);
 
-        Assert.Equal(new Size(0F, 5F), additionalSize);
+        Assert.Equal(new Size(0F, 10F), additionalSize);
         mockCanvas.AssertState();
-        mockCanvas.AssertClip(0, new Rectangle(0F, 95F, 10F, 15F));
-        mockCanvas.AssertDrawText(textStyle, "cell", 0F, 108F);
+        mockCanvas.AssertClip(0, new Rectangle(0F, 95F, 10F, 25F));
+        mockCanvas.AssertDrawText(textStyle, "cell", 0F, 115F);
     }
 
     [Fact]

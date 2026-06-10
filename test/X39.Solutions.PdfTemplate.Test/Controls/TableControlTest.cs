@@ -520,7 +520,11 @@ public class TableControlTest
     [Fact]
     public void OversizedRowExpandsTableClipWhenNestedCellTextMovesToNextPage()
     {
-        var textControl = new TextControl(new FixedTextLayoutService())
+        var textControl = new TextControl(
+            new FixedTextLayoutService(
+                lineHeight: 15F,
+                baselineOffset: 10F,
+                lineTopOffset: -5F))
         {
             Text = "cell",
             HorizontalAlignment = EHorizontalAlignment.Left,
@@ -553,10 +557,10 @@ public class TableControlTest
         control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
         var additionalRenderSize = control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
 
-        Assert.Equal(new Size(0F, 105F), additionalRenderSize);
+        Assert.Equal(new Size(0F, 110F), additionalRenderSize);
         mockCanvas.AssertState();
-        mockCanvas.AssertClip(0, new Rectangle(0F, 0F, 100F, 210F));
-        mockCanvas.AssertDrawText(textStyle, "cell", 0F, 208F);
+        mockCanvas.AssertClip(0, new Rectangle(0F, 0F, 100F, 220F));
+        mockCanvas.AssertDrawText(textStyle, "cell", 0F, 215F);
     }
 
     [Fact]
