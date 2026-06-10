@@ -66,9 +66,11 @@ public abstract class TableRowControlBase : AlignableContentControl
                 if (!cellWidths.TryGetValue(localCellIndex, out var tuple))
                     tuple = (size.Width, child.Width);
                 cellWidths[localCellIndex] = (Math.Max(tuple.desiredWitdth, adjustedDesiredWidth),
-                                              tuple.columnLength < adjustedCellWidth
-                                                  ? adjustedCellWidth
-                                                  : tuple.columnLength);
+                                              GetPreferredColumnLength(
+                                                  tuple.columnLength,
+                                                  adjustedCellWidth,
+                                                  childSize.Width,
+                                                  dpi));
             }
 
             cellIndex  += child.ColumnSpan;
@@ -225,6 +227,31 @@ public abstract class TableRowControlBase : AlignableContentControl
 
         return availableWidth / totalWidth;
     }
+
+    private static ColumnLength GetPreferredColumnLength(
+        ColumnLength current,
+        ColumnLength candidate,
+        float bounds,
+        float dpi)
+    {
+        if (IsAuto(current))
+            return candidate;
+        if (IsAuto(candidate))
+            return current;
+
+        if (current.Unit is EColumnUnit.Parts || candidate.Unit is EColumnUnit.Parts)
+            return GetPartsValue(candidate) > GetPartsValue(current) ? candidate : current;
+
+        var currentWidth = current.Length?.ToPixels(bounds, dpi) ?? 0F;
+        var candidateWidth = candidate.Length?.ToPixels(bounds, dpi) ?? 0F;
+        return candidateWidth > currentWidth ? candidate : current;
+    }
+
+    private static bool IsAuto(ColumnLength length)
+        => length is {Unit: EColumnUnit.Length, Length.Unit: ELengthUnit.Auto};
+
+    private static float GetPartsValue(ColumnLength length)
+        => length.Unit is EColumnUnit.Parts ? length.Value ?? 0F : 0F;
 
     private float GetTotalCellWidth()
     {

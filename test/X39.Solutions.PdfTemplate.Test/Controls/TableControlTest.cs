@@ -176,6 +176,37 @@ public class TableControlTest
     }
 
     [Fact]
+    public async Task LaterAutoCellsDoNotOverrideEarlierFixedColumnWidth()
+    {
+        var control = await $$"""
+                              <table>
+                                  <tr>
+                                      <td width="40px"><mock width="1px" height="10px"/></td>
+                                      <td width="1*"><mock width="1px" height="10px"/></td>
+                                  </tr>
+                                  <tr>
+                                      <td><mock width="1px" height="10px"/></td>
+                                      <td><mock width="1px" height="10px"/></td>
+                                  </tr>
+                              </table>
+                              """.ToControl<TableControl>();
+        var pageSize   = new Size(200, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+        mockCanvas.AssertState();
+        mockCanvas.AssertAllClip((rectangle) => rectangle is {Width: > 0, Height: > 0});
+        mockCanvas.AssertClip(0, new Rectangle(0,  0, 200, 20)); // table
+        mockCanvas.AssertClip(1, new Rectangle(0,  0, 200, 10)); // first tr
+        mockCanvas.AssertClip(2, new Rectangle(0,  0, 40,  10)); // fixed-width td
+        mockCanvas.AssertClip(3, new Rectangle(40, 0, 160, 10)); // star-width td
+        mockCanvas.AssertClip(4, new Rectangle(0,  10, 200, 10)); // second tr
+        mockCanvas.AssertClip(5, new Rectangle(0,  10, 40,  10)); // auto cell using fixed column width
+        mockCanvas.AssertClip(6, new Rectangle(40, 10, 160, 10)); // auto cell using star column width
+    }
+
+    [Fact]
     public async Task RightAlignedContentIsNotClippedAway()
     {
         var control = await $$"""

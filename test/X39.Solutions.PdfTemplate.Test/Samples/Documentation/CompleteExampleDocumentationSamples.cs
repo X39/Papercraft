@@ -246,22 +246,22 @@ public sealed class CompleteExampleDocumentationSamples : DocumentationSampleBas
                     <text fontsize="11" weight="bold" margin="0 0 0 1mm">Count detail</text>
                     <table>
                         <th borderThickness="0 0 0 1pt" borderColor="#334155">
-                            <td width="14mm" padding="1mm">
+                            <td width="9mm" padding="1mm">
                                 <text weight="bold">Zone</text>
                             </td>
                             <td width="2*" padding="1mm">
                                 <text weight="bold">Item</text>
                             </td>
-                            <td width="17mm" padding="1mm">
+                            <td width="15mm" padding="1mm">
                                 <text weight="bold" horizontalAlignment="right">Expected</text>
                             </td>
-                            <td width="17mm" padding="1mm">
+                            <td width="14mm" padding="1mm">
                                 <text weight="bold" horizontalAlignment="right">Counted</text>
                             </td>
-                            <td width="14mm" padding="1mm">
+                            <td width="8mm" padding="1mm">
                                 <text weight="bold" horizontalAlignment="right">Diff</text>
                             </td>
-                            <td width="22mm" padding="1mm">
+                            <td width="11mm" padding="1mm">
                                 <text weight="bold" horizontalAlignment="right">Status</text>
                             </td>
                         </th>
