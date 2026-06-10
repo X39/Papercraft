@@ -77,7 +77,7 @@ internal class PropertyAccessCache : IPropertyAccessCache, IDisposable
 
     public void Map(Type type)
     {
-        if (!WithReadLock(_lock, () => _mapped.Contains(type)))
+        if (WithReadLock(_lock, () => _mapped.Contains(type)))
             return;
         WithWriteLock(
             _lock,
@@ -99,6 +99,7 @@ internal class PropertyAccessCache : IPropertyAccessCache, IDisposable
                     Expression getterExpression = getter is null
                         ? Expression.Default(propertyInfo.PropertyType)
                         : Expression.Call(instanceCast, getter);
+                    getterExpression = Expression.Convert(getterExpression, typeof(object));
                     Expression setterExpression = setter is null
                         ? Expression.Empty()
                         : Expression.Call(instanceCast, setter, valueCast);

@@ -35,7 +35,7 @@ public record XmlNodeInformation(
     /// </summary>
     /// <param name="controlName">The name of the attribute to search for.</param>
     public string? this[string controlName]
-        => Attributes.FirstOrDefault(x => x.Key.Equals(controlName, StringComparison.OrdinalIgnoreCase)).Value;
+        => Attributes.GetValueOrDefault(controlName);
 
     /// <inheritdoc />
     public IEnumerator<XmlNodeInformation> GetEnumerator()

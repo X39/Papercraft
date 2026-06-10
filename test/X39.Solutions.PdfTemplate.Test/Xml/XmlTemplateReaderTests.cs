@@ -226,6 +226,34 @@ public class XmlTemplateReaderTests
     }
 
     [Fact]
+    public async Task StylesApplyToFollowingSiblingsAndAttributesAreCaseInsensitive()
+    {
+        const string ns = Constants.ControlsNamespace;
+        const string template = $"""
+                                 <?xml version="1.0" encoding="utf-8"?>
+                                 <styleCaseTest xmlns="{ns}">
+                                     <styleCaseTest.style>
+                                         <line Margin="1px"/>
+                                     </styleCaseTest.style>
+                                     <line/>
+                                     <styleCaseTest.style>
+                                         <line Padding="2px"/>
+                                     </styleCaseTest.style>
+                                     <line margin="3px"/>
+                                 </styleCaseTest>
+                                 """;
+
+        var node = await ReadTemplateAsync(template);
+
+        var firstLine = node.Children.ElementAt(0);
+        var secondLine = node.Children.ElementAt(1);
+        Assert.Equal("1px", firstLine.Attributes["margin"]);
+        Assert.False(firstLine.Attributes.ContainsKey("padding"));
+        Assert.Equal("3px", secondLine.Attributes["MARGIN"]);
+        Assert.Equal("2px", secondLine.Attributes["padding"]);
+    }
+
+    [Fact]
     public async Task NoDotInName()
     {
         const string ns = Constants.ControlsNamespace;

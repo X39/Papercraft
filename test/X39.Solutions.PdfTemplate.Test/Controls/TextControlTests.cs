@@ -1,8 +1,10 @@
 using System.Globalization;
 using X39.Solutions.Papercraft.Controls;
+using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Data;
 using X39.Solutions.Papercraft.Rendering.SkiaSharp.Services;
 using X39.Solutions.Papercraft.Rendering.SkiaSharp.Services.TextService;
+using X39.Solutions.Papercraft.Services.TextService;
 using X39.Solutions.PdfTemplate.Test.Mock;
 
 namespace X39.Solutions.PdfTemplate.Test.Controls;
@@ -76,6 +78,30 @@ public class TextControlTests : IDisposable
             (textStyle, "second", 0F, 130F));
     }
 
+    [Fact]
+    public void RenderReusesArrangedLayoutForDeferredText()
+    {
+        var pageBounds = new Size(100, 100);
+        var canvas = new DeferredCanvasMock{ActualPageSize = pageBounds, PageSize = pageBounds};
+        var textService = new CountingTextLayoutService();
+        var control = new TextControl(textService)
+        {
+            Text = "cached",
+            HorizontalAlignment = EHorizontalAlignment.Left,
+            VerticalAlignment = EVerticalAlignment.Top,
+        };
+
+        control.Measure(90, pageBounds, pageBounds, pageBounds, CultureInfo.InvariantCulture);
+        control.Arrange(90, pageBounds, pageBounds, pageBounds, CultureInfo.InvariantCulture);
+        control.Render(canvas, 90, pageBounds, CultureInfo.InvariantCulture);
+
+        Assert.Equal(2, textService.MeasureCount);
+        Assert.Equal(1, textService.LayoutCount);
+        Assert.Equal(0, textService.DrawCount);
+        canvas.AssertState();
+        canvas.AssertDrawText(control.GetTextStyle(), "cached", 0F, 8F);
+    }
+
     [Theory]
     [InlineData("underline", TextDecoration.Underline)]
     [InlineData("strikeThrough", TextDecoration.StrikeThrough)]
@@ -125,5 +151,42 @@ public class TextControlTests : IDisposable
                 "NunitoSans-Italic-VariableFont_YTLC,opsz,wdth,wght.ttf"));
         Assert.True(File.Exists(fontPath), $"Font file not found: {fontPath}");
         return fontPath;
+    }
+
+    private sealed class CountingTextLayoutService : ITextLayoutService
+    {
+        public int MeasureCount { get; private set; }
+        public int LayoutCount { get; private set; }
+        public int DrawCount { get; private set; }
+
+        public Size Measure(TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
+        {
+            MeasureCount++;
+            return text.IsEmpty ? Size.Zero : new Size(text.Length * 5F, 10F);
+        }
+
+        public void Draw(IDrawableCanvas canvas, TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
+        {
+            DrawCount++;
+            foreach (var line in Layout(textStyle, dpi, text, maxWidth))
+            {
+                canvas.DrawText(textStyle, dpi, line.Text, line.X, line.BaselineY);
+            }
+        }
+
+        public IReadOnlyList<TextLineLayout> Layout(
+            TextStyle textStyle,
+            float dpi,
+            ReadOnlySpan<char> text,
+            float maxWidth)
+        {
+            LayoutCount++;
+            return text.IsEmpty
+                ? Array.Empty<TextLineLayout>()
+                : new[]
+                {
+                    new TextLineLayout(text.ToString(), 0F, 8F, 0F, 10F, text.Length * 5F),
+                };
+        }
     }
 }

@@ -14,7 +14,7 @@ public class XmlStyleInformation
     /// </summary>
     public XmlStyleInformation()
     {
-        _contents = new();
+        _contents = new(XmlStyleKeyComparer.Instance);
     }
     
     /// <summary>
@@ -23,7 +23,9 @@ public class XmlStyleInformation
     /// <param name="styles">The style information.</param>
     public XmlStyleInformation(Dictionary<(string controlName, string controlNamespace), IReadOnlyDictionary<string, string>> styles)
     {
-        _contents = styles;
+        _contents = new Dictionary<(string controlName, string controlNamespace), IReadOnlyDictionary<string, string>>(
+            styles,
+            XmlStyleKeyComparer.Instance);
     }
 
     /// <summary>
@@ -56,7 +58,7 @@ public class XmlStyleInformation
     /// <returns>A dictionary containing the style information.</returns>
     public Dictionary<string, string> Of(string nodeName, string nodeNamespace, IReadOnlyDictionary<string,string>? attributes = null)
     {
-        var result = new Dictionary<string, string>();
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         if (_contents.TryGetValue((nodeName, nodeNamespace), out var attributeDictionary))
         {
             foreach (var (key, value) in attributeDictionary)
@@ -74,4 +76,24 @@ public class XmlStyleInformation
 
         return result;
     }
+}
+
+internal sealed class XmlStyleKeyComparer : IEqualityComparer<(string controlName, string controlNamespace)>
+{
+    public static XmlStyleKeyComparer Instance { get; } = new();
+
+    private XmlStyleKeyComparer()
+    {
+    }
+
+    public bool Equals(
+        (string controlName, string controlNamespace) x,
+        (string controlName, string controlNamespace) y)
+        => string.Equals(x.controlName, y.controlName, StringComparison.OrdinalIgnoreCase)
+           && string.Equals(x.controlNamespace, y.controlNamespace, StringComparison.OrdinalIgnoreCase);
+
+    public int GetHashCode((string controlName, string controlNamespace) obj)
+        => HashCode.Combine(
+            StringComparer.OrdinalIgnoreCase.GetHashCode(obj.controlName),
+            StringComparer.OrdinalIgnoreCase.GetHashCode(obj.controlNamespace));
 }

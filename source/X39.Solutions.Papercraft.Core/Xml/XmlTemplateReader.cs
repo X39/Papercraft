@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Xml;
 using X39.Solutions.Papercraft.Abstraction;
@@ -16,6 +17,65 @@ public sealed class XmlTemplateReader : IDisposable
         string Name,
         string RemainingLine,
         IReadOnlyCollection<XmlNode> Nodes);
+
+    private sealed class StyleFrame
+    {
+        private Dictionary<(string controlName, string controlNamespace), IReadOnlyDictionary<string, string>>? _styles;
+
+        public StyleFrame(StyleFrame? parent)
+        {
+            Parent = parent;
+        }
+
+        public StyleFrame? Parent { get; }
+
+        public void Set(string controlName, string controlNamespace, IReadOnlyDictionary<string, string> attributes)
+        {
+            _styles ??= new Dictionary<(string controlName, string controlNamespace), IReadOnlyDictionary<string, string>>(
+                XmlStyleKeyComparer.Instance);
+            _styles[(controlName, controlNamespace)] = attributes;
+        }
+
+        public static Dictionary<string, string> Of(
+            StyleFrame? styleFrame,
+            string nodeName,
+            string nodeNamespace,
+            IReadOnlyDictionary<string, string>? attributes = null)
+        {
+            var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (styleFrame?.TryGetStyle((nodeName, nodeNamespace), out var attributeDictionary) is true)
+            {
+                foreach (var (key, value) in attributeDictionary)
+                {
+                    result.Add(key, value);
+                }
+            }
+
+            if (attributes is null)
+                return result;
+
+            foreach (var (key, value) in attributes)
+            {
+                result[key] = value;
+            }
+
+            return result;
+        }
+
+        private bool TryGetStyle(
+            (string controlName, string controlNamespace) key,
+            [NotNullWhen(true)] out IReadOnlyDictionary<string, string>? attributes)
+        {
+            for (var frame = this; frame is not null; frame = frame.Parent)
+            {
+                if (frame._styles?.TryGetValue(key, out attributes) is true)
+                    return true;
+            }
+
+            attributes = null;
+            return false;
+        }
+    }
 
     /// <inheritdoc />
     public void Dispose()
@@ -58,7 +118,7 @@ public sealed class XmlTemplateReader : IDisposable
         _transformers    = transformers;
     }
 
-    private readonly Stack<XmlStyleInformation> _styles = new();
+    private readonly Stack<StyleFrame> _styles = new();
 
     private static (int line, int column) Location(XmlReader xmlReader)
     {
@@ -789,7 +849,7 @@ public sealed class XmlTemplateReader : IDisposable
         PushStyle();
         var children = new List<XmlNodeInformation>();
         var styleName = $"{xmlNode.Name.ToLower(CultureInfo.InvariantCulture)}.style";
-        var effectiveStyle = GetEffectiveStyle();
+        var effectiveStyle = CurrentStyle.Parent;
         foreach (var nodeChild in xmlNode.Children)
         {
             if (nodeChild.Name.Equals(styleName, StringComparison.OrdinalIgnoreCase))
@@ -813,7 +873,7 @@ public sealed class XmlTemplateReader : IDisposable
                 xmlNode.Name,
                 xmlNode.Namespace,
                 text,
-                effectiveStyle.Of(xmlNode.Name, xmlNode.Namespace, xmlNode.Attributes),
+                StyleFrame.Of(effectiveStyle, xmlNode.Name, xmlNode.Namespace, xmlNode.Attributes),
                 ArraySegment<XmlNodeInformation>.Empty
             );
         }
@@ -825,25 +885,10 @@ public sealed class XmlTemplateReader : IDisposable
                 xmlNode.Name,
                 xmlNode.Namespace,
                 xmlNode.Text ?? string.Empty,
-                effectiveStyle.Of(xmlNode.Name, xmlNode.Namespace, xmlNode.Attributes),
+                StyleFrame.Of(effectiveStyle, xmlNode.Name, xmlNode.Namespace, xmlNode.Attributes),
                 children.AsReadOnly()
             );
         }
-    }
-
-    private XmlStyleInformation GetEffectiveStyle()
-    {
-        Dictionary<(string controlName, string controlNamespace), IReadOnlyDictionary<string, string>> effectiveStyles =
-            new();
-        foreach (var style in _styles.Reverse())
-        {
-            foreach (var (key, value) in style.GetAll())
-            {
-                effectiveStyles[key] = value;
-            }
-        }
-
-        return new XmlStyleInformation(effectiveStyles);
     }
 
     private void ReadStyle(XmlNode xmlNode)
@@ -857,15 +902,15 @@ public sealed class XmlTemplateReader : IDisposable
                     nodeChild.Column,
                     $"A style node (L{nodeChild.Line}:C{nodeChild.Column}) cannot have children."
                 );
-            style.Set(nodeChild.Line, nodeChild.Column, nodeChild.Name, nodeChild.Namespace, nodeChild.Attributes);
+            style.Set(nodeChild.Name, nodeChild.Namespace, nodeChild.Attributes);
         }
     }
 
     private void PushStyle()
-        => _styles.Push(new XmlStyleInformation());
+        => _styles.Push(new StyleFrame(_styles.Count is 0 ? null : _styles.Peek()));
 
     private void PopStyle()
         => _styles.Pop();
 
-    private XmlStyleInformation CurrentStyle => _styles.Peek();
+    private StyleFrame CurrentStyle => _styles.Peek();
 }

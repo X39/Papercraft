@@ -93,6 +93,24 @@ public class HyperlinkControlTests
     }
 
     [Fact]
+    public void LinkAnnotationsReuseVisibleTextLayout()
+    {
+        const string href = "https://example.test/cached";
+        var textService = new CountingTextLayoutService();
+        var control = CreateControl("Portal", textService);
+        control.Href = href;
+        var canvas = CreateCanvas();
+
+        ArrangeAndRender(control, canvas);
+
+        Assert.Equal(2, textService.MeasureCount);
+        Assert.Equal(1, textService.LayoutCount);
+        Assert.Equal(0, textService.DrawCount);
+        canvas.AssertDrawText(control.GetTextStyle(), "Portal", 0F, 8F);
+        canvas.AssertLinkAnnotation(href, new Rectangle(0F, 0F, 30F, 10F));
+    }
+
+    [Fact]
     public void MultilineHyperlinkCreatesAnnotationPerRenderedLine()
     {
         const string href = "https://example.test/multiline";
@@ -349,6 +367,43 @@ public class HyperlinkControlTests
                             WordWidth);
                     })
                 .ToArray();
+        }
+    }
+
+    private sealed class CountingTextLayoutService : ITextLayoutService
+    {
+        public int MeasureCount { get; private set; }
+        public int LayoutCount { get; private set; }
+        public int DrawCount { get; private set; }
+
+        public Size Measure(TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
+        {
+            MeasureCount++;
+            return text.IsEmpty ? Size.Zero : new Size(30F, 10F);
+        }
+
+        public void Draw(IDrawableCanvas canvas, TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
+        {
+            DrawCount++;
+            foreach (var line in Layout(textStyle, dpi, text, maxWidth))
+            {
+                canvas.DrawText(textStyle, dpi, line.Text, line.X, line.BaselineY);
+            }
+        }
+
+        public IReadOnlyList<TextLineLayout> Layout(
+            TextStyle textStyle,
+            float dpi,
+            ReadOnlySpan<char> text,
+            float maxWidth)
+        {
+            LayoutCount++;
+            return text.IsEmpty
+                ? Array.Empty<TextLineLayout>()
+                : new[]
+                {
+                    new TextLineLayout(text.ToString(), 0F, 8F, 0F, 10F, 30F),
+                };
         }
     }
 }

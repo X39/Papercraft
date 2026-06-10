@@ -12,6 +12,7 @@ namespace X39.Solutions.Papercraft.Controls;
 public abstract class TextBaseControl : AlignableControl
 {
     private const float PageBoundaryTolerance = 0.001F;
+    private TextLayoutCacheEntry? _textLayoutCacheEntry;
 
     /// <summary>
     /// The text service passed in the constructor.
@@ -206,7 +207,7 @@ public abstract class TextBaseControl : AlignableControl
         in Size     remainingSize,
         CultureInfo cultureInfo)
     {
-        return TextService.Measure(TextStyle, dpi, GetText().AsSpan().Trim(), remainingSize.Width);
+        return MeasureText(dpi, GetText().Trim(), remainingSize.Width);
     }
 
     /// <inheritdoc />
@@ -217,14 +218,17 @@ public abstract class TextBaseControl : AlignableControl
         in Size     remainingSize,
         CultureInfo cultureInfo)
     {
-        return TextService.Measure(TextStyle, dpi, GetText().AsSpan().Trim(), remainingSize.Width);
+        var text = GetText().Trim();
+        var size = MeasureText(dpi, text, remainingSize.Width);
+        _ = GetTextLayout(dpi, text, size.Width);
+        return size;
     }
 
     /// <inheritdoc />
     protected override Size PreRender(IDeferredCanvas canvas, float dpi, in Size parentSize, CultureInfo cultureInfo)
     {
         var baseAdditionalSize = base.PreRender(canvas, dpi, parentSize, cultureInfo);
-        var layout = GetTextLayout(dpi, GetText().Trim());
+        var layout = GetTextLayout(dpi, GetText().Trim(), ArrangementInner.Width);
         if (layout is null)
             return baseAdditionalSize;
 
@@ -254,7 +258,7 @@ public abstract class TextBaseControl : AlignableControl
     protected Size RenderText(IDrawableCanvas canvas, float dpi, string text, float pageHeight = 0F)
     {
         if (canvas is IDeferredCanvas deferredCanvas
-            && GetTextLayout(dpi, text) is { } layout)
+            && GetTextLayout(dpi, text, ArrangementInner.Width) is { } layout)
         {
             return RenderPaginatedText(deferredCanvas, dpi, layout, pageHeight);
         }
@@ -263,10 +267,22 @@ public abstract class TextBaseControl : AlignableControl
         return Size.Zero;
     }
 
-    private IReadOnlyList<TextLineLayout>? GetTextLayout(float dpi, string text)
-        => TextService is ITextLayoutService textLayoutService
-            ? textLayoutService.Layout(TextStyle, dpi, text.AsSpan(), ArrangementInner.Width)
-            : null;
+    private Size MeasureText(float dpi, string text, float maxWidth)
+        => TextService.Measure(TextStyle, dpi, text.AsSpan(), maxWidth);
+
+    private protected IReadOnlyList<TextLineLayout>? GetTextLayout(float dpi, string text, float maxWidth)
+    {
+        if (TextService is not ITextLayoutService textLayoutService)
+            return null;
+
+        var key = new TextLayoutCacheKey(text, TextStyle, dpi, maxWidth);
+        if (_textLayoutCacheEntry is { } entry && entry.Key == key)
+            return entry.Layout;
+
+        var layout = textLayoutService.Layout(TextStyle, dpi, text.AsSpan(), maxWidth);
+        _textLayoutCacheEntry = new TextLayoutCacheEntry(key, layout);
+        return layout;
+    }
 
     private Size RenderPaginatedText(
         IDeferredCanvas canvas,
@@ -331,4 +347,14 @@ public abstract class TextBaseControl : AlignableControl
         var multiplier = (int)(y / pageHeight);
         return y - multiplier * pageHeight;
     }
+
+    private readonly record struct TextLayoutCacheKey(
+        string Text,
+        TextStyle TextStyle,
+        float Dpi,
+        float MaxWidth);
+
+    private sealed record TextLayoutCacheEntry(
+        TextLayoutCacheKey Key,
+        IReadOnlyList<TextLineLayout> Layout);
 }

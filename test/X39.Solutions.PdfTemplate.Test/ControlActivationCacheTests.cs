@@ -42,6 +42,36 @@ public class ControlActivationCacheTests
     }
 
     [Fact]
+    public void CreateControl_ResolvesDefaultConstructorDependencies()
+    {
+        var services = new ServiceCollection()
+            .AddSingleton(new ConstructorDependency("dependency"))
+            .BuildServiceProvider();
+
+        var control = (DefaultDependencyControl) new ControlActivationCache().CreateControl(
+            services,
+            typeof(DefaultDependencyControl),
+            new Dictionary<string, string>(),
+            null,
+            CultureInfo.InvariantCulture);
+
+        Assert.Equal("dependency", control.Value);
+    }
+
+    [Fact]
+    public void CreateControl_UsesOptionalDefaultConstructorParameters()
+    {
+        var control = (OptionalConstructorControl) new ControlActivationCache().CreateControl(
+            new ServiceCollection().BuildServiceProvider(),
+            typeof(OptionalConstructorControl),
+            new Dictionary<string, string>(),
+            null,
+            CultureInfo.InvariantCulture);
+
+        Assert.Equal("default", control.Value);
+    }
+
+    [Fact]
     public void CreateControl_ThrowsForUnknownParameter()
     {
         var exception = Assert.Throws<ControlParameterIsNotExistingException>(
@@ -106,6 +136,26 @@ public class ControlActivationCacheTests
         public ConstructorControl(ConstructorDependency dependency)
         {
             Value = dependency.Value;
+        }
+
+        public string Value { get; }
+    }
+
+    private sealed class DefaultDependencyControl : TestControl
+    {
+        public DefaultDependencyControl(ConstructorDependency dependency)
+        {
+            Value = dependency.Value;
+        }
+
+        public string Value { get; }
+    }
+
+    private sealed class OptionalConstructorControl : TestControl
+    {
+        public OptionalConstructorControl(ConstructorDependency? dependency = null)
+        {
+            Value = dependency?.Value ?? "default";
         }
 
         public string Value { get; }

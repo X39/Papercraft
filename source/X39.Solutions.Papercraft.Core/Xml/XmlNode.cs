@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Collections.ObjectModel;
 
 namespace X39.Solutions.Papercraft.Xml;
 
@@ -12,9 +13,10 @@ public sealed class XmlNode
     /// </summary>
     internal Dictionary<string, object?>? Scope { get; set; }
     
-    private readonly Dictionary<string, string> _attributes = new();
+    private readonly Dictionary<string, string> _attributes = new(StringComparer.OrdinalIgnoreCase);
     private          XmlNode?                   _parent;
     private readonly List<XmlNode>              _children = new();
+    private readonly ReadOnlyCollection<XmlNode> _childrenView;
 
     /// <summary>
     /// The attributes of this node.
@@ -31,7 +33,7 @@ public sealed class XmlNode
     /// <summary>
     /// The children of this node.
     /// </summary>
-    public IReadOnlyCollection<XmlNode> Children => _children.AsReadOnly();
+    public IReadOnlyCollection<XmlNode> Children => _childrenView;
     
     /// <summary>
     /// Accesses a child of this node.
@@ -74,6 +76,7 @@ public sealed class XmlNode
     /// <param name="name">The name of this node.</param>
     public XmlNode(int line, int column, string ns, string name)
     {
+        _childrenView = _children.AsReadOnly();
         Name       = name;
         Namespace  = ns;
         Line       = line;
@@ -94,6 +97,7 @@ public sealed class XmlNode
     /// <param name="text">The text of this node.</param>
     public XmlNode(int line, int column, string text)
     {
+        _childrenView = _children.AsReadOnly();
         Name       = string.Empty;
         Namespace  = string.Empty;
         Text       = text;
@@ -148,7 +152,7 @@ public sealed class XmlNode
     /// <param name="value">The value of the attribute.</param>
     public void SetAttribute(string name, string value)
     {
-        _attributes[name.ToUpperInvariant()] = value;
+        _attributes[name] = value;
     }
 
     /// <summary>
@@ -176,7 +180,7 @@ public sealed class XmlNode
     /// <returns><see langword="true"/> if the attribute exists, otherwise <see langword="false"/>.</returns>
     public bool TryGetAttribute(string name, out string? value)
     {
-        return _attributes.TryGetValue(name.ToUpperInvariant(), out value);
+        return _attributes.TryGetValue(name, out value);
     }
 
     /// <summary>

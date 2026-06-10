@@ -1,6 +1,8 @@
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Attributes;
 using X39.Solutions.Papercraft.Exceptions;
@@ -68,7 +70,7 @@ public sealed class ControlActivationCache
                 continue;
             }
 
-            (missingParameters ??= []).Add(parameterName);
+            (missingParameters ??= []).Add(parameterName.ToUpperInvariant());
         }
 
         if (missingParameters is { Count: > 0 })
@@ -264,6 +266,9 @@ public sealed class ControlActivationCache
         string ParameterName,
         Action<IServiceProvider, IControl, string, CultureInfo> Set);
 
+    private static readonly MethodInfo ResolveConstructorArgumentMethod = typeof(ControlActivationCache)
+        .GetMethod(nameof(ResolveConstructorArgument), BindingFlags.NonPublic | BindingFlags.Static)!;
+
     private static ObjectFactory CreateAttributedFactory<TConstructorAttribute>(Type implementationType)
         where TConstructorAttribute : Attribute
     {
@@ -283,54 +288,12 @@ public sealed class ControlActivationCache
 
     private static ObjectFactory CreateDefaultFactory(Type implementationType)
     {
-        var constructors = implementationType
-            .GetConstructors(BindingFlags.Instance | BindingFlags.Public)
-            .OrderByDescending((constructor) => constructor.GetParameters().Length)
-            .ToArray();
-        if (constructors.Length is 0)
+        if (implementationType.GetConstructors(BindingFlags.Instance | BindingFlags.Public).Length is 0)
             throw new InvalidOperationException(
                 $"The type {implementationType.FullName ?? implementationType.Name} has no public constructor.");
 
-        return (serviceProvider, _) =>
-        {
-            foreach (var constructor in constructors)
-            {
-                if (TryCreateConstructorArguments(serviceProvider, constructor.GetParameters(), out var arguments))
-                    return constructor.Invoke(arguments);
-            }
-
-            throw new InvalidOperationException(
-                $"Unable to resolve an activatable constructor for type {implementationType.FullName ?? implementationType.Name}.");
-        };
-    }
-
-    private static bool TryCreateConstructorArguments(
-        IServiceProvider serviceProvider,
-        ParameterInfo[] parameters,
-        out object?[] arguments)
-    {
-        arguments = new object?[parameters.Length];
-        for (var i = 0; i < parameters.Length; i++)
-        {
-            var parameter = parameters[i];
-            var service = serviceProvider.GetService(parameter.ParameterType);
-            if (service is not null)
-            {
-                arguments[i] = service;
-                continue;
-            }
-
-            if (parameter.HasDefaultValue)
-            {
-                arguments[i] = parameter.DefaultValue;
-                continue;
-            }
-
-            arguments = [];
-            return false;
-        }
-
-        return true;
+        var factory = ActivatorUtilities.CreateFactory(implementationType, Type.EmptyTypes);
+        return (serviceProvider, arguments) => factory(serviceProvider, arguments);
     }
 
     private static ObjectFactory CreateConstructorFactory<TConstructorAttribute>(
@@ -338,30 +301,44 @@ public sealed class ControlActivationCache
         ConstructorInfo constructor)
         where TConstructorAttribute : Attribute
     {
-        var parameters = constructor.GetParameters();
-        return (serviceProvider, _) =>
-        {
-            var arguments = new object?[parameters.Length];
-            for (var i = 0; i < parameters.Length; i++)
-            {
-                var parameter = parameters[i];
-                var service = serviceProvider.GetService(parameter.ParameterType);
-                if (service is null)
-                {
-                    if (parameter.HasDefaultValue)
-                    {
-                        arguments[i] = parameter.DefaultValue;
-                        continue;
-                    }
+        var serviceProviderParameter = Expression.Parameter(typeof(IServiceProvider), "serviceProvider");
+        var argumentsParameter = Expression.Parameter(typeof(object[]), "arguments");
+        var constructorArguments = constructor
+            .GetParameters()
+            .Select(
+                (parameter) => Expression.Convert(
+                    Expression.Call(
+                        ResolveConstructorArgumentMethod,
+                        serviceProviderParameter,
+                        Expression.Constant(parameter.ParameterType, typeof(Type)),
+                        Expression.Constant(parameter.HasDefaultValue),
+                        Expression.Constant(parameter.HasDefaultValue ? parameter.DefaultValue : null, typeof(object)),
+                        Expression.Constant(implementationType, typeof(Type)),
+                        Expression.Constant(typeof(TConstructorAttribute), typeof(Type))),
+                    parameter.ParameterType))
+            .ToArray();
 
-                    throw new InvalidOperationException(
-                        $"Unable to resolve service for type {parameter.ParameterType.FullName ?? parameter.ParameterType.Name} while activating {implementationType.FullName ?? implementationType.Name} via {typeof(TConstructorAttribute).Name}.");
-                }
+        var body = Expression.Convert(Expression.New(constructor, constructorArguments), typeof(object));
+        return Expression.Lambda<ObjectFactory>(body, serviceProviderParameter, argumentsParameter)
+            .Compile();
+    }
 
-                arguments[i] = service;
-            }
+    private static object? ResolveConstructorArgument(
+        IServiceProvider serviceProvider,
+        Type parameterType,
+        bool hasDefaultValue,
+        object? defaultValue,
+        Type implementationType,
+        Type constructorAttributeType)
+    {
+        var service = serviceProvider.GetService(parameterType);
+        if (service is not null)
+            return service;
 
-            return constructor.Invoke(arguments);
-        };
+        if (hasDefaultValue)
+            return defaultValue;
+
+        throw new InvalidOperationException(
+            $"Unable to resolve service for type {parameterType.FullName ?? parameterType.Name} while activating {implementationType.FullName ?? implementationType.Name} via {constructorAttributeType.Name}.");
     }
 }

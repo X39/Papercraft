@@ -4,6 +4,7 @@ using X39.Solutions.Papercraft.Canvas;
 using X39.Solutions.Papercraft.Data;
 using X39.Solutions.Papercraft.Display;
 using X39.Solutions.Papercraft.Rendering.SkiaSharp.Abstraction;
+using X39.Solutions.PdfTemplate.Test.Mock;
 
 namespace X39.Solutions.PdfTemplate.Test.Canvas;
 
@@ -92,5 +93,55 @@ public sealed class DeferredCanvasImplTests
         Assert.Equal(4F, command.TextStyle.Rotation);
         Assert.Equal(5F, command.TextStyle.StrokeThickness);
         Assert.Equal(TextDecoration.Underline | TextDecoration.StrikeThrough, command.TextStyle.Decoration);
+    }
+
+    [Fact]
+    public void RenderReplaysRendererNeutralCommandsToImmediateCanvas()
+    {
+        var canvas = new DeferredCanvasImpl();
+        var target = new DeferredCanvasMock();
+        var textStyle = new TextStyle { Foreground = Colors.Red };
+        var bytes = new byte[] { 1, 2, 3 };
+
+        using (canvas.CreateState())
+        {
+            canvas.Translate(new Point(2F, 3F));
+            canvas.DrawRect(new Rectangle(1F, 1F, 2F, 2F), Colors.Red);
+            canvas.DrawText(textStyle, 90F, "Text", 4F, 5F);
+            canvas.DrawLine(Colors.Blue, 1F, 0F, 0F, 1F, 1F);
+            canvas.DrawImage(bytes, new Rectangle(5F, 6F, 7F, 8F));
+        }
+
+        canvas.Render(target);
+
+        target.AssertState();
+        target.AssertDrawRect(new Rectangle(3F, 4F, 2F, 2F), Colors.Red);
+        target.AssertDrawText(textStyle, "Text", 6F, 8F);
+        target.AssertDrawLine(Colors.Blue, 1F, 2F, 3F, 3F, 4F);
+        target.AssertDrawImage(new Rectangle(7F, 9F, 7F, 8F));
+    }
+
+    [Fact]
+    public void RenderExecutesDeferredCallbackWithImmediatePageContext()
+    {
+        var canvas = new DeferredCanvasImpl();
+        var target = new DisplayCanvasImpl
+        {
+            PageNumber = 2,
+            TotalPages = 5,
+        };
+
+        canvas.Defer(
+            (immediateCanvas) => immediateCanvas.DrawText(
+                new TextStyle(),
+                90F,
+                $"{immediateCanvas.PageNumber}/{immediateCanvas.TotalPages}",
+                0F,
+                0F));
+
+        canvas.Render(target);
+
+        var command = Assert.IsType<DrawTextCommand>(Assert.Single(target.DisplayList.Commands));
+        Assert.Equal("2/5", command.Text);
     }
 }

@@ -27,6 +27,12 @@ public sealed class SkiaSharpDisplayListRenderer
     /// <param name="canvas">The Skia canvas to render to.</param>
     /// <param name="displayList">The display list to render.</param>
     public void Render(SKCanvas canvas, DisplayList displayList)
+        => RenderCore(canvas, displayList, null);
+
+    internal void Render(SKCanvas canvas, DisplayList displayList, SkiaImageDecodeCache imageDecodeCache)
+        => RenderCore(canvas, displayList, imageDecodeCache);
+
+    private void RenderCore(SKCanvas canvas, DisplayList displayList, SkiaImageDecodeCache? imageDecodeCache)
     {
         ArgumentNullException.ThrowIfNull(canvas);
         ArgumentNullException.ThrowIfNull(displayList);
@@ -37,7 +43,7 @@ public sealed class SkiaSharpDisplayListRenderer
         {
             foreach (var command in displayList.Commands)
             {
-                RenderCommand(canvas, command);
+                RenderCommand(canvas, command, imageDecodeCache);
             }
         }
         catch (Exception ex)
@@ -47,7 +53,7 @@ public sealed class SkiaSharpDisplayListRenderer
         }
     }
 
-    private void RenderCommand(SKCanvas canvas, DisplayCommand command)
+    private void RenderCommand(SKCanvas canvas, DisplayCommand command, SkiaImageDecodeCache? imageDecodeCache)
     {
         switch (command)
         {
@@ -88,13 +94,21 @@ public sealed class SkiaSharpDisplayListRenderer
                 canvas.DrawUrlAnnotation(ToSkRect(link.Rectangle), link.Uri);
                 break;
             case DrawImageCommand image:
-                DrawImage(canvas, image);
+                DrawImage(canvas, image, imageDecodeCache);
                 break;
         }
     }
 
-    private static void DrawImage(SKCanvas canvas, DrawImageCommand image)
+    private static void DrawImage(SKCanvas canvas, DrawImageCommand image, SkiaImageDecodeCache? imageDecodeCache)
     {
+        if (imageDecodeCache is not null)
+        {
+            var cachedBitmap = imageDecodeCache.GetOrDecode(image.Bytes);
+            if (cachedBitmap is not null)
+                canvas.DrawBitmap(cachedBitmap, ToSkRect(image.Rectangle));
+            return;
+        }
+
         using var stream = new MemoryStream(image.Bytes);
         using var bitmap = SKBitmap.Decode(stream);
         if (bitmap is null)

@@ -69,11 +69,13 @@ public sealed class HyperlinkControl : TextBaseControl
     private void RenderLinkAnnotations(IDeferredCanvas canvas, float dpi, string text, float pageHeight)
     {
         var uri = Href.Trim();
-        if (string.IsNullOrWhiteSpace(uri)
-            || TextService is not ITextLayoutService textLayoutService)
+        if (string.IsNullOrWhiteSpace(uri))
             return;
 
-        var layout = textLayoutService.Layout(TextStyle, dpi, text.AsSpan(), ArrangementInner.Width);
+        var layout = GetTextLayout(dpi, text, ArrangementInner.Width);
+        if (layout is null)
+            return;
+
         var additionalHeight = 0F;
         foreach (var line in layout)
         {

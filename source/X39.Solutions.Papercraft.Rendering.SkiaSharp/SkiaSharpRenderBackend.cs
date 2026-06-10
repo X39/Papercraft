@@ -149,15 +149,16 @@ public sealed class SkiaSharpRenderBackend : IPapercraftRenderBackend
             PapercraftActivity.SetValidation(activity, validation);
             validation.ThrowIfUnsupported();
 
+            using var imageDecodeCache = new SkiaImageDecodeCache();
             foreach (var page in document.Pages)
             {
                 using var pageActivity = PapercraftActivity.Start(SkiaSharpActivityNames.RenderRasterPage);
                 pageActivity?.SetTag(PapercraftActivity.PageIndexTag, page.PageIndex);
                 pageActivity?.SetTag(PapercraftActivity.PageNumberTag, page.PageNumber);
-                try
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    using var bitmap = RenderPageToBitmap(page, document.DocumentOptions);
+                    try
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                    using var bitmap = RenderPageToBitmap(page, document.DocumentOptions, imageDecodeCache);
                     var pageInfo = new RasterPageInfo(
                         page.PageIndex,
                         page.PageNumber,
@@ -234,11 +235,12 @@ public sealed class SkiaSharpRenderBackend : IPapercraftRenderBackend
                 return;
             }
 
+            using var imageDecodeCache = new SkiaImageDecodeCache();
             foreach (var page in document.Pages)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 using var canvas = skDocument.BeginPage(page.PageSize.Width, page.PageSize.Height);
-                _displayListRenderer.Render(canvas, page.DisplayList);
+                _displayListRenderer.Render(canvas, page.DisplayList, imageDecodeCache);
                 skDocument.EndPage();
             }
 
@@ -269,7 +271,8 @@ public sealed class SkiaSharpRenderBackend : IPapercraftRenderBackend
 
             cancellationToken.ThrowIfCancellationRequested();
             var page = document.Pages[0];
-            using var bitmap = RenderPageToBitmap(page, document.DocumentOptions);
+            using var imageDecodeCache = new SkiaImageDecodeCache();
+            using var bitmap = RenderPageToBitmap(page, document.DocumentOptions, imageDecodeCache);
             using (var encodeActivity = PapercraftActivity.Start(SkiaSharpActivityNames.EncodePng))
             {
                 encodeActivity?.SetTag(PapercraftActivity.PageIndexTag, page.PageIndex);
@@ -286,7 +289,10 @@ public sealed class SkiaSharpRenderBackend : IPapercraftRenderBackend
         }
     }
 
-    private SKBitmap RenderPageToBitmap(PapercraftPage page, DocumentOptions options)
+    private SKBitmap RenderPageToBitmap(
+        PapercraftPage page,
+        DocumentOptions options,
+        SkiaImageDecodeCache? imageDecodeCache = null)
     {
         using var activity = PapercraftActivity.Start(SkiaSharpActivityNames.RenderPageToBitmap);
         activity?.SetTag(PapercraftActivity.PageIndexTag, page.PageIndex);
@@ -298,7 +304,10 @@ public sealed class SkiaSharpRenderBackend : IPapercraftRenderBackend
                 (int)Math.Ceiling(page.PageSize.Height));
             using var canvas = new SKCanvas(bitmap);
             canvas.Clear(SKColors.White);
-            _displayListRenderer.Render(canvas, page.DisplayList);
+            if (imageDecodeCache is null)
+                _displayListRenderer.Render(canvas, page.DisplayList);
+            else
+                _displayListRenderer.Render(canvas, page.DisplayList, imageDecodeCache);
             return bitmap;
         }
         catch (Exception ex)
