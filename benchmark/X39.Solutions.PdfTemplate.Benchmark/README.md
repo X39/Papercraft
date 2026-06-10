@@ -15,6 +15,7 @@ This project is not packable.
 | Template creation | `TemplateCreationBenchmarks`, `DefaultControlTemplateCreationBenchmarks`, `CreationSurfaceBenchmarks` |
 | Parsing and transformers | `ParsingBenchmarks`, `TransformerDirectBenchmarks`, `TransformerParsingBenchmarks`, `TransformerGenerationBenchmarks` |
 | Full generation | `GenerationBenchmarks`, `ControlGenerationBenchmarks` |
+| PDF comparison | `PdfComparisonBenchmarks` |
 
 Benchmark categories are defined in `BenchmarkCategories.cs`:
 
@@ -24,6 +25,7 @@ Benchmark categories are defined in `BenchmarkCategories.cs`:
 - `Parsing`
 - `TemplateCreation`
 - `Generation`
+- `Comparison`
 
 ## Run Benchmarks
 
@@ -43,6 +45,12 @@ Run a short activation smoke test:
 
 ```shell
 dotnet run -c Release --project benchmark/X39.Solutions.PdfTemplate.Benchmark/X39.Solutions.PdfTemplate.Benchmark.csproj -- --anyCategories Activation --job Short --warmupCount 1 --iterationCount 1
+```
+
+Run the focused PDF comparison:
+
+```shell
+dotnet run -c Release --project benchmark/X39.Solutions.PdfTemplate.Benchmark/X39.Solutions.PdfTemplate.Benchmark.csproj -- --anyCategories Comparison --job Short --warmupCount 3 --iterationCount 10
 ```
 
 BenchmarkDotNet writes reports under `BenchmarkDotNet.Artifacts/`.

@@ -46,6 +46,34 @@ dotnet run -c Release --project benchmark/X39.Solutions.PdfTemplate.Benchmark/X3
 dotnet run -c Release --project benchmark/X39.Solutions.PdfTemplate.Benchmark/X39.Solutions.PdfTemplate.Benchmark.csproj -- --anyCategories Generation --job Dry
 ```
 
+Focused PDF comparison run:
+
+```powershell
+dotnet run -c Release --project benchmark/X39.Solutions.PdfTemplate.Benchmark/X39.Solutions.PdfTemplate.Benchmark.csproj -- --anyCategories Comparison --job Short --warmupCount 3 --iterationCount 10
+```
+
+`PdfComparisonBenchmarks` renders the same deterministic 28-row invoice shape to an in-memory PDF through three paths:
+
+- direct SkiaSharp PDF/A drawing, as the lower-level baseline for the current backend output mode
+- QuestPDF, as a mainstream code-first .NET PDF layout engine
+- Papercraft XML template rendering through the public compatibility generator
+
+Current local reference run, generated on 2026-06-10 with BenchmarkDotNet 0.15.8, Windows 11,
+AMD Ryzen 9 5900X, .NET SDK 10.0.201, `Short` job, 3 warmups and 10 measured iterations:
+
+| Method | Mean | Allocated | Ratio vs direct SkiaSharp |
+|--------|-----:|----------:|--------------------------:|
+| Direct SkiaSharp PDF/A | 23.487 ms | 2,308.87 KB | 1.00 |
+| QuestPDF PDF | 7.805 ms | 736.44 KB | 0.33 |
+| Papercraft XML PDF/A | 32.677 ms | 5,337.52 KB | 1.39 |
+
+This is not a README headline benchmark yet. Papercraft is close to the current SkiaSharp PDF/A emission path,
+but it is about 4.2x slower and about 7.2x heavier in managed allocations than QuestPDF for this invoice shape.
+The current target before making a public performance claim is Papercraft XML PDF below 12 ms and below 2 MB allocated
+on this harness, with the generator phase below 5 ms. The PDF activity profile for the same case currently attributes
+about 23.6 ms to SkiaSharp PDF/A emission and about 13.3 ms to Papercraft generation when tracing is enabled, so backend
+PDF emission and page composition are the first optimization areas.
+
 ## Reports and graphs
 
 BenchmarkDotNet writes HTML, Markdown, CSV, and raw measurement reports to `BenchmarkDotNet.Artifacts/results/`.
@@ -77,10 +105,13 @@ The default workflow inputs use the `Short` BenchmarkDotNet job so the run is pr
 - `CreationSurfaceBenchmarks` measures a more realistic creation surface: XML parse plus `Template.CreateAsync`, repeated parameter-heavy controls, controls with completed or yielding `IInitializeControlAsync` hooks, and transformer/function-heavy templates before control creation.
 - `ParsingBenchmarks` measures XML parsing and template transformation for small, medium, and large deterministic templates.
 - `GenerationBenchmarks` measures full `GenerateBitmapsAsync` for a representative invoice/table document and disposes all returned bitmaps inside the measured method.
+- `PdfComparisonBenchmarks` compares direct SkiaSharp PDF/A drawing, QuestPDF PDF generation and Papercraft XML PDF/A generation for one deterministic invoice/table shape.
 
 ## Caveats
 
 - Run in `Release`; Debug results are not useful.
+- The PDF comparison methods produce similar invoice-shaped documents, not byte-identical output.
+- The direct SkiaSharp and Papercraft paths use the current SkiaSharp PDF/A output mode; the QuestPDF path uses QuestPDF's normal PDF output.
 - Activation prototype benchmarks use benchmark-local controls. Real controls may have different constructor and parameter profiles.
 - `ControlActivationCache.CreateControl` returns directly after activation when no parameters or content are supplied.
 - Per-control activation/template benchmarks use built-in control types directly; full rendering uses valid parent/child compositions for controls that cannot render standalone.

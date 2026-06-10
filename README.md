@@ -174,6 +174,18 @@ Run tests:
 dotnet test --framework net10.0 --no-build --verbosity normal
 ```
 
+Run focused PDF comparison benchmarks:
+
+```shell
+dotnet run -c Release --project benchmark/X39.Solutions.PdfTemplate.Benchmark/X39.Solutions.PdfTemplate.Benchmark.csproj -- --anyCategories Comparison --job Short --warmupCount 3 --iterationCount 10
+```
+
+The comparison benchmark intentionally measures a deterministic 28-row invoice against direct SkiaSharp PDF/A output,
+QuestPDF PDF output and Papercraft XML template PDF/A output. Current local results are tracked in the benchmark README
+rather than advertised as a package performance claim: Papercraft is close to the current SkiaSharp PDF/A backend path,
+but still several times slower than QuestPDF on this shape. The current tuning target for this benchmark is below 12 ms
+and below 2 MB allocated for Papercraft XML PDF/A generation on the maintainer Ryzen 9 5900X/.NET 10 harness.
+
 Create a local package:
 
 ```shell

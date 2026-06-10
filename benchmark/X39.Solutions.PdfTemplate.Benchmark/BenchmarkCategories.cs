@@ -8,4 +8,5 @@ internal static class BenchmarkCategories
     public const string Parsing = "Parsing";
     public const string TemplateCreation = "TemplateCreation";
     public const string Generation = "Generation";
+    public const string Comparison = "Comparison";
 }
