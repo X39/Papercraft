@@ -11,6 +11,8 @@ namespace X39.Solutions.Papercraft.Controls;
 [Control(Constants.ControlsNamespace, "hyperlink")]
 public sealed class HyperlinkControl : TextBaseControl
 {
+    private bool _underline = true;
+
     /// <summary>
     /// Creates a new instance of <see cref="HyperlinkControl"/>.
     /// </summary>
@@ -19,6 +21,7 @@ public sealed class HyperlinkControl : TextBaseControl
     public HyperlinkControl(ITextService textService) : base(textService)
     {
         Foreground = Colors.Blue;
+        Decoration = TextDecoration.Underline;
     }
 
     /// <summary>
@@ -37,7 +40,17 @@ public sealed class HyperlinkControl : TextBaseControl
     /// Whether the visible text should be underlined.
     /// </summary>
     [Parameter]
-    public bool Underline { get; set; } = true;
+    public bool Underline
+    {
+        get => _underline;
+        set
+        {
+            _underline = value;
+            Decoration = value
+                ? Decoration | TextDecoration.Underline
+                : Decoration & ~(TextDecoration.Underline | TextDecoration.DoubleUnderline);
+        }
+    }
 
     /// <inheritdoc />
     protected override string GetText() => Text;
@@ -47,12 +60,6 @@ public sealed class HyperlinkControl : TextBaseControl
     {
         var text = GetText().Trim();
         RenderText(canvas, dpi, text);
-
-        if (Underline && text.Length > 0 && ArrangementInner is {Width: > 0F, Height: > 0F})
-        {
-            var y = Math.Max(0F, ArrangementInner.Height - 1F);
-            canvas.DrawLine(Foreground, 1F, 0F, y, ArrangementInner.Width, y);
-        }
 
         return Size.Zero;
     }

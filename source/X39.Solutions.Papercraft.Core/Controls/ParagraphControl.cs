@@ -91,6 +91,16 @@ public sealed class ParagraphControl : AlignableContentControl
     }
 
     /// <summary>
+    /// Decorations applied to the text.
+    /// </summary>
+    [Parameter]
+    public TextDecoration Decoration
+    {
+        get => TextStyle.Decoration;
+        set => TextStyle = TextStyle with { Decoration = value };
+    }
+
+    /// <summary>
     /// The width or letter-spacing of the font.
     /// </summary>
     [Parameter]

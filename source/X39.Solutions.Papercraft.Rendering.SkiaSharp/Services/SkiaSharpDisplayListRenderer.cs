@@ -65,11 +65,14 @@ public sealed class SkiaSharpDisplayListRenderer
                 canvas.DrawRect(ToSkRect(rectangle.Rectangle), _paintCache.Get(ToColor(rectangle.Color)));
                 break;
             case DrawTextCommand text:
-                canvas.DrawText(
+                SkiaTextDecorationRenderer.DrawText(
+                    canvas,
+                    _paintCache,
+                    ToTextStyle(text.TextStyle),
+                    text.Dpi,
                     text.Text,
                     text.X,
-                    text.Y,
-                    _paintCache.Get(ToTextStyle(text.TextStyle), text.Dpi));
+                    text.Y);
                 break;
             case DrawImageCommand image:
                 DrawImage(canvas, image);
@@ -106,6 +109,7 @@ public sealed class SkiaSharpDisplayListRenderer
             LineHeight = textStyle.LineHeight,
             Rotation = textStyle.Rotation,
             StrokeThickness = textStyle.StrokeThickness,
+            Decoration = textStyle.Decoration,
         };
 
     private static Font ToFont(DisplayFont font)

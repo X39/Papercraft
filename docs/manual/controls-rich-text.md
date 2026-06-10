@@ -20,9 +20,9 @@ Use [`text`](controls-text.md) instead when all words in the control share one s
 This fragment mirrors the activation coverage in `ParagraphControlTests`:
 
 ```xml
-<paragraph foreground="red" fontsize="14" lineheight="1.5">
+<paragraph foreground="red" fontsize="14" lineheight="1.5" decoration="underline">
     <span>Total: </span>
-    <span foreground="blue" weight="bold">Value</span>
+    <span foreground="blue" weight="bold" decoration="doubleUnderline">Value</span>
     <br/>
 </paragraph>
 ```
@@ -61,10 +61,10 @@ The `href` value is kept as control data; it does not create a PDF navigation an
 
 | Control | Attributes |
 |---------|------------|
-| `paragraph` | Text styling attributes: `foreground`, `fontsize`, `lineheight`, `scale`, `rotation`, `strokethickness`, `letterspacing`, `weight`, `style`, `fontfamily`; shared layout attributes. |
-| `span` | `text` or element content, plus optional text styling overrides: `foreground`, `fontsize`, `lineheight`, `scale`, `rotation`, `strokethickness`, `letterspacing`, `weight`, `style`, `fontfamily`. |
+| `paragraph` | Text styling attributes: `foreground`, `fontsize`, `lineheight`, `scale`, `rotation`, `strokethickness`, `decoration`, `letterspacing`, `weight`, `style`, `fontfamily`; shared layout attributes. |
+| `span` | `text` or element content, plus optional text styling overrides: `foreground`, `fontsize`, `lineheight`, `scale`, `rotation`, `strokethickness`, `decoration`, `letterspacing`, `weight`, `style`, `fontfamily`. |
 | `br` | Shared layout attributes only; no control-specific attributes. |
-| `hyperlink` | `href`, `text` or element content, `underline`, text styling attributes and shared layout attributes. |
+| `hyperlink` | `href`, `text` or element content, `underline`, `decoration`, text styling attributes and shared layout attributes. |
 
 For shared `margin`, `padding`, `clip`, `horizontalAlignment` and `verticalAlignment`, see
 [Layout fundamentals](layout-fundamentals.md).

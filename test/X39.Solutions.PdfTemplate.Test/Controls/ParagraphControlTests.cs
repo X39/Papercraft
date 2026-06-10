@@ -24,6 +24,7 @@ public class ParagraphControlTests
                                 scale="1.2"
                                 rotation="5"
                                 strokethickness="2"
+                                decoration="underline"
                                 letterspacing="5"
                                 weight="bold"
                                 style="italic"
@@ -40,6 +41,7 @@ public class ParagraphControlTests
         Assert.Equal(1.2F, control.Scale);
         Assert.Equal(5F, control.Rotation);
         Assert.Equal(2F, control.StrokeThickness);
+        Assert.Equal(TextDecoration.Underline, control.Decoration);
         Assert.Equal(FontWidths.Normal, control.LetterSpacing);
         Assert.Equal(FontWeights.Bold, control.Weight);
         Assert.Equal(EFontStyle.Italic, control.Style);
@@ -145,6 +147,30 @@ public class ParagraphControlTests
         canvas.AssertDrawText(
             (baseStyle, "Default", 0F, 10F),
             (overrideStyle, "Bold", 35F, 10F));
+    }
+
+    [Fact]
+    public void SpanDecorationOverrideChangesDrawTextStyle()
+    {
+        var control = CreateParagraph();
+        control.Decoration = TextDecoration.Underline;
+        control.Add(new SpanControl { Text = "Default" });
+        control.Add(
+            new SpanControl
+            {
+                Text = "Deleted",
+                Decoration = TextDecoration.StrikeThrough,
+            });
+        var canvas = CreateCanvas();
+
+        ArrangeAndRender(control, canvas);
+
+        var baseStyle = control.GetTextStyle();
+        var overrideStyle = baseStyle with { Decoration = TextDecoration.StrikeThrough };
+        canvas.AssertState();
+        canvas.AssertDrawText(
+            (baseStyle, "Default", 0F, 10F),
+            (overrideStyle, "Deleted", 35F, 10F));
     }
 
     [Fact]

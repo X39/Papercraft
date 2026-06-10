@@ -117,6 +117,7 @@ internal sealed class DeferredCanvasImpl : IDeferredCanvas
             LineHeight       = textStyle.LineHeight,
             Rotation         = textStyle.Rotation,
             StrokeThickness  = textStyle.StrokeThickness,
+            Decoration       = textStyle.Decoration,
         };
 
     private static DisplayFont ToDisplay(Font font)

@@ -26,6 +26,7 @@ public class HyperlinkControlTests
         Assert.Equal("https://example.test/invoice/123", control.Href);
         Assert.Equal("View invoice", control.Text);
         Assert.False(control.Underline);
+        Assert.Equal(TextDecoration.None, control.Decoration);
         Assert.Equal(Colors.Red, control.Foreground);
         Assert.Equal(14F, control.FontSize);
     }
@@ -39,6 +40,7 @@ public class HyperlinkControlTests
         Assert.Equal("mailto:support@example.test", control.Href);
         Assert.Equal("Contact support", control.Text);
         Assert.True(control.Underline);
+        Assert.Equal(TextDecoration.Underline, control.Decoration);
         Assert.Equal(Colors.Blue, control.Foreground);
     }
 
@@ -58,16 +60,17 @@ public class HyperlinkControlTests
     }
 
     [Fact]
-    public void RendersVisibleTextAndUnderlineByDefault()
+    public void RendersVisibleTextWithUnderlineDecorationByDefault()
     {
         var control = CreateControl("Portal");
         var canvas = CreateCanvas();
 
         ArrangeAndRender(control, canvas);
 
+        Assert.Equal(TextDecoration.Underline, control.GetTextStyle().Decoration);
         canvas.AssertState();
         canvas.AssertDrawText(control.GetTextStyle(), "Portal", 0F, 10F);
-        canvas.AssertDrawLine((Colors.Blue, 1F, 0F, 9F, 30F, 9F));
+        Assert.Equal(0, canvas.DrawLineCount);
     }
 
     [Fact]
@@ -79,6 +82,7 @@ public class HyperlinkControlTests
 
         ArrangeAndRender(control, canvas);
 
+        Assert.Equal(TextDecoration.None, control.GetTextStyle().Decoration);
         canvas.AssertState();
         canvas.AssertDrawText(control.GetTextStyle(), "Portal", 0F, 10F);
         Assert.Equal(0, canvas.DrawLineCount);
@@ -93,9 +97,10 @@ public class HyperlinkControlTests
         ArrangeAndRender(control, canvas);
 
         Assert.Equal(string.Empty, control.Href);
+        Assert.Equal(TextDecoration.Underline, control.GetTextStyle().Decoration);
         canvas.AssertState();
         canvas.AssertDrawText(control.GetTextStyle(), "No target", 0F, 10F);
-        canvas.AssertDrawLine((Colors.Blue, 1F, 0F, 9F, 45F, 9F));
+        Assert.Equal(0, canvas.DrawLineCount);
     }
 
     private static HyperlinkControl CreateControl(string text)

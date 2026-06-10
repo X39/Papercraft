@@ -17,6 +17,7 @@ public sealed class SpanControl : Control
     private float _scale;
     private float _rotation;
     private float _strokeThickness;
+    private TextDecoration _decoration;
     private FontWidth _letterSpacing;
     private FontWeight _weight;
     private EFontStyle _style;
@@ -28,6 +29,7 @@ public sealed class SpanControl : Control
     private bool _hasScale;
     private bool _hasRotation;
     private bool _hasStrokeThickness;
+    private bool _hasDecoration;
     private bool _hasLetterSpacing;
     private bool _hasWeight;
     private bool _hasStyle;
@@ -124,6 +126,20 @@ public sealed class SpanControl : Control
     }
 
     /// <summary>
+    /// Optional text decoration override for this span.
+    /// </summary>
+    [Parameter]
+    public TextDecoration Decoration
+    {
+        get => _decoration;
+        set
+        {
+            _decoration = value;
+            _hasDecoration = true;
+        }
+    }
+
+    /// <summary>
     /// Optional letter spacing override for this span.
     /// </summary>
     [Parameter]
@@ -194,6 +210,8 @@ public sealed class SpanControl : Control
             textStyle = textStyle with { Rotation = _rotation };
         if (_hasStrokeThickness)
             textStyle = textStyle with { StrokeThickness = _strokeThickness };
+        if (_hasDecoration)
+            textStyle = textStyle with { Decoration = _decoration };
         if (_hasLetterSpacing)
             textStyle = textStyle with
             {

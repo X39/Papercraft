@@ -52,7 +52,9 @@ internal class TextService : ITextService
             lines++;
             resultWidth = Math.Max(resultWidth, width);
         }
-        var height = skPaint.FontMetrics.Bottom + -skPaint.FontMetrics.Top;
+        var height = skPaint.FontMetrics.Bottom
+                     + -skPaint.FontMetrics.Top
+                     + SkiaTextDecorationRenderer.GetDecorationExtraHeight(textStyle, skPaint);
         return new Size(resultWidth, height + (lines - 1) * (height * textStyle.LineHeight));
     }
     private static ReadOnlySpanPair<char> NextLine(ReadOnlySpan<char> text)
@@ -65,30 +67,67 @@ internal class TextService : ITextService
 
     private static ReadOnlySpanPair<char> DivideAndConquer(ReadOnlySpan<char> text, SKPaint skPaint, float maxWidth, out float leftWidth)
     {
-        const int start = 0;
+        if (text.IsEmpty)
+        {
+            leftWidth = 0F;
+            return new ReadOnlySpanPair<char>(ReadOnlySpan<char>.Empty, ReadOnlySpan<char>.Empty);
+        }
+
         var end = text.Length;
         leftWidth = skPaint.MeasureText(text);
         while (leftWidth > maxWidth)
         {
-            for (end--; end > start; end--)
+            var breakIndex = LastWhitespaceBefore(text, end);
+            if (breakIndex < 0)
             {
-                if (!char.IsWhiteSpace(text[end]))
-                    continue;
-                break;
+                end       = FirstTokenEnd(text);
+                leftWidth = ConstrainLineWidth(skPaint.MeasureText(text[..end]), maxWidth);
+                return new ReadOnlySpanPair<char>(text[..end], text[end..]);
             }
 
-            if (end < 0)
-                return new ReadOnlySpanPair<char>(ReadOnlySpan<char>.Empty, text);
-
+            end       = breakIndex;
             leftWidth = skPaint.MeasureText(text[..end]);
         }
         return new ReadOnlySpanPair<char>(text[..end], text[end..]);
     }
 
+    private static int LastWhitespaceBefore(ReadOnlySpan<char> text, int endExclusive)
+    {
+        for (var i = Math.Min(endExclusive, text.Length) - 1; i > 0; i--)
+        {
+            if (char.IsWhiteSpace(text[i]))
+                return i;
+        }
+
+        return -1;
+    }
+
+    private static int FirstTokenEnd(ReadOnlySpan<char> text)
+    {
+        var isWhiteSpace = char.IsWhiteSpace(text[0]);
+        for (var i = 1; i < text.Length; i++)
+        {
+            if (char.IsWhiteSpace(text[i]) != isWhiteSpace)
+                return i;
+        }
+
+        return text.Length;
+    }
+
+    private static float ConstrainLineWidth(float width, float maxWidth)
+    {
+        if (float.IsNaN(maxWidth))
+            return width;
+
+        return Math.Max(0F, Math.Min(width, maxWidth));
+    }
+
     public void Draw(IDrawableCanvas canvas, TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
     {
         var skPaint = _paintCache.Get(textStyle, dpi);
-        var height = skPaint.FontMetrics.Bottom + -skPaint.FontMetrics.Top;
+        var height = skPaint.FontMetrics.Bottom
+                     + -skPaint.FontMetrics.Top
+                     + SkiaTextDecorationRenderer.GetDecorationExtraHeight(textStyle, skPaint);
         var right = text;
         var left = text;
         var y = 0F;

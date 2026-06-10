@@ -86,6 +86,7 @@ public sealed class PapercraftCoreContractTests
             new object[] { typeof(Length) },
             new object[] { typeof(LengthConverter) },
             new object[] { typeof(ELengthUnit) },
+            new object[] { typeof(TextDecoration) },
             new object[] { typeof(TextStyle) },
             new object[] { typeof(Font) },
             new object[] { typeof(EFontStyle) },

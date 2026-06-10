@@ -59,6 +59,9 @@ public sealed class TextDocumentationSamples : DocumentationSampleBase
                     <text fontsize="12" weight="bold">Bold text</text>
                     <text fontsize="12" style="italic">Italic text</text>
                     <text fontsize="12" weight="semiBold" foreground="#166534">Semi-bold green text</text>
+                    <text fontsize="12" decoration="underline">Underlined text</text>
+                    <text fontsize="12" decoration="strikeThrough">Strikethrough text</text>
+                    <text fontsize="12" decoration="doubleUnderline">Double-underlined text</text>
                 </body>
             </template>
             """);

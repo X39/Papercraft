@@ -32,7 +32,7 @@ internal sealed class ImmediateCanvasImpl : IImmediateCanvas
         => _canvas.Translate(point.X, point.Y);
 
     public void DrawText(TextStyle textStyle, float dpi, string text, float x, float y)
-        => _canvas.DrawText(text, x, y, _paintCache.Get(textStyle, dpi));
+        => SkiaTextDecorationRenderer.DrawText(_canvas, _paintCache, textStyle, dpi, text, x, y);
 
     public void DrawRect(Rectangle rectangle, Color color)
         => _canvas.DrawRect(rectangle.ToSkRect(), _paintCache.Get(color));

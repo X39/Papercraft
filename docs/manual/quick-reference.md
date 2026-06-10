@@ -43,14 +43,14 @@ For explanations and rendered examples, follow the linked control pages.
 
 | Need | Use | Common attributes |
 |------|-----|-------------------|
-| Text, labels, values. | [`text`](controls-text.md) | `fontsize`, `foreground`, `weight`, `style`, `fontfamily`, `margin`, `padding` |
+| Text, labels, values. | [`text`](controls-text.md) | `fontsize`, `foreground`, `weight`, `style`, `decoration`, `fontfamily`, `margin`, `padding` |
 | Box, background, callout, one-sided rule. | [`border`](controls-border.md) | `thickness`, `color`, `background`, `padding`, `margin`, `verticalAlignment` |
 | Image from template data or a resolver. | [`image`](controls-image.md) | `source`, `width`, `height` |
 | Horizontal or vertical separator. | [`line`](controls-line.md) | `length`, `thickness`, `orientation`, `color` |
 | Page number text. | [`pageNumber`](controls-page-number.md) | `mode`, `prefix`, `delimiter`, `suffix`, plus text styling attributes |
 | Rows and columns. | [`table`](controls-table.md), `th`, `tr`, `td` | `td width`, `td columnspan`, `padding`, `background`, `borderThickness`, `borderColor` |
 | Line, bar or pie chart. | [`chart`](controls-chart.md), `lineChart`, `barChart`, `pieChart`, `data` | `width`, `height`, `title`, chart-specific attributes |
-| Rich text, links and line breaks. | [`paragraph`, `span`, `br`, `hyperlink`](controls-rich-text.md) | text styling attributes, `href`, `underline` |
+| Rich text, links and line breaks. | [`paragraph`, `span`, `br`, `hyperlink`](controls-rich-text.md) | text styling attributes, `decoration`, `href`, `underline` |
 | Flow grouping, space and page breaks. | [`block`, `spacer`, `pageBreak`, `columns`](controls-flow.md) | `background`, `minHeight`, `pageBreakBefore`, `width`, `height`, `count`, `gap` |
 | Lists. | [`ul`, `ol`, `li`](controls-lists.md) | `marker`, `start`, `markerFormat`, `indent`, `markerWidth`, `itemSpacing` |
 | Checkboxes and signatures. | [`checkbox`, `signature`](controls-forms.md) | `checked`, `size`, `label`, signature line attributes |
@@ -82,6 +82,7 @@ The manual uses lower-case or lower-camel-case names for readability.
 | `text`, `pageNumber` | `scale` | Number. Default `1`. |
 | `text`, `pageNumber` | `rotation` | Number, in degrees. Default `0`. |
 | `text`, `pageNumber` | `strokethickness` | Number. Default `1`. |
+| `text`, `pageNumber` | `decoration` | `none`, `underline`, `strikeThrough`, `doubleUnderline`; values can be combined with commas. |
 | `text`, `pageNumber` | `letterspacing` | Number. |
 | `text`, `pageNumber` | `weight` | Number or names such as `normal`, `semiBold`, `bold`. |
 | `text`, `pageNumber` | `style` | `normal`, `upright`, `italic`, `oblique`. |
@@ -157,7 +158,7 @@ pages.
 | [`paragraph`](controls-rich-text.md) | Rich text made from inline fragments. | Text styling attributes; contains `span` and `br`. |
 | [`span`](controls-rich-text.md) | Inline text fragment inside `paragraph`. | `text` or content, plus text styling overrides. |
 | [`br`](controls-rich-text.md) | Explicit line break inside `paragraph`. | No control-specific attributes. |
-| [`hyperlink`](controls-rich-text.md) | Visual hyperlink-style text. | `href`, `text` or content, `underline`, plus text styling attributes. |
+| [`hyperlink`](controls-rich-text.md) | Visual hyperlink-style text. | `href`, `text` or content, `underline`, `decoration`, plus text styling attributes. |
 | [`ul`, `ol`, `li`](controls-lists.md) | Unordered and ordered lists. | `ul marker`; `ol start`, `markerFormat`; `indent`, `markerWidth`, `itemSpacing`; list children must be `li`. |
 | [`checkbox`](controls-forms.md) | Checkbox mark with plain label or child content. | `checked`, `size`, `label` or content, `gap`, `strokeColor`, `fill`, `checkColor`, `strokeThickness`. |
 | [`signature`](controls-forms.md) | Signature line with optional helper text. | `height`, `lineWidth`, `lineThickness`, `lineColor`, `label`, `subtext`, `textPlacement`, plus text styling attributes. |

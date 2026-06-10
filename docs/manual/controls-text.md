@@ -93,11 +93,12 @@ When the padding should be visible, put the text inside a `border` with a backgr
 
 ![Rendered text padding sample](../assets/samples/text-padding.png)
 
-## Make Text Bold Or Italic
+## Make Text Bold, Italic Or Decorated
 
 Use `weight="bold"` for bold text.
 Use `style="italic"` for italic text.
 Named weights such as `semiBold` are accepted by the font-weight converter.
+Use `decoration` for underline, strike-through and double underline.
 
 
 ```xml
@@ -107,14 +108,16 @@ Named weights such as `semiBold` are accepted by the font-weight converter.
         <text fontsize="12" weight="bold">Bold text</text>
         <text fontsize="12" style="italic">Italic text</text>
         <text fontsize="12" weight="semiBold" foreground="#166534">Semi-bold green text</text>
+        <text fontsize="12" decoration="underline">Underlined text</text>
+        <text fontsize="12" decoration="strikeThrough">Strikethrough text</text>
+        <text fontsize="12" decoration="doubleUnderline">Double-underlined text</text>
     </body>
 </template>
 ```
 
 ![Rendered text style and weight sample](../assets/samples/text-style-and-weight.png)
 
-No `underline` attribute is present on the built-in `TextBaseControl`, so this page does not document underline as
-supported.
+Decoration values can be combined, for example `decoration="underline, strikeThrough"`.
 
 ## Insert Data In Text
 
@@ -151,6 +154,7 @@ Parameter binding is case-insensitive, so `fontsize`, `FontSize` and `fontSize` 
 | `scale` | Horizontal text scale. | Number, default `1`. |
 | `rotation` | Text skew/rotation parameter passed to the renderer. | Number, default `0`. |
 | `strokethickness` | Stroke thickness for drawing the text. | Number, default `1`. |
+| `decoration` | Text decoration. | `none`, `underline`, `strikeThrough`, `doubleUnderline`; values can be combined with commas. |
 | `letterspacing` | Font width or letter-spacing value. | Number. |
 | `weight` | Font weight. | Number or names such as `normal`, `semiBold`, `bold`. |
 | `style` | Font slant. | `normal`, `upright`, `italic`, `oblique`. |
@@ -175,7 +179,7 @@ use a surrounding `border`, table cell or another container control instead.
 
 - Using `text` when a `border` is needed for background color or a visible box.
 - Putting controls inside `text`; use a container control such as `border`, `table` or `td` instead.
-- Expecting underline to work as a text attribute; the built-in text control does not expose an underline attribute.
+- Using `underline` on `text`; use `decoration="underline"` instead. The `underline` attribute is only for `hyperlink`.
 - Writing a long paragraph and assuming it will look right without checking the generated output.
 
 [Controls](controls.md) | [Manual home](index.md)

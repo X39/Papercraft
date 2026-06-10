@@ -73,6 +73,7 @@ public sealed class DeferredCanvasImplTests
             LineHeight = 3,
             Rotation = 4,
             StrokeThickness = 5,
+            Decoration = TextDecoration.Underline | TextDecoration.StrikeThrough,
         };
 
         canvas.DrawText(textStyle, 96, "Text", 7, 8);
@@ -90,5 +91,6 @@ public sealed class DeferredCanvasImplTests
         Assert.Equal(3F, command.TextStyle.LineHeight);
         Assert.Equal(4F, command.TextStyle.Rotation);
         Assert.Equal(5F, command.TextStyle.StrokeThickness);
+        Assert.Equal(TextDecoration.Underline | TextDecoration.StrikeThrough, command.TextStyle.Decoration);
     }
 }

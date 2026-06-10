@@ -11,9 +11,9 @@ public sealed class RichTextDocumentationSamples : DocumentationSampleBase
             <?xml version="1.0" encoding="utf-8"?>
             <template>
                 <body>
-                    <paragraph foreground="red" fontsize="14" lineheight="1.5">
+                    <paragraph foreground="red" fontsize="14" lineheight="1.5" decoration="underline">
                         <span>Total: </span>
-                        <span foreground="blue" weight="bold">Value</span>
+                        <span foreground="blue" weight="bold" decoration="doubleUnderline">Value</span>
                         <br/>
                     </paragraph>
                 </body>

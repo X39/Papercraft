@@ -91,7 +91,7 @@ public abstract class TextBaseControl : AlignableControl
     }
 
     /// <summary>
-    /// The rotation of the text, default is 0°.
+    /// The rotation of the text, default is 0 degrees.
     /// </summary>
     [Parameter]
     public float Rotation
@@ -113,6 +113,19 @@ public abstract class TextBaseControl : AlignableControl
         set => TextStyle = TextStyle with
         {
             StrokeThickness = value,
+        };
+    }
+
+    /// <summary>
+    /// Decorations applied to the text.
+    /// </summary>
+    [Parameter]
+    public TextDecoration Decoration
+    {
+        get => TextStyle.Decoration;
+        set => TextStyle = TextStyle with
+        {
+            Decoration = value,
         };
     }
 

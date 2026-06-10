@@ -48,4 +48,9 @@ public readonly record struct TextStyle()
     /// The thickness of the stroke for the <see cref="Foreground"/> color.
     /// </summary>
     public float StrokeThickness { get; init; } = 1F;
+
+    /// <summary>
+    /// Decorations applied to the text.
+    /// </summary>
+    public TextDecoration Decoration { get; init; } = TextDecoration.None;
 }

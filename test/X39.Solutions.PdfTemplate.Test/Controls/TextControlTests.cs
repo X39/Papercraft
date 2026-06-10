@@ -46,6 +46,19 @@ public class TextControlTests : IDisposable
         mock.AssertAllClip((rectangle) => rectangle is {Width: > 0, Height: > 0});
     }
 
+    [Theory]
+    [InlineData("underline", TextDecoration.Underline)]
+    [InlineData("strikeThrough", TextDecoration.StrikeThrough)]
+    [InlineData("doubleUnderline", TextDecoration.DoubleUnderline)]
+    [InlineData("underline, strikeThrough", TextDecoration.Underline | TextDecoration.StrikeThrough)]
+    public async Task XmlActivatesTextDecoration(string value, TextDecoration expected)
+    {
+        var control = await $"""<text decoration="{value}">Styled</text>""".ToControl<TextControl>();
+
+        Assert.Equal(expected, control.Decoration);
+        Assert.Equal(expected, control.GetTextStyle().Decoration);
+    }
+
     [Fact(Skip = "This test is not working in CI environment")]
     public void LeftAlignedText()
     {

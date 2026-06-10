@@ -239,7 +239,7 @@ Initial coverage is now in [Text control](controls-text.md), backed by `BasicDoc
 
 - How do I add plain text? Done in [Text control](controls-text.md#how-do-i-start), backed by `BasicDocumentationSamples.Text_Basic`.
 - How do I change font size? Done in [Change size and color](controls-text.md#change-size-and-color), backed by `TextDocumentationSamples.Text_FontSizeAndColor` and `TextBaseControl`.
-- How do I make text bold, italic or underlined when supported? Done in [Make text bold or italic](controls-text.md#make-text-bold-or-italic), backed by `TextDocumentationSamples.Text_StyleAndWeight`, `EFontStyle`, `FontWeightConverter` and `TextSample.NamedFontWeights`; underline is documented as not supported by the built-in `TextBaseControl`.
+- How do I make text bold, italic or decorated? Done in [Make text bold, italic or decorated](controls-text.md#make-text-bold-italic-or-decorated), backed by `TextDocumentationSamples.Text_StyleAndWeight`, `EFontStyle`, `FontWeightConverter`, `TextDecoration` and `TextSample.NamedFontWeights`.
 - How do I align text left, center and right? Done in [Align text](controls-text.md#align-text), backed by `TextDocumentationSamples.Text_Alignment` and `AlignableControl`.
 - How do I change text color? Done in [Change size and color](controls-text.md#change-size-and-color), backed by `TextDocumentationSamples.Text_FontSizeAndColor` and `TextBaseControl`.
 - How do I add padding around text? Done in [Text control](controls-text.md#add-padding-around-text), backed by `TextDocumentationSamples.Text_Padding`.

@@ -114,6 +114,7 @@ using System.Runtime.CompilerServices;
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Data.Point))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Data.Rectangle))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Data.Size))]
+[assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Data.TextDecoration))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Data.TextStyle))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Data.Thickness))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.Data.ThicknessConverter))]
