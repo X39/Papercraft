@@ -24,6 +24,7 @@ public sealed class PapercraftPackageScaffoldTests
         "IPapercraftRenderBackend.cs",
         "PapercraftDocument.cs",
         "PapercraftPage.cs",
+        "PapercraftInstrumentation.cs",
         "PapercraftRenderOptions.cs",
     };
 
@@ -45,6 +46,8 @@ public sealed class PapercraftPackageScaffoldTests
         "JetBrains",
         "PublicAPI",
         "MeansImplicitUse",
+        "OpenTelemetry",
+        "Microsoft.Extensions.Hosting",
     };
 
     private static readonly string[] BarcodeDependencyNames =
@@ -71,6 +74,7 @@ public sealed class PapercraftPackageScaffoldTests
     [InlineData("X39.Solutions.Papercraft.Core")]
     [InlineData("X39.Solutions.Papercraft.Rendering.SkiaSharp")]
     [InlineData("X39.Solutions.Papercraft")]
+    [InlineData("X39.Solutions.Papercraft.OpenTelemetry")]
     [InlineData("X39.Solutions.Papercraft.Controls.QrCode")]
     [InlineData("X39.Solutions.Papercraft.Controls.ZXing")]
     public void ScaffoldProjectsUsePlannedPackageIds(string packageId)
@@ -88,6 +92,7 @@ public sealed class PapercraftPackageScaffoldTests
         var core = LoadProject("X39.Solutions.Papercraft.Core");
         var skiaSharp = LoadProject("X39.Solutions.Papercraft.Rendering.SkiaSharp");
         var facade = LoadProject("X39.Solutions.Papercraft");
+        var openTelemetry = LoadProject("X39.Solutions.Papercraft.OpenTelemetry");
         var qrCodeControls = LoadProject("X39.Solutions.Papercraft.Controls.QrCode");
         var zxingControls = LoadProject("X39.Solutions.Papercraft.Controls.ZXing");
         var compatibility = LoadProject("X39.Solutions.PdfTemplate");
@@ -147,6 +152,25 @@ public sealed class PapercraftPackageScaffoldTests
             {
                 @"..\X39.Solutions.Papercraft.Core\X39.Solutions.Papercraft.Core.csproj",
             },
+            GetProjectReferences(openTelemetry),
+            StringComparer.OrdinalIgnoreCase);
+        Assert.Equal(
+            new[]
+            {
+                "Microsoft.Extensions.Hosting.Abstractions",
+                "OpenTelemetry",
+                "OpenTelemetry.Extensions.Hosting",
+            },
+            GetPackageReferences(openTelemetry),
+            StringComparer.OrdinalIgnoreCase);
+        Assert.DoesNotContain(GetProjectReferences(openTelemetry), ReferencesSkiaSharp);
+        Assert.DoesNotContain(GetPackageReferences(openTelemetry), ReferencesSkiaSharp);
+
+        Assert.Equal(
+            new[]
+            {
+                @"..\X39.Solutions.Papercraft.Core\X39.Solutions.Papercraft.Core.csproj",
+            },
             GetProjectReferences(qrCodeControls),
             StringComparer.OrdinalIgnoreCase);
         Assert.Equal(
@@ -166,7 +190,7 @@ public sealed class PapercraftPackageScaffoldTests
             GetPackageReferences(zxingControls),
             StringComparer.OrdinalIgnoreCase);
 
-        foreach (var project in new[] { core, skiaSharp, facade, compatibility })
+        foreach (var project in new[] { core, skiaSharp, facade, openTelemetry, compatibility })
         {
             Assert.DoesNotContain(GetPackageReferences(project), ReferencesBarcodeDependency);
             Assert.DoesNotContain(GetProjectReferences(project), ReferencesBarcodePackage);
@@ -358,7 +382,9 @@ public sealed class PapercraftPackageScaffoldTests
 
     private static bool ReferencesLegacyCoreDependency(string reference)
         => reference.Contains("X39.Util", StringComparison.OrdinalIgnoreCase)
-           || reference.Contains("JetBrains", StringComparison.OrdinalIgnoreCase);
+           || reference.Contains("JetBrains", StringComparison.OrdinalIgnoreCase)
+           || reference.Contains("OpenTelemetry", StringComparison.OrdinalIgnoreCase)
+           || reference.Contains("Microsoft.Extensions.Hosting", StringComparison.OrdinalIgnoreCase);
 
     private static bool ReferencesBarcodeDependency(string reference)
         => BarcodeDependencyNames.Any((dependencyName) => reference.Contains(dependencyName, StringComparison.OrdinalIgnoreCase));

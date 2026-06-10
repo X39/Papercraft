@@ -88,6 +88,9 @@ internal sealed class Template : IAsyncDisposable
         CancellationToken cancellationToken
     )
     {
+        using var activity = PapercraftActivity.Start(PapercraftActivityNames.TemplateCreate);
+        try
+        {
         var headerControls = new List<IControl>();
         var bodyControls = new List<IControl>();
         var footerControls = new List<IControl>();
@@ -200,6 +203,12 @@ internal sealed class Template : IAsyncDisposable
             foregroundControls.AsReadOnly(),
             areaControls.AsReadOnly()
         );
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     private static async Task<IControl> CreateControlAsync(

@@ -6,6 +6,7 @@ using X39.Solutions.Papercraft.Attributes;
 using X39.Solutions.Papercraft.Data;
 using X39.Solutions.Papercraft.Data.Compound;
 using X39.Solutions.Papercraft.Display;
+using X39.Solutions.Papercraft.OpenTelemetry;
 using X39.Solutions.Papercraft.Exceptions;
 using X39.Solutions.Papercraft.Rendering.SkiaSharp;
 using X39.Solutions.Papercraft.Rendering.SkiaSharp.Abstraction;
@@ -43,6 +44,7 @@ public sealed class PapercraftCoreContractTests
             new object[] { typeof(TemplateLocation) },
             new object[] { typeof(IPapercraftRenderBackend) },
             new object[] { typeof(IPapercraftTemplateDataAccessor) },
+            new object[] { typeof(PapercraftInstrumentation) },
             new object[] { typeof(PapercraftRenderOptions) },
             new object[] { typeof(DocumentOptions) },
             new object[] { typeof(Constants) },
@@ -168,6 +170,12 @@ public sealed class PapercraftCoreContractTests
             new object[] { typeof(SkiaSharpCanvasCompatibilityExtensions) },
         };
 
+    public static IEnumerable<object[]> OpenTelemetryTypes
+        => new[]
+        {
+            new object[] { typeof(PapercraftOpenTelemetryHostExtensions) },
+        };
+
     [Theory]
     [MemberData(nameof(RendererNeutralTypes))]
     public void RendererNeutralTypesLiveInPapercraftCore(Type type)
@@ -189,6 +197,13 @@ public sealed class PapercraftCoreContractTests
         Assert.Equal("X39.Solutions.Papercraft.Rendering.SkiaSharp", type.Assembly.GetName().Name);
     }
 
+    [Theory]
+    [MemberData(nameof(OpenTelemetryTypes))]
+    public void OpenTelemetryTypesLiveInOpenTelemetryPackage(Type type)
+    {
+        Assert.Equal("X39.Solutions.Papercraft.OpenTelemetry", type.Assembly.GetName().Name);
+    }
+
     [Fact]
     public void CompatibilityBridgeForwardsSkiaSpecificRuntimeEntryPoints()
     {
@@ -200,6 +215,7 @@ public sealed class PapercraftCoreContractTests
         Assert.Contains(typeof(SkPaintCache), forwardedTypes);
         Assert.Contains(typeof(SkiaSharpCanvasCompatibilityExtensions), forwardedTypes);
         Assert.Contains(typeof(PapercraftGenerator), forwardedTypes);
+        Assert.Contains(typeof(PapercraftInstrumentation), forwardedTypes);
         Assert.Contains(typeof(PapercraftRenderer), forwardedTypes);
         Assert.Contains(typeof(PapercraftServiceBuilder), forwardedTypes);
         Assert.Contains(typeof(PapercraftServiceCollectionExtensions), forwardedTypes);
@@ -222,6 +238,7 @@ public sealed class PapercraftCoreContractTests
         Assert.Contains(typeof(PapercraftDocument), forwardedTypes);
         Assert.Contains(typeof(PapercraftPage), forwardedTypes);
         Assert.Contains(typeof(PapercraftGenerator), forwardedTypes);
+        Assert.Contains(typeof(PapercraftInstrumentation), forwardedTypes);
         Assert.Contains(typeof(PapercraftRenderer), forwardedTypes);
         Assert.Contains(typeof(PapercraftServiceBuilder), forwardedTypes);
         Assert.Contains(typeof(PapercraftServiceCollectionExtensions), forwardedTypes);

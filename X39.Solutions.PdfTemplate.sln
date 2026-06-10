@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source", "source", "{E290E22A-D697-4B30-A067-AF972686C3B5}"
 EndProject
@@ -52,6 +52,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X39.Solutions.Papercraft.Controls.QrCode", "source\X39.Solutions.Papercraft.Controls.QrCode\X39.Solutions.Papercraft.Controls.QrCode.csproj", "{762C60A1-235E-43DE-9111-66DF0706A80B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X39.Solutions.Papercraft.Controls.ZXing", "source\X39.Solutions.Papercraft.Controls.ZXing\X39.Solutions.Papercraft.Controls.ZXing.csproj", "{A986E375-6F3C-45DE-8BC6-67C57759ED2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "X39.Solutions.Papercraft.OpenTelemetry", "source\X39.Solutions.Papercraft.OpenTelemetry\X39.Solutions.Papercraft.OpenTelemetry.csproj", "{FB75C877-0844-4451-9C4D-42A35E680146}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -159,6 +161,18 @@ Global
 		{A986E375-6F3C-45DE-8BC6-67C57759ED2B}.Release|x64.Build.0 = Release|Any CPU
 		{A986E375-6F3C-45DE-8BC6-67C57759ED2B}.Release|x86.ActiveCfg = Release|Any CPU
 		{A986E375-6F3C-45DE-8BC6-67C57759ED2B}.Release|x86.Build.0 = Release|Any CPU
+		{FB75C877-0844-4451-9C4D-42A35E680146}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB75C877-0844-4451-9C4D-42A35E680146}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB75C877-0844-4451-9C4D-42A35E680146}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FB75C877-0844-4451-9C4D-42A35E680146}.Debug|x64.Build.0 = Debug|Any CPU
+		{FB75C877-0844-4451-9C4D-42A35E680146}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FB75C877-0844-4451-9C4D-42A35E680146}.Debug|x86.Build.0 = Debug|Any CPU
+		{FB75C877-0844-4451-9C4D-42A35E680146}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB75C877-0844-4451-9C4D-42A35E680146}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB75C877-0844-4451-9C4D-42A35E680146}.Release|x64.ActiveCfg = Release|Any CPU
+		{FB75C877-0844-4451-9C4D-42A35E680146}.Release|x64.Build.0 = Release|Any CPU
+		{FB75C877-0844-4451-9C4D-42A35E680146}.Release|x86.ActiveCfg = Release|Any CPU
+		{FB75C877-0844-4451-9C4D-42A35E680146}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -175,5 +189,6 @@ Global
 		{652994D1-E6AA-4E7C-9D2E-638361A8EFE6} = {09EED85C-BE3C-7566-DC0E-2E8E43466740}
 		{762C60A1-235E-43DE-9111-66DF0706A80B} = {E290E22A-D697-4B30-A067-AF972686C3B5}
 		{A986E375-6F3C-45DE-8BC6-67C57759ED2B} = {E290E22A-D697-4B30-A067-AF972686C3B5}
+		{FB75C877-0844-4451-9C4D-42A35E680146} = {E290E22A-D697-4B30-A067-AF972686C3B5}
 	EndGlobalSection
 EndGlobal

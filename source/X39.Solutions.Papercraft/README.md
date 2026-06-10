@@ -76,6 +76,7 @@ The template can then read `@CustomerName` through the template language.
 
 - [`X39.Solutions.Papercraft.Core`](../X39.Solutions.Papercraft.Core/README.md): renderer-neutral contracts, parser, controls, data types and transformers.
 - [`X39.Solutions.Papercraft.Rendering.SkiaSharp`](../X39.Solutions.Papercraft.Rendering.SkiaSharp/README.md): default PDF and raster backend.
+- [`X39.Solutions.Papercraft.OpenTelemetry`](../X39.Solutions.Papercraft.OpenTelemetry/README.md): optional host/OpenTelemetry registration for renderer activity tracing.
 - [`X39.Solutions.PdfTemplate`](../X39.Solutions.PdfTemplate/README.md): compatibility bridge for existing `X39.Solutions.PdfTemplate` consumers.
 
 The template-author manual lives in [`../../docs/manual`](../../docs/manual/index.md).

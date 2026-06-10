@@ -13,7 +13,7 @@ remaining release work needed before the Papercraft packages are the primary dis
 - `source/X39.Solutions.Papercraft.Core` now contains renderer-neutral contracts and the current shared
   runtime: XML parsing, template data, functions, transformers, control registration, built-in
   controls, deferred canvas/display-list primitives, render targets, diagnostics, capabilities,
-  `PapercraftGenerator`, `PapercraftRenderer`, `PapercraftServiceBuilder`, `AddPapercraftCore()`
+  `PapercraftGenerator`, `PapercraftRenderer`, `PapercraftInstrumentation`, `PapercraftServiceBuilder`, `AddPapercraftCore()`
   and related options.
   It must stay free of a SkiaSharp package reference.
 - `source/X39.Solutions.Papercraft.Rendering.SkiaSharp` owns the SkiaSharp-backed runtime: text
@@ -36,6 +36,7 @@ remaining release work needed before the Papercraft packages are the primary dis
 | `X39.Solutions.Papercraft.Core` | Renderer-neutral contracts, parsing, template data, layout/control abstractions, validation, diagnostics and display-list primitives. No SkiaSharp dependency. |
 | `X39.Solutions.Papercraft.Rendering.SkiaSharp` | SkiaSharp renderer, PDF/raster output, immediate drawing, image decoding, text measurement, font resolution, paint/cache services and Skia compatibility adapters. |
 | `X39.Solutions.Papercraft` | Batteries-included facade for normal application use. Depends on core and the default SkiaSharp renderer. |
+| `X39.Solutions.Papercraft.OpenTelemetry` | Optional host/OpenTelemetry integration that registers Papercraft's core `ActivitySource` without adding hosting dependencies to Core. |
 | `X39.Solutions.PdfTemplate` | Compatibility bridge for existing users. Keeps old service registration, namespaces, templates and common extension points working while forwarding to Papercraft packages. |
 
 Core should define what a renderer can do; renderer packages should define how output is produced.
@@ -97,7 +98,7 @@ are the stable contracts between callers, the generator and backends.
 
 Current core-owned renderer-neutral contract inventory:
 `IPapercraftRenderBackend`, `PapercraftDocument`, `PapercraftPage`, `PapercraftRenderOptions`,
-`PapercraftMediaTypes`, `RenderTarget`, `RenderOutput`, `RasterPageInfo`,
+`PapercraftInstrumentation`, `PapercraftMediaTypes`, `RenderTarget`, `RenderOutput`, `RasterPageInfo`,
 `RasterPageRenderOutput`, `RendererOutputKind`, `RendererSupportLevel`, `RendererCapabilities`,
 `RendererFeatures`, `RenderFeatureUse`, `RenderDiagnosticCodes`, `RenderDiagnostic`,
 `RenderValidationResult`, `RenderValidationException` and `TemplateLocation`.
@@ -128,6 +129,7 @@ Current core-owned renderer-neutral contract inventory:
   dependency graph.
 - Assert that `X39.Solutions.Papercraft.Core` has no SkiaSharp reference and that Skia-specific APIs live in
   `X39.Solutions.Papercraft.Rendering.SkiaSharp` or the bridge.
+- Assert that OpenTelemetry and hosting references stay in `X39.Solutions.Papercraft.OpenTelemetry`, not Core.
 - Cover `AddPapercraftCore()`, `AddPapercraftSkiaSharpRenderer()`, `AddPapercraft()` and
   `AddPdfTemplateService()` registration paths.
 - Test renderer selection, missing renderer ids, unsupported targets, degraded strict mode and

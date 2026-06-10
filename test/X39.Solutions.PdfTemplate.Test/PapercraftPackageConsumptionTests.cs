@@ -312,6 +312,46 @@ public sealed class PapercraftPackageConsumptionTests
     }
 
     [Fact]
+    public async Task OpenTelemetryPackageConsumerCompilesHostRegistrationExtensions()
+    {
+        using var project = TemporaryConsumerProject.Create(
+            "OpenTelemetryConsumer",
+            new[] { ProjectPath("source", "X39.Solutions.Papercraft.OpenTelemetry", "X39.Solutions.Papercraft.OpenTelemetry.csproj") },
+            """
+            using Microsoft.Extensions.DependencyInjection;
+            using Microsoft.Extensions.Hosting;
+            using X39.Solutions.Papercraft.OpenTelemetry;
+
+            namespace OpenTelemetryConsumer;
+
+            public static class OpenTelemetrySmoke
+            {
+                public static void Configure()
+                {
+                    var applicationBuilder = Host.CreateApplicationBuilder();
+                    applicationBuilder.AddPapercraftOpenTelemetry();
+                    applicationBuilder.Services.AddPapercraftOpenTelemetry();
+
+                    var hostBuilder = Host.CreateDefaultBuilder();
+                    hostBuilder.AddPapercraftOpenTelemetry();
+                }
+            }
+            """,
+            packageReferences: new[]
+            {
+                new PackageReferenceSpec("Microsoft.Extensions.Hosting", "10.0.8"),
+            });
+
+        await project.BuildAsync();
+        project.AssertAssetsContainLibrary("X39.Solutions.Papercraft.OpenTelemetry");
+        project.AssertAssetsContainLibrary("X39.Solutions.Papercraft.Core");
+        project.AssertAssetsContainLibrary("OpenTelemetry");
+        project.AssertAssetsContainLibrary("OpenTelemetry.Extensions.Hosting");
+        project.AssertAssetsDoesNotContainLibrary("X39.Solutions.PdfTemplate");
+        project.AssertAssetsDoesNotContainLibrary("SkiaSharp");
+    }
+
+    [Fact]
     public async Task QrCodeControlPackageConsumerCompilesWithoutZxing()
     {
         using var project = TemporaryConsumerProject.Create(

@@ -31,9 +31,19 @@ public sealed class SkiaSharpDisplayListRenderer
         ArgumentNullException.ThrowIfNull(canvas);
         ArgumentNullException.ThrowIfNull(displayList);
 
-        foreach (var command in displayList.Commands)
+        using var activity = PapercraftActivity.Start(SkiaSharpActivityNames.DisplayListRender);
+        activity?.SetTag(PapercraftActivity.DisplayListCommandCountTag, displayList.Commands.Count);
+        try
         {
-            RenderCommand(canvas, command);
+            foreach (var command in displayList.Commands)
+            {
+                RenderCommand(canvas, command);
+            }
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
         }
     }
 

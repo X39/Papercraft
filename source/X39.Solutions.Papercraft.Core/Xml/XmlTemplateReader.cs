@@ -78,10 +78,46 @@ public sealed class XmlTemplateReader : IDisposable
     /// </returns>
     public async Task<XmlNodeInformation> ReadAsync(XmlReader reader, CancellationToken cancellationToken = default)
     {
-        var nodeTree = ReadXmlNode(reader);
-        await TransformNodeTreeAsync(nodeTree, cancellationToken)
-            .ConfigureAwait(false);
-        return HandleNode(nodeTree);
+        XmlNode nodeTree;
+        using (var activity = PapercraftActivity.Start(PapercraftActivityNames.TemplateReadXml))
+        {
+            try
+            {
+                nodeTree = ReadXmlNode(reader);
+            }
+            catch (Exception ex)
+            {
+                PapercraftActivity.SetError(activity, ex);
+                throw;
+            }
+        }
+
+        using (var activity = PapercraftActivity.Start(PapercraftActivityNames.TemplateTransform))
+        {
+            try
+            {
+                await TransformNodeTreeAsync(nodeTree, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                PapercraftActivity.SetError(activity, ex);
+                throw;
+            }
+        }
+
+        using (var activity = PapercraftActivity.Start(PapercraftActivityNames.TemplateMaterialize))
+        {
+            try
+            {
+                return HandleNode(nodeTree);
+            }
+            catch (Exception ex)
+            {
+                PapercraftActivity.SetError(activity, ex);
+                throw;
+            }
+        }
     }
 
     private async Task TransformNodeTreeAsync(XmlNode nodeTree, CancellationToken cancellationToken = default)

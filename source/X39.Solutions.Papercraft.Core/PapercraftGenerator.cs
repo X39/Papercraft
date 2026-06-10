@@ -1,4 +1,5 @@
 using System.Xml;
+using System.Diagnostics;
 using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Canvas;
 using X39.Solutions.Papercraft.Data;
@@ -80,24 +81,35 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
         ArgumentNullException.ThrowIfNull(cultureInfo);
         cancellationToken.ThrowIfCancellationRequested();
 
-        var options = documentOptions ?? DocumentOptions.Default;
-        using var templateDataScope = TemplateData.Scope("Document");
-        XmlNodeInformation rootNode;
-        using (var templateReader = new XmlTemplateReader(options, cultureInfo, TemplateData, _transformers))
-            rootNode = await templateReader.ReadAsync(reader, cancellationToken)
+        using var activity = PapercraftActivity.Start(PapercraftActivityNames.GeneratorGenerate);
+        try
+        {
+            var options = documentOptions ?? DocumentOptions.Default;
+            using var templateDataScope = TemplateData.Scope("Document");
+            XmlNodeInformation rootNode;
+            using (var templateReader = new XmlTemplateReader(options, cultureInfo, TemplateData, _transformers))
+                rootNode = await templateReader.ReadAsync(reader, cancellationToken)
+                    .ConfigureAwait(false);
+
+            await using var template = await Template.CreateAsync(
+                    rootNode,
+                    _controlFactory,
+                    cultureInfo,
+                    options.Context,
+                    cancellationToken)
                 .ConfigureAwait(false);
 
-        await using var template = await Template.CreateAsync(
-                rootNode,
-                _controlFactory,
-                cultureInfo,
-                options.Context,
-                cancellationToken)
-            .ConfigureAwait(false);
-
-        var layout = MeasureAndArrange(template, options, cultureInfo);
-        var pages = ComposePages(template, options, layout, cultureInfo, cancellationToken);
-        return new PapercraftDocument(pages, cultureInfo, options);
+            var layout = MeasureAndArrange(template, options, cultureInfo);
+            var pages = ComposePages(template, options, layout, cultureInfo, cancellationToken);
+            var document = new PapercraftDocument(pages, cultureInfo, options);
+            PapercraftActivity.SetDocument(activity, document);
+            return document;
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     private static RenderLayout MeasureAndArrange(
@@ -105,6 +117,9 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
         DocumentOptions options,
         CultureInfo cultureInfo)
     {
+        using var activity = PapercraftActivity.Start(PapercraftActivityNames.GeneratorMeasureArrange);
+        try
+        {
         var originalPageSize = GetOriginalPageSize(options);
         var marginLeft = options.Margin.Left.ToPixels(originalPageSize.Width, options.DotsPerInch);
         var marginTop = options.Margin.Top.ToPixels(originalPageSize.Height, options.DotsPerInch);
@@ -209,6 +224,12 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
             foregroundPageSize,
             foregroundSizes,
             areaSizes);
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     private static IReadOnlyList<PapercraftPage> ComposePages(
@@ -218,7 +239,12 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
         CultureInfo cultureInfo,
         CancellationToken cancellationToken)
     {
+        using var activity = PapercraftActivity.Start(PapercraftActivityNames.GeneratorComposePages);
+        try
+        {
         var backgroundCanvas = CreateLayerCanvas(layout.OriginalPageSize, layout.OriginalPageSize);
+        using (StartLayerActivity("background"))
+        {
         RenderSequentialControls(
             backgroundCanvas,
             template.BackgroundControls,
@@ -226,8 +252,11 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
             options.DotsPerInch,
             layout.BackgroundPageSize,
             cultureInfo);
+        }
 
         var headerCanvas = CreateLayerCanvas(layout.OriginalPageSize, layout.PageSize);
+        using (StartLayerActivity("header"))
+        {
         RenderSequentialControls(
             headerCanvas,
             template.HeaderControls,
@@ -235,9 +264,12 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
             options.DotsPerInch,
             layout.HeaderPageSize,
             cultureInfo);
+        }
 
         var bodyCanvas = CreateLayerCanvas(layout.OriginalPageSize, layout.PageSize);
         var desiredBodyHeight = layout.BodySizes.Sum((q) => q.Height);
+        using (StartLayerActivity("body"))
+        {
         using (bodyCanvas.CreateState())
         {
             foreach (var (control, size) in template.BodyControls.Zip(layout.BodySizes))
@@ -251,8 +283,11 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
                 bodyCanvas.Translate(0F, size.Height + additionalHeight);
             }
         }
+        }
 
         var footerCanvas = CreateLayerCanvas(layout.OriginalPageSize, layout.PageSize);
+        using (StartLayerActivity("footer"))
+        {
         RenderSequentialControls(
             footerCanvas,
             template.FooterControls,
@@ -260,8 +295,11 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
             options.DotsPerInch,
             layout.FooterPageSize,
             cultureInfo);
+        }
 
         var areaCanvas = CreateLayerCanvas(layout.OriginalPageSize, layout.OriginalPageSize);
+        using (StartLayerActivity("area"))
+        {
         using (areaCanvas.CreateState())
         {
             for (var areaIndex = 0; areaIndex < template.AreaControls.Count; areaIndex++)
@@ -280,8 +318,11 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
                 }
             }
         }
+        }
 
         var foregroundCanvas = CreateLayerCanvas(layout.OriginalPageSize, layout.OriginalPageSize);
+        using (StartLayerActivity("foreground"))
+        {
         RenderSequentialControls(
             foregroundCanvas,
             template.ForegroundControls,
@@ -289,6 +330,7 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
             options.DotsPerInch,
             layout.ForegroundPageSize,
             cultureInfo);
+        }
 
         var pageCount = Math.Max((ushort)Math.Ceiling(desiredBodyHeight / layout.BodyPageSize.Height), (ushort)1);
         var pages = new List<PapercraftPage>(pageCount);
@@ -360,7 +402,14 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
             currentHeight += layout.BodyPageSize.Height;
         }
 
+        activity?.SetTag(PapercraftActivity.DocumentPageCountTag, pages.Count);
         return pages;
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     private static DeferredCanvasImpl CreateLayerCanvas(Size actualPageSize, Size pageSize)
@@ -393,6 +442,13 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
                 canvas.Translate(0F, size.Height);
             }
         }
+    }
+
+    private static Activity? StartLayerActivity(string layer)
+    {
+        var activity = PapercraftActivity.Start(PapercraftActivityNames.GeneratorComposeLayer);
+        activity?.SetTag(PapercraftActivity.LayerTag, layer);
+        return activity;
     }
 
     private static Size GetOriginalPageSize(DocumentOptions options)

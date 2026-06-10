@@ -181,6 +181,23 @@ Validation reads the XML template. Create a new `XmlReader` for the actual rende
 Unsupported diagnostics block rendering. Degraded diagnostics are warnings unless
 `PapercraftRenderOptions.TreatDegradedAsUnsupported` is enabled.
 
+## Trace Renderer Activity
+
+Papercraft emits phase-level renderer activities through `PapercraftInstrumentation.ActivitySource`.
+Applications that use OpenTelemetry can install `X39.Solutions.Papercraft.OpenTelemetry` and register the source during host setup:
+
+```csharp
+using X39.Solutions.Papercraft.OpenTelemetry;
+
+builder.AddPapercraftOpenTelemetry(
+    (tracing) =>
+    {
+        // Add exporters or processors here.
+    });
+```
+
+The tracing package only wires Papercraft into OpenTelemetry. Exporters, sampling and resource configuration remain application-owned.
+
 ## Add A Function
 
 Use a function when a template needs a reusable value or calculation such as a formatted total, lookup result or application-specific label.

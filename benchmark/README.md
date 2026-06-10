@@ -1,6 +1,7 @@
 # Papercraft benchmarks
 
 This folder contains BenchmarkDotNet benchmarks focused on Papercraft generator and renderer performance, especially control activation and parameter binding.
+The normal BenchmarkDotNet reports compare benchmark methods and aggregate allocations, but full generation benchmarks still measure one complete operation. Use the activity profile mode when you need to attribute a render to parser, template creation, layout, display-list composition, backend rendering, or image encoding phases.
 
 ## Run
 
@@ -24,6 +25,19 @@ dotnet run -c Release --project benchmark/X39.Solutions.PdfTemplate.Benchmark/X3
 
 BenchmarkDotNet writes reports under `BenchmarkDotNet.Artifacts/`, which is ignored by git.
 
+Activity profile smoke run:
+
+```powershell
+dotnet run -c Release --project benchmark/X39.Solutions.PdfTemplate.Benchmark/X39.Solutions.PdfTemplate.Benchmark.csproj -- --activityProfile --iterations 1
+```
+
+Activity profile options:
+
+- `--case`: `RepresentativeInvoice` by default; also accepts `TransformerHeavy`, `TransformerHeavyExpanded`, or a control generation case such as `Text`, `Table`, or `PieChart`.
+- `--target`: `png` by default; use `pdf` for PDF backend output.
+- `--backendId`: `skiasharp` by default.
+- `--iterations`: `5` by default.
+
 Category smoke runs:
 
 ```powershell
@@ -37,6 +51,7 @@ dotnet run -c Release --project benchmark/X39.Solutions.PdfTemplate.Benchmark/X3
 BenchmarkDotNet writes HTML, Markdown, CSV, and raw measurement reports to `BenchmarkDotNet.Artifacts/results/`.
 This benchmark project also enables BenchmarkDotNet's R plot exporter when `Rscript` is available on `PATH`.
 Install R locally before running the benchmarks if you want PNG plot files in the same artifact folder.
+Activity profile CSV summaries are written separately under `BenchmarkDotNet.Artifacts/activity-profile/` and include ActivitySource listener overhead, so do not compare them directly with normal BenchmarkDotNet timing columns.
 
 The repository includes a manually triggered GitHub Actions workflow for report generation:
 

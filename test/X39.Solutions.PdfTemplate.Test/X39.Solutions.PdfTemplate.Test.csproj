@@ -27,6 +27,7 @@
       <ProjectReference Include="..\..\source\X39.Solutions.Papercraft\X39.Solutions.Papercraft.csproj" />
       <ProjectReference Include="..\..\source\X39.Solutions.Papercraft.Core\X39.Solutions.Papercraft.Core.csproj" />
       <ProjectReference Include="..\..\source\X39.Solutions.Papercraft.Rendering.SkiaSharp\X39.Solutions.Papercraft.Rendering.SkiaSharp.csproj" />
+      <ProjectReference Include="..\..\source\X39.Solutions.Papercraft.OpenTelemetry\X39.Solutions.Papercraft.OpenTelemetry.csproj" />
       <ProjectReference Include="..\..\source\X39.Solutions.PdfTemplate\X39.Solutions.PdfTemplate.csproj" />
       <ProjectReference Include="..\..\source\X39.Solutions.Papercraft.Controls.QrCode\X39.Solutions.Papercraft.Controls.QrCode.csproj" />
       <ProjectReference Include="..\..\source\X39.Solutions.Papercraft.Controls.ZXing\X39.Solutions.Papercraft.Controls.ZXing.csproj" />

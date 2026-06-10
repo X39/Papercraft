@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\PapercraftPackageScaffold.props" />
+    <PropertyGroup>
+        <PackageId>X39.Solutions.Papercraft.OpenTelemetry</PackageId>
+        <AssemblyName>X39.Solutions.Papercraft.OpenTelemetry</AssemblyName>
+        <RootNamespace>X39.Solutions.Papercraft.OpenTelemetry</RootNamespace>
+        <Title>Papercraft OpenTelemetry integration</Title>
+        <PackageDescription>
+            <![CDATA[OpenTelemetry host integration package for Papercraft renderer activity tracing.
+It wires Papercraft's ActivitySource into OpenTelemetry tracing without adding hosting dependencies to Papercraft Core.
+]]>
+        </PackageDescription>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\X39.Solutions.Papercraft.Core\X39.Solutions.Papercraft.Core.csproj" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.8" />
+        <PackageReference Include="OpenTelemetry" Version="1.15.3" />
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.15.3" />
+    </ItemGroup>
+</Project>

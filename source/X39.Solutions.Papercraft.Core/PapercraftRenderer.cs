@@ -49,16 +49,30 @@ public sealed class PapercraftRenderer
         ArgumentNullException.ThrowIfNull(target);
         ArgumentNullException.ThrowIfNull(cultureInfo);
 
-        var renderOptions = options ?? PapercraftRenderOptions.Default;
-        var backend = SelectBackend(target, renderOptions);
-        var document = await _generator.GenerateAsync(
-                reader,
-                cultureInfo,
-                renderOptions.DocumentOptions,
-                cancellationToken)
-            .ConfigureAwait(false);
-        return await ValidateBackendAsync(backend, document, target, cancellationToken)
-            .ConfigureAwait(false);
+        using var activity = PapercraftActivity.Start(PapercraftActivityNames.RendererValidate);
+        PapercraftActivity.SetRenderTarget(activity, target);
+        try
+        {
+            var renderOptions = options ?? PapercraftRenderOptions.Default;
+            var backend = SelectBackend(target, renderOptions);
+            PapercraftActivity.SetBackend(activity, backend);
+            var document = await _generator.GenerateAsync(
+                    reader,
+                    cultureInfo,
+                    renderOptions.DocumentOptions,
+                    cancellationToken)
+                .ConfigureAwait(false);
+            PapercraftActivity.SetDocument(activity, document);
+            var validation = await ValidateBackendAsync(backend, document, target, cancellationToken)
+                .ConfigureAwait(false);
+            PapercraftActivity.SetValidation(activity, validation);
+            return validation;
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     /// <summary>
@@ -75,16 +89,28 @@ public sealed class PapercraftRenderer
         ArgumentNullException.ThrowIfNull(output);
         ArgumentNullException.ThrowIfNull(cultureInfo);
 
-        var renderOptions = options ?? PapercraftRenderOptions.Default;
-        var backend = SelectBackend(output.Target, renderOptions);
-        var document = await _generator.GenerateAsync(
-                reader,
-                cultureInfo,
-                renderOptions.DocumentOptions,
-                cancellationToken)
-            .ConfigureAwait(false);
-        await RenderAsync(document, output, renderOptions, backend, cancellationToken)
-            .ConfigureAwait(false);
+        using var activity = PapercraftActivity.Start(PapercraftActivityNames.RendererRender);
+        PapercraftActivity.SetRenderTarget(activity, output.Target);
+        try
+        {
+            var renderOptions = options ?? PapercraftRenderOptions.Default;
+            var backend = SelectBackend(output.Target, renderOptions);
+            PapercraftActivity.SetBackend(activity, backend);
+            var document = await _generator.GenerateAsync(
+                    reader,
+                    cultureInfo,
+                    renderOptions.DocumentOptions,
+                    cancellationToken)
+                .ConfigureAwait(false);
+            PapercraftActivity.SetDocument(activity, document);
+            await RenderAsync(document, output, renderOptions, backend, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     /// <summary>
@@ -99,10 +125,22 @@ public sealed class PapercraftRenderer
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(output);
 
-        var renderOptions = options ?? PapercraftRenderOptions.Default;
-        var backend = SelectBackend(output.Target, renderOptions);
-        await RenderAsync(document, output, renderOptions, backend, cancellationToken)
-            .ConfigureAwait(false);
+        using var activity = PapercraftActivity.Start(PapercraftActivityNames.RendererRender);
+        PapercraftActivity.SetRenderTarget(activity, output.Target);
+        PapercraftActivity.SetDocument(activity, document);
+        try
+        {
+            var renderOptions = options ?? PapercraftRenderOptions.Default;
+            var backend = SelectBackend(output.Target, renderOptions);
+            PapercraftActivity.SetBackend(activity, backend);
+            await RenderAsync(document, output, renderOptions, backend, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     /// <summary>
@@ -119,16 +157,28 @@ public sealed class PapercraftRenderer
         ArgumentNullException.ThrowIfNull(output);
         ArgumentNullException.ThrowIfNull(cultureInfo);
 
-        var renderOptions = options ?? PapercraftRenderOptions.Default;
-        var backend = SelectBackend(output.Target, renderOptions);
-        var document = await _generator.GenerateAsync(
-                reader,
-                cultureInfo,
-                renderOptions.DocumentOptions,
-                cancellationToken)
-            .ConfigureAwait(false);
-        await RenderRasterPagesAsync(document, output, renderOptions, backend, cancellationToken)
-            .ConfigureAwait(false);
+        using var activity = PapercraftActivity.Start(PapercraftActivityNames.RendererRenderRasterPages);
+        PapercraftActivity.SetRenderTarget(activity, output.Target);
+        try
+        {
+            var renderOptions = options ?? PapercraftRenderOptions.Default;
+            var backend = SelectBackend(output.Target, renderOptions);
+            PapercraftActivity.SetBackend(activity, backend);
+            var document = await _generator.GenerateAsync(
+                    reader,
+                    cultureInfo,
+                    renderOptions.DocumentOptions,
+                    cancellationToken)
+                .ConfigureAwait(false);
+            PapercraftActivity.SetDocument(activity, document);
+            await RenderRasterPagesAsync(document, output, renderOptions, backend, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     /// <summary>
@@ -143,10 +193,22 @@ public sealed class PapercraftRenderer
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(output);
 
-        var renderOptions = options ?? PapercraftRenderOptions.Default;
-        var backend = SelectBackend(output.Target, renderOptions);
-        await RenderRasterPagesAsync(document, output, renderOptions, backend, cancellationToken)
-            .ConfigureAwait(false);
+        using var activity = PapercraftActivity.Start(PapercraftActivityNames.RendererRenderRasterPages);
+        PapercraftActivity.SetRenderTarget(activity, output.Target);
+        PapercraftActivity.SetDocument(activity, document);
+        try
+        {
+            var renderOptions = options ?? PapercraftRenderOptions.Default;
+            var backend = SelectBackend(output.Target, renderOptions);
+            PapercraftActivity.SetBackend(activity, backend);
+            await RenderRasterPagesAsync(document, output, renderOptions, backend, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     /// <summary>
@@ -176,11 +238,24 @@ public sealed class PapercraftRenderer
         IPapercraftRenderBackend backend,
         CancellationToken cancellationToken)
     {
-        var validation = await ValidateBackendAsync(backend, document, output.Target, cancellationToken)
-            .ConfigureAwait(false);
-        validation.ThrowIfUnsupportedOrStrictDegraded(options.TreatDegradedAsUnsupported);
-        await backend.RenderAsync(document, output, cancellationToken)
-            .ConfigureAwait(false);
+        using var activity = PapercraftActivity.Start(PapercraftActivityNames.RendererBackendRender);
+        PapercraftActivity.SetRenderTarget(activity, output.Target);
+        PapercraftActivity.SetDocument(activity, document);
+        PapercraftActivity.SetBackend(activity, backend);
+        try
+        {
+            var validation = await ValidateBackendAsync(backend, document, output.Target, cancellationToken)
+                .ConfigureAwait(false);
+            PapercraftActivity.SetValidation(activity, validation);
+            validation.ThrowIfUnsupportedOrStrictDegraded(options.TreatDegradedAsUnsupported);
+            await backend.RenderAsync(document, output, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     private async ValueTask RenderRasterPagesAsync(
@@ -190,32 +265,60 @@ public sealed class PapercraftRenderer
         IPapercraftRenderBackend backend,
         CancellationToken cancellationToken)
     {
-        var validation = await ValidateBackendAsync(backend, document, output.Target, cancellationToken)
-            .ConfigureAwait(false);
-        validation.ThrowIfUnsupportedOrStrictDegraded(options.TreatDegradedAsUnsupported);
-        await backend.RenderRasterPagesAsync(document, output, cancellationToken)
-            .ConfigureAwait(false);
+        using var activity = PapercraftActivity.Start(PapercraftActivityNames.RendererBackendRenderRasterPages);
+        PapercraftActivity.SetRenderTarget(activity, output.Target);
+        PapercraftActivity.SetDocument(activity, document);
+        PapercraftActivity.SetBackend(activity, backend);
+        try
+        {
+            var validation = await ValidateBackendAsync(backend, document, output.Target, cancellationToken)
+                .ConfigureAwait(false);
+            PapercraftActivity.SetValidation(activity, validation);
+            validation.ThrowIfUnsupportedOrStrictDegraded(options.TreatDegradedAsUnsupported);
+            await backend.RenderRasterPagesAsync(document, output, cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     private IPapercraftRenderBackend SelectBackend(RenderTarget target, PapercraftRenderOptions options)
     {
-        if (_backends.Length is 0)
-            throw new InvalidOperationException("No Papercraft render backend is registered.");
-
+        using var activity = PapercraftActivity.Start(PapercraftActivityNames.RendererSelectBackend);
+        PapercraftActivity.SetRenderTarget(activity, target);
         if (!IsNullOrWhiteSpace(options.BackendId))
+            activity?.SetTag(PapercraftActivity.BackendIdTag, options.BackendId);
+        try
         {
-            var backend = _backends.FirstOrDefault(
-                (q) => string.Equals(
-                    q.Capabilities.RendererId,
-                    options.BackendId,
-                    StringComparison.OrdinalIgnoreCase));
-            if (backend is null)
-                throw new InvalidOperationException($"No Papercraft render backend with id '{options.BackendId}' is registered.");
-            return backend;
-        }
+            if (_backends.Length is 0)
+                throw new InvalidOperationException("No Papercraft render backend is registered.");
 
-        return _backends.FirstOrDefault((q) => q.Capabilities.Supports(target))
-               ?? _backends.First();
+            if (!IsNullOrWhiteSpace(options.BackendId))
+            {
+                var backend = _backends.FirstOrDefault(
+                    (q) => string.Equals(
+                        q.Capabilities.RendererId,
+                        options.BackendId,
+                        StringComparison.OrdinalIgnoreCase));
+                if (backend is null)
+                    throw new InvalidOperationException($"No Papercraft render backend with id '{options.BackendId}' is registered.");
+                PapercraftActivity.SetBackend(activity, backend);
+                return backend;
+            }
+
+            var selected = _backends.FirstOrDefault((q) => q.Capabilities.Supports(target))
+                           ?? _backends.First();
+            PapercraftActivity.SetBackend(activity, selected);
+            return selected;
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     private static async ValueTask<RenderValidationResult> ValidateBackendAsync(
@@ -224,10 +327,24 @@ public sealed class PapercraftRenderer
         RenderTarget target,
         CancellationToken cancellationToken)
     {
-        var backendValidation = await backend.ValidateAsync(document, target, cancellationToken)
-            .ConfigureAwait(false);
-        return RenderValidationResult.Combine(
-            backendValidation,
-            backend.Capabilities.ValidateDocument(document));
+        using var activity = PapercraftActivity.Start(PapercraftActivityNames.RendererValidateBackend);
+        PapercraftActivity.SetRenderTarget(activity, target);
+        PapercraftActivity.SetDocument(activity, document);
+        PapercraftActivity.SetBackend(activity, backend);
+        try
+        {
+            var backendValidation = await backend.ValidateAsync(document, target, cancellationToken)
+                .ConfigureAwait(false);
+            var validation = RenderValidationResult.Combine(
+                backendValidation,
+                backend.Capabilities.ValidateDocument(document));
+            PapercraftActivity.SetValidation(activity, validation);
+            return validation;
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 }

@@ -14,10 +14,11 @@ Use this package when you need Papercraft contracts without taking a dependency 
 | Backend-neutral generation | `PapercraftGenerator` |
 | Render facade and contracts | `PapercraftRenderer`, `IPapercraftRenderBackend`, `RenderTarget`, `RenderOutput` |
 | Capability validation | `RendererCapabilities`, `RenderValidationResult`, `RenderDiagnostic` |
+| Activity tracing | `PapercraftInstrumentation.ActivitySource` |
 | Built-in controls | Text, paragraph, border, image, line, table, lists, charts, page numbers, columns, blocks and related layout controls |
 | Template language | `for`, `forEach`, `if`, `switch`, `alternate`, `var` and variable expansion transformers |
 
-This package references `Microsoft.Extensions.DependencyInjection.Abstractions` and intentionally does not reference SkiaSharp or `X39.Solutions.PdfTemplate`.
+This package references `Microsoft.Extensions.DependencyInjection.Abstractions` and intentionally does not reference SkiaSharp, hosting, OpenTelemetry or `X39.Solutions.PdfTemplate`.
 
 ## Register Core Services
 
@@ -89,4 +90,5 @@ The source currently exposes the builder through `AddPapercraftCore()` and throu
 
 - [`X39.Solutions.Papercraft`](../X39.Solutions.Papercraft/README.md): default app-facing facade with SkiaSharp already registered.
 - [`X39.Solutions.Papercraft.Rendering.SkiaSharp`](../X39.Solutions.Papercraft.Rendering.SkiaSharp/README.md): built-in PDF and raster backend.
+- [`X39.Solutions.Papercraft.OpenTelemetry`](../X39.Solutions.Papercraft.OpenTelemetry/README.md): optional host/OpenTelemetry registration for Core's activity source.
 - [`X39.Solutions.Papercraft.Controls.QrCode`](../X39.Solutions.Papercraft.Controls.QrCode/README.md) and [`X39.Solutions.Papercraft.Controls.ZXing`](../X39.Solutions.Papercraft.Controls.ZXing/README.md): optional control packages that depend on Core only.

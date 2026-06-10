@@ -51,8 +51,21 @@ public sealed class SkiaSharpRenderBackend : IPapercraftRenderBackend
     {
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(target);
-        cancellationToken.ThrowIfCancellationRequested();
-        return ValueTask.FromResult(Capabilities.ValidateTarget(target));
+        using var activity = PapercraftActivity.Start(SkiaSharpActivityNames.Validate);
+        PapercraftActivity.SetRenderTarget(activity, target);
+        PapercraftActivity.SetDocument(activity, document);
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var validation = Capabilities.ValidateTarget(target);
+            PapercraftActivity.SetValidation(activity, validation);
+            return ValueTask.FromResult(validation);
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     /// <inheritdoc />
@@ -63,29 +76,41 @@ public sealed class SkiaSharpRenderBackend : IPapercraftRenderBackend
     {
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(output);
-        var validation = await ValidateAsync(document, output.Target, cancellationToken)
-            .ConfigureAwait(false);
-        validation.ThrowIfUnsupported();
-
-        switch (output.Target.OutputKind)
+        using var activity = PapercraftActivity.Start(SkiaSharpActivityNames.Render);
+        PapercraftActivity.SetRenderTarget(activity, output.Target);
+        PapercraftActivity.SetDocument(activity, document);
+        try
         {
-            case RendererOutputKind.Pdf:
-                RenderPdf(document, output.Stream, cancellationToken);
-                break;
-            case RendererOutputKind.RasterImage:
-                RenderPng(document, output.Stream, cancellationToken);
-                break;
-            default:
-                throw new RenderValidationException(
-                    new RenderValidationResult(
-                        new[]
-                        {
-                            new RenderDiagnostic(
-                                RenderDiagnosticCodes.UnsupportedOutputKind,
-                                RendererSupportLevel.Unsupported,
-                                RendererFeatures.ForOutputKind(output.Target.OutputKind),
-                                $"Backend '{Capabilities.DisplayName}' does not have a render path for output kind '{output.Target.OutputKind}'."),
-                        }));
+            var validation = await ValidateAsync(document, output.Target, cancellationToken)
+                .ConfigureAwait(false);
+            PapercraftActivity.SetValidation(activity, validation);
+            validation.ThrowIfUnsupported();
+
+            switch (output.Target.OutputKind)
+            {
+                case RendererOutputKind.Pdf:
+                    RenderPdf(document, output.Stream, cancellationToken);
+                    break;
+                case RendererOutputKind.RasterImage:
+                    RenderPng(document, output.Stream, cancellationToken);
+                    break;
+                default:
+                    throw new RenderValidationException(
+                        new RenderValidationResult(
+                            new[]
+                            {
+                                new RenderDiagnostic(
+                                    RenderDiagnosticCodes.UnsupportedOutputKind,
+                                    RendererSupportLevel.Unsupported,
+                                    RendererFeatures.ForOutputKind(output.Target.OutputKind),
+                                    $"Backend '{Capabilities.DisplayName}' does not have a render path for output kind '{output.Target.OutputKind}'."),
+                            }));
+            }
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
         }
     }
 
@@ -97,39 +122,68 @@ public sealed class SkiaSharpRenderBackend : IPapercraftRenderBackend
     {
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(output);
-        var validation = await ValidateAsync(document, output.Target, cancellationToken)
-            .ConfigureAwait(false);
-        validation.ThrowIfUnsupported();
-
-        foreach (var page in document.Pages)
+        using var activity = PapercraftActivity.Start(SkiaSharpActivityNames.RenderRasterPages);
+        PapercraftActivity.SetRenderTarget(activity, output.Target);
+        PapercraftActivity.SetDocument(activity, document);
+        try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            using var bitmap = RenderPageToBitmap(page, document.DocumentOptions);
-            var pageInfo = new RasterPageInfo(
-                page.PageIndex,
-                page.PageNumber,
-                output.MediaType,
-                bitmap.Width,
-                bitmap.Height,
-                page.DotsPerMillimeter);
-            var pageStream = await output.OpenPageStreamAsync(pageInfo, cancellationToken)
-                .ConfigureAwait(false)
-                             ?? throw new InvalidOperationException(
-                                 "The raster page output callback must return a stream.");
-            try
+            var validation = await ValidateAsync(document, output.Target, cancellationToken)
+                .ConfigureAwait(false);
+            PapercraftActivity.SetValidation(activity, validation);
+            validation.ThrowIfUnsupported();
+
+            foreach (var page in document.Pages)
             {
-                using var image = SKImage.FromBitmap(bitmap);
-                using var data = image.Encode(SKEncodedImageFormat.Png, 100);
-                data.SaveTo(pageStream);
-                await pageStream.FlushAsync(cancellationToken)
-                    .ConfigureAwait(false);
+                using var pageActivity = PapercraftActivity.Start(SkiaSharpActivityNames.RenderRasterPage);
+                pageActivity?.SetTag(PapercraftActivity.PageIndexTag, page.PageIndex);
+                pageActivity?.SetTag(PapercraftActivity.PageNumberTag, page.PageNumber);
+                try
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    using var bitmap = RenderPageToBitmap(page, document.DocumentOptions);
+                    var pageInfo = new RasterPageInfo(
+                        page.PageIndex,
+                        page.PageNumber,
+                        output.MediaType,
+                        bitmap.Width,
+                        bitmap.Height,
+                        page.DotsPerMillimeter);
+                    var pageStream = await output.OpenPageStreamAsync(pageInfo, cancellationToken)
+                        .ConfigureAwait(false)
+                                     ?? throw new InvalidOperationException(
+                                         "The raster page output callback must return a stream.");
+                    try
+                    {
+                        using (var encodeActivity = PapercraftActivity.Start(SkiaSharpActivityNames.EncodePng))
+                        {
+                            encodeActivity?.SetTag(PapercraftActivity.PageIndexTag, page.PageIndex);
+                            encodeActivity?.SetTag(PapercraftActivity.PageNumberTag, page.PageNumber);
+                            using var image = SKImage.FromBitmap(bitmap);
+                            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+                            data.SaveTo(pageStream);
+                        }
+
+                        await pageStream.FlushAsync(cancellationToken)
+                            .ConfigureAwait(false);
+                    }
+                    finally
+                    {
+                        if (!output.LeaveStreamsOpen)
+                            await pageStream.DisposeAsync()
+                                .ConfigureAwait(false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    PapercraftActivity.SetError(pageActivity, ex);
+                    throw;
+                }
             }
-            finally
-            {
-                if (!output.LeaveStreamsOpen)
-                    await pageStream.DisposeAsync()
-                        .ConfigureAwait(false);
-            }
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
         }
     }
 
@@ -138,35 +192,46 @@ public sealed class SkiaSharpRenderBackend : IPapercraftRenderBackend
         Stream outputStream,
         CancellationToken cancellationToken)
     {
-        var options = document.DocumentOptions;
-        using var skDocument = SKDocument.CreatePdf(
-            outputStream,
-            new SKDocumentPdfMetadata
+        using var activity = PapercraftActivity.Start(SkiaSharpActivityNames.RenderPdf);
+        PapercraftActivity.SetRenderTarget(activity, RenderTarget.Pdf);
+        PapercraftActivity.SetDocument(activity, document);
+        try
+        {
+            var options = document.DocumentOptions;
+            using var skDocument = SKDocument.CreatePdf(
+                outputStream,
+                new SKDocumentPdfMetadata
+                {
+                    RasterDpi = options.DotsPerInch,
+                    Producer = options.Producer,
+                    Modified = options.Modified,
+                    PdfA = true,
+                });
+
+            if (document.Pages.Count is 0)
             {
-                RasterDpi = options.DotsPerInch,
-                Producer = options.Producer,
-                Modified = options.Modified,
-                PdfA = true,
-            });
+                var size = GetFallbackPageSize(options);
+                skDocument.BeginPage(size.Width, size.Height).Dispose();
+                skDocument.EndPage();
+                skDocument.Close();
+                return;
+            }
 
-        if (document.Pages.Count is 0)
-        {
-            var size = GetFallbackPageSize(options);
-            skDocument.BeginPage(size.Width, size.Height).Dispose();
-            skDocument.EndPage();
+            foreach (var page in document.Pages)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using var canvas = skDocument.BeginPage(page.PageSize.Width, page.PageSize.Height);
+                _displayListRenderer.Render(canvas, page.DisplayList);
+                skDocument.EndPage();
+            }
+
             skDocument.Close();
-            return;
         }
-
-        foreach (var page in document.Pages)
+        catch (Exception ex)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            using var canvas = skDocument.BeginPage(page.PageSize.Width, page.PageSize.Height);
-            _displayListRenderer.Render(canvas, page.DisplayList);
-            skDocument.EndPage();
+            PapercraftActivity.SetError(activity, ex);
+            throw;
         }
-
-        skDocument.Close();
     }
 
     private void RenderPng(
@@ -174,28 +239,56 @@ public sealed class SkiaSharpRenderBackend : IPapercraftRenderBackend
         Stream outputStream,
         CancellationToken cancellationToken)
     {
-        if (document.Pages.Count is 0)
-            return;
-        if (document.Pages.Count > 1)
-            throw new NotSupportedException(
-                "Single-stream PNG output supports one rendered page. Use RenderRasterPagesAsync for multi-page raster output.");
+        using var activity = PapercraftActivity.Start(SkiaSharpActivityNames.RenderPng);
+        PapercraftActivity.SetRenderTarget(activity, RenderTarget.ImagePng);
+        PapercraftActivity.SetDocument(activity, document);
+        try
+        {
+            if (document.Pages.Count is 0)
+                return;
+            if (document.Pages.Count > 1)
+                throw new NotSupportedException(
+                    "Single-stream PNG output supports one rendered page. Use RenderRasterPagesAsync for multi-page raster output.");
 
-        cancellationToken.ThrowIfCancellationRequested();
-        using var bitmap = RenderPageToBitmap(document.Pages[0], document.DocumentOptions);
-        using var image = SKImage.FromBitmap(bitmap);
-        using var data = image.Encode(SKEncodedImageFormat.Png, 100);
-        data.SaveTo(outputStream);
+            cancellationToken.ThrowIfCancellationRequested();
+            var page = document.Pages[0];
+            using var bitmap = RenderPageToBitmap(page, document.DocumentOptions);
+            using (var encodeActivity = PapercraftActivity.Start(SkiaSharpActivityNames.EncodePng))
+            {
+                encodeActivity?.SetTag(PapercraftActivity.PageIndexTag, page.PageIndex);
+                encodeActivity?.SetTag(PapercraftActivity.PageNumberTag, page.PageNumber);
+                using var image = SKImage.FromBitmap(bitmap);
+                using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+                data.SaveTo(outputStream);
+            }
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     private SKBitmap RenderPageToBitmap(PapercraftPage page, DocumentOptions options)
     {
-        var bitmap = new SKBitmap(
-            (int)Math.Ceiling(page.PageSize.Width),
-            (int)Math.Ceiling(page.PageSize.Height));
-        using var canvas = new SKCanvas(bitmap);
-        canvas.Clear(SKColors.White);
-        _displayListRenderer.Render(canvas, page.DisplayList);
-        return bitmap;
+        using var activity = PapercraftActivity.Start(SkiaSharpActivityNames.RenderPageToBitmap);
+        activity?.SetTag(PapercraftActivity.PageIndexTag, page.PageIndex);
+        activity?.SetTag(PapercraftActivity.PageNumberTag, page.PageNumber);
+        try
+        {
+            var bitmap = new SKBitmap(
+                (int)Math.Ceiling(page.PageSize.Width),
+                (int)Math.Ceiling(page.PageSize.Height));
+            using var canvas = new SKCanvas(bitmap);
+            canvas.Clear(SKColors.White);
+            _displayListRenderer.Render(canvas, page.DisplayList);
+            return bitmap;
+        }
+        catch (Exception ex)
+        {
+            PapercraftActivity.SetError(activity, ex);
+            throw;
+        }
     }
 
     private static (float Width, float Height) GetFallbackPageSize(DocumentOptions options)

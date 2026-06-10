@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.IPapercraftTemplateDataAccessor))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.PapercraftDocument))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.PapercraftGenerator))]
+[assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.PapercraftInstrumentation))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.PapercraftPage))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.PapercraftRenderer))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.PapercraftMediaTypes))]
