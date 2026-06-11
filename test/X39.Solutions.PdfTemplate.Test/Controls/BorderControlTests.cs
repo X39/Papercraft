@@ -176,6 +176,31 @@ public class BorderControlTests
     }
 
     [Fact]
+    public void RenderStretchBorderWithLeftMarginWithinParentWidth()
+    {
+        var control = CreateBorder(
+            thickness: new Thickness(1F),
+            color: Colors.Red,
+            background: Colors.Blue);
+        control.Margin = new Thickness(10F, 0F, 0F, 0F);
+        control.Add(new MockControl {Width = 20F, Height = 10F});
+        var canvas = CreateCanvas();
+
+        var arranged = control.Arrange(Dpi, PageSize, PageSize, PageSize, CultureInfo.InvariantCulture);
+        control.Render(canvas, Dpi, PageSize, CultureInfo.InvariantCulture);
+
+        Assert.Equal(PageSize, arranged);
+        Assert.Equal(new Rectangle(10, 0, 190, 100), control.Arrangement);
+        canvas.AssertDrawRect(
+            (new Rectangle(10, 0, 190, 100), Colors.Blue),
+            (new Rectangle(10, 0, 1, 100), Colors.Red),
+            (new Rectangle(10, 0, 190, 1), Colors.Red),
+            (new Rectangle(199, 0, 1, 100), Colors.Red),
+            (new Rectangle(10, 99, 190, 1), Colors.Red));
+        Assert.Equal(0, canvas.DrawLineCount);
+    }
+
+    [Fact]
     public void RenderPlacesChildrenInsideBorderAndStacksByArrangedHeight()
     {
         var control = CreateBorder(

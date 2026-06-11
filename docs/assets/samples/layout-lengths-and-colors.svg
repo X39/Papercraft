@@ -2,7 +2,7 @@
 <svg version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:papercraft="https://x39.solutions/papercraft" width="755.905518" height="340.157501" viewBox="0 0 755.905518 340.157501" role="img" xmlns="http://www.w3.org/2000/svg">
   <title>Papercraft SVG document</title>
   <metadata>
-    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-11T17:43:00.6274093Z" />
+    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-11T23:21:52.8434247Z" />
   </metadata>
   <!--Papercraft SVG backend output. Pages: 1. Pages are stacked vertically.-->
   <!--Page 1 of 1-->
@@ -96,16 +96,16 @@
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-10" clipPathUnits="userSpaceOnUse">
-                      <rect x="45.3543549" y="176.500916" width="680.314941" height="68.1637878" />
+                      <rect x="45.3543549" y="176.500916" width="672.755859" height="68.1637878" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-10)">
                     <g>
-                      <rect x="45.3543549" y="176.500916" width="680.314941" height="68.1637878" fill="#DCFCE7" fill-opacity="0.667" />
+                      <rect x="45.3543549" y="176.500916" width="672.755859" height="68.1637878" fill="#DCFCE7" fill-opacity="0.667" />
                       <rect x="45.3543549" y="176.500916" width="2.65663028" height="68.1637878" fill="#166534" />
-                      <rect x="45.3543549" y="176.500916" width="680.314941" height="2.65663028" fill="#166534" />
-                      <rect x="723.012695" y="176.500916" width="2.65663028" height="68.1637878" fill="#166534" />
-                      <rect x="45.3543549" y="242.008072" width="680.314941" height="2.65663028" fill="#166534" />
+                      <rect x="45.3543549" y="176.500916" width="672.755859" height="2.65663028" fill="#166534" />
+                      <rect x="715.453613" y="176.500916" width="2.65663028" height="68.1637878" fill="#166534" />
+                      <rect x="45.3543549" y="242.008072" width="672.755859" height="2.65663028" fill="#166534" />
                       <g>
                         <defs>
                           <clipPath id="papercraft-clip-11" clipPathUnits="userSpaceOnUse">

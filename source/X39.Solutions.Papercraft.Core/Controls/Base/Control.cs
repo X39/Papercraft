@@ -175,16 +175,20 @@ public abstract class Control : IControl
             ToSize(framedPageSize, margin),
             ToSize(remainingSize, margin, padding),
             cultureInfo);
+        var horizontalPadding = GetHorizontalSpacing(padding);
+        var verticalPadding   = GetVerticalSpacing(padding);
+        var horizontalMargin  = GetHorizontalSpacing(margin);
+        var verticalMargin    = GetVerticalSpacing(margin);
         MeasurementOuter = new Rectangle(
             0,
             0,
-            measureResult.Width + padding.Right + margin.Right,
-            measureResult.Height + padding.Bottom + margin.Bottom);
+            measureResult.Width + horizontalPadding + horizontalMargin,
+            measureResult.Height + verticalPadding + verticalMargin);
         Measurement = new Rectangle(
             margin.Left,
             margin.Top,
-            measureResult.Width + padding.Right,
-            measureResult.Height + padding.Bottom);
+            measureResult.Width + horizontalPadding,
+            measureResult.Height + verticalPadding);
         MeasurementInner = new Rectangle(
             margin.Left + padding.Left,
             margin.Top + padding.Top,
@@ -196,9 +200,13 @@ public abstract class Control : IControl
     private static Size ToSize(Size fullPageSize, Rectangle margin, Rectangle padding = default)
     {
         return new Size(
-            fullPageSize.Width - padding.Width - padding.Width - margin.Width - margin.Width,
-            fullPageSize.Height - padding.Height - padding.Height - margin.Height - margin.Height);
+            fullPageSize.Width - GetHorizontalSpacing(padding) - GetHorizontalSpacing(margin),
+            fullPageSize.Height - GetVerticalSpacing(padding) - GetVerticalSpacing(margin));
     }
+
+    private static float GetHorizontalSpacing(Rectangle rectangle) => rectangle.Left + rectangle.Width;
+
+    private static float GetVerticalSpacing(Rectangle rectangle) => rectangle.Top + rectangle.Height;
 
     /// <inheritdoc cref="Measure"/>
     protected abstract Size DoMeasure(
@@ -226,16 +234,20 @@ public abstract class Control : IControl
             ToSize(framedPageSize, margin),
             ToSize(remainingSize, margin, padding),
             cultureInfo);
+        var horizontalPadding = GetHorizontalSpacing(padding);
+        var verticalPadding   = GetVerticalSpacing(padding);
+        var horizontalMargin  = GetHorizontalSpacing(margin);
+        var verticalMargin    = GetVerticalSpacing(margin);
         ArrangementOuter = new Rectangle(
             0,
             0,
-            measureResult.Width + padding.Right + margin.Right,
-            measureResult.Height + padding.Bottom + margin.Bottom);
+            measureResult.Width + horizontalPadding + horizontalMargin,
+            measureResult.Height + verticalPadding + verticalMargin);
         Arrangement = new Rectangle(
             margin.Left,
             margin.Top,
-            measureResult.Width + padding.Right,
-            measureResult.Height + padding.Bottom);
+            measureResult.Width + horizontalPadding,
+            measureResult.Height + verticalPadding);
         ArrangementInner = new Rectangle(
             margin.Left + padding.Left,
             margin.Top + padding.Top,
@@ -265,8 +277,8 @@ public abstract class Control : IControl
         using (canvas.CreateState())
         {
             var arrangedSize = new Size(
-                parentSize.Width - padding.Width - padding.Width - margin.Width - margin.Width,
-                parentSize.Height - padding.Height - padding.Height - margin.Height - margin.Height
+                parentSize.Width - GetHorizontalSpacing(padding) - GetHorizontalSpacing(margin),
+                parentSize.Height - GetVerticalSpacing(padding) - GetVerticalSpacing(margin)
             );
             var (width, height) = PreRender(canvas, dpi, arrangedSize, cultureInfo);
             var additionalHeight = height;
