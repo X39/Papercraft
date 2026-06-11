@@ -1,6 +1,6 @@
 # Developer Integration Appendix
 
-Previous: [Troubleshooting](troubleshooting.md) | [Manual home](index.md)
+Previous: [Troubleshooting](troubleshooting.md) | [Manual home](index.md) | Next: [Renderer backends](render-backends.md)
 
 ## What Is This?
 
@@ -11,6 +11,7 @@ It keeps service registration, custom controls, custom transformers, functions, 
 
 Use this appendix when a template change requires application code, such as adding a new function,
 supplying new data, loading images from a custom location, registering a custom control or selecting a render target.
+Use [renderer backends](render-backends.md) for output-format choices such as SkiaSharp PDF/PNG, SVG, PDFsharp or ESC/POS.
 
 ## How Do I Start?
 
@@ -76,9 +77,10 @@ services.AddPapercraftCore();
 services.AddTransient<IPapercraftRenderBackend, MyRenderBackend>();
 ```
 
-When `PapercraftRenderer` selects a backend by `BackendId` or render target, it also uses that
-backend's `ITextService` while generating the document. Custom backends must expose a text service
-that matches their rendering behavior.
+When `PapercraftRenderer` selects a backend by `BackendId` or render target, it uses that backend's
+`ITextService` while generating the document. Custom backends must expose a text service that matches
+their rendering behavior. Renderer-specific package setup and output examples are documented in
+[Renderer backends](render-backends.md).
 
 ## Generate A PDF
 
@@ -476,4 +478,4 @@ Ask for application work when a manual page or template needs:
 Keep those decisions in application code.
 The user-facing template should stay focused on XML structure, layout, data placeholders and small task examples.
 
-Previous: [Troubleshooting](troubleshooting.md) | [Manual home](index.md)
+Previous: [Troubleshooting](troubleshooting.md) | [Manual home](index.md) | Next: [Renderer backends](render-backends.md)

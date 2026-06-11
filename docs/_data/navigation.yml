@@ -28,6 +28,8 @@
   url: /manual/troubleshooting.html
 - title: Developer integration
   url: /manual/developer-integration.html
+- title: Renderer backends
+  url: /manual/render-backends.html
 - title: Migration to Papercraft
   url: /manual/migration-to-papercraft.html
 - title: Papercraft architecture plan

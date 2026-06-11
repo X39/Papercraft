@@ -78,6 +78,7 @@ The template can then read `@CustomerName` through the template language.
 - [`X39.Solutions.Papercraft.Rendering.SkiaSharp`](../X39.Solutions.Papercraft.Rendering.SkiaSharp/README.md): default PDF and raster backend.
 - [`X39.Solutions.Papercraft.Rendering.Svg`](../X39.Solutions.Papercraft.Rendering.Svg/README.md): optional SVG vector backend.
 - [`X39.Solutions.Papercraft.Rendering.PdfSharp`](../X39.Solutions.Papercraft.Rendering.PdfSharp/README.md): optional PDFsharp backend.
+- [`X39.Solutions.Papercraft.Rendering.EscPos`](../X39.Solutions.Papercraft.Rendering.EscPos/README.md): optional ESC/POS printer-command backend.
 - [`X39.Solutions.Papercraft.OpenTelemetry`](../X39.Solutions.Papercraft.OpenTelemetry/README.md): optional host/OpenTelemetry registration for renderer activity tracing.
 - [`X39.Solutions.PdfTemplate`](../X39.Solutions.PdfTemplate/README.md): compatibility bridge for existing `X39.Solutions.PdfTemplate` consumers.
 

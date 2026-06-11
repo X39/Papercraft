@@ -1,6 +1,6 @@
 # Migration To Papercraft
 
-Previous: [Developer appendix](developer-integration.md) | [Manual home](index.md)
+Previous: [Renderer backends](render-backends.md) | [Manual home](index.md)
 
 Papercraft is the new product name for the template-driven rendering engine that started as
 `X39.Solutions.PdfTemplate`.
@@ -39,6 +39,9 @@ The source tree now has the Papercraft package split:
 | `X39.Solutions.Papercraft` | Default facade for application developers. It depends on core plus the SkiaSharp renderer and exposes `AddPapercraft()`. |
 | `X39.Solutions.Papercraft.Core` | Renderer-neutral contracts plus the current shared parsing, template data, control, transformer, layout and validation runtime. |
 | `X39.Solutions.Papercraft.Rendering.SkiaSharp` | Default PDF and raster renderer, including Skia canvas, text, image, paint and bitmap services. |
+| `X39.Solutions.Papercraft.Rendering.Svg` | Optional SVG vector renderer. |
+| `X39.Solutions.Papercraft.Rendering.PdfSharp` | Optional PDFsharp-backed PDF renderer. |
+| `X39.Solutions.Papercraft.Rendering.EscPos` | Optional first-pass ESC/POS printer-command renderer. |
 | `X39.Solutions.Papercraft.Controls.QrCode` | Optional QR code controls. Depends on `X39.Solutions.Papercraft.Core` and `Net.Codecrete.QrCodeGenerator`. |
 | `X39.Solutions.Papercraft.Controls.ZXing` | Optional broad barcode controls. Depends on `X39.Solutions.Papercraft.Core` and `ZXing.Net`. |
 | `X39.Solutions.PdfTemplate` | Compatibility bridge for existing users. It keeps old service registration and type identities available through forwarding or wrappers. |

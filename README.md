@@ -34,6 +34,7 @@ Useful manual entry points:
 - [Template language](https://x39.github.io/X39.Solutions.PdfTemplate/manual/template-language.html)
 - [Complete examples](https://x39.github.io/X39.Solutions.PdfTemplate/manual/complete-examples.html)
 - [Developer integration appendix](https://x39.github.io/X39.Solutions.PdfTemplate/manual/developer-integration.html)
+- [Renderer backends](https://x39.github.io/X39.Solutions.PdfTemplate/manual/render-backends.html)
 
 ## Requirements
 
@@ -63,6 +64,7 @@ The source tree now follows this partial Papercraft package split:
 | `X39.Solutions.Papercraft.Rendering.SkiaSharp` | SkiaSharp PDF/raster renderer and runtime services. |
 | `X39.Solutions.Papercraft.Rendering.Svg` | Dependency-free SVG vector renderer. |
 | `X39.Solutions.Papercraft.Rendering.PdfSharp` | PDFsharp-backed PDF renderer. |
+| `X39.Solutions.Papercraft.Rendering.EscPos` | First-pass ESC/POS printer-command renderer. |
 | `X39.Solutions.Papercraft.OpenTelemetry` | Optional host/OpenTelemetry integration for Papercraft renderer activity tracing. |
 | `X39.Solutions.Papercraft.Controls.QrCode` | Optional QR code control package backed by `Net.Codecrete.QrCodeGenerator`. |
 | `X39.Solutions.Papercraft.Controls.ZXing` | Optional general barcode control package backed by `ZXing.Net`. |
@@ -80,6 +82,7 @@ public entry points and contributor notes:
 | `X39.Solutions.Papercraft.Rendering.SkiaSharp` | [`source/X39.Solutions.Papercraft.Rendering.SkiaSharp/README.md`](source/X39.Solutions.Papercraft.Rendering.SkiaSharp/README.md) |
 | `X39.Solutions.Papercraft.Rendering.Svg` | [`source/X39.Solutions.Papercraft.Rendering.Svg/README.md`](source/X39.Solutions.Papercraft.Rendering.Svg/README.md) |
 | `X39.Solutions.Papercraft.Rendering.PdfSharp` | [`source/X39.Solutions.Papercraft.Rendering.PdfSharp/README.md`](source/X39.Solutions.Papercraft.Rendering.PdfSharp/README.md) |
+| `X39.Solutions.Papercraft.Rendering.EscPos` | [`source/X39.Solutions.Papercraft.Rendering.EscPos/README.md`](source/X39.Solutions.Papercraft.Rendering.EscPos/README.md) |
 | `X39.Solutions.Papercraft.OpenTelemetry` | [`source/X39.Solutions.Papercraft.OpenTelemetry/README.md`](source/X39.Solutions.Papercraft.OpenTelemetry/README.md) |
 | `X39.Solutions.Papercraft.Controls.QrCode` | [`source/X39.Solutions.Papercraft.Controls.QrCode/README.md`](source/X39.Solutions.Papercraft.Controls.QrCode/README.md) |
 | `X39.Solutions.Papercraft.Controls.ZXing` | [`source/X39.Solutions.Papercraft.Controls.ZXing/README.md`](source/X39.Solutions.Papercraft.Controls.ZXing/README.md) |

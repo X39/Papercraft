@@ -42,3 +42,4 @@ This package only writes command bytes to `RenderOutput.Stream`. It does not ope
 
 - [`X39.Solutions.Papercraft.Core`](../X39.Solutions.Papercraft.Core/README.md): renderer-neutral contracts consumed by this backend.
 - [`X39.Solutions.Papercraft.Rendering.Svg`](../X39.Solutions.Papercraft.Rendering.Svg/README.md): dependency-free SVG backend.
+- [`Renderer backends`](../../docs/manual/render-backends.md): manual page for choosing and using renderer packages.

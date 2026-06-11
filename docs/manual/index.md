@@ -23,8 +23,9 @@ Use this manual when you need to design or adjust the XML template for a PDF doc
 Start here if you need to know where page content belongs, which control to use, how to insert data,
 or how to make visible layout changes such as spacing, borders and tables.
 
-Developer setup, custom controls and resource resolvers belong in the
-[developer integration appendix](developer-integration.md), not in the beginner chapters.
+Developer setup, custom controls, renderer backend choices and resource resolvers belong in the
+[developer integration appendix](developer-integration.md) and [renderer backends](render-backends.md) pages,
+not in the beginner chapters.
 
 ## How Do I Start?
 
@@ -59,5 +60,6 @@ Next, read [Introduction](introduction.md), then [First document](first-document
 11. [Complete examples](complete-examples.md): full document examples such as invoices, reports, table-heavy sheets, product sheets and dashboards.
 12. [Troubleshooting](troubleshooting.md): common XML, data, image and layout problems.
 13. [Developer integration appendix](developer-integration.md): installation, service registration and extension points.
-14. [Migration to Papercraft](migration-to-papercraft.md): additive user migration path for the Papercraft facade and compatibility bridge.
-15. [Papercraft architecture plan](papercraft-architecture-plan.md): maintainer plan for the current package split, SkiaSharp renderer, diagnostics and release phases.
+14. [Renderer backends](render-backends.md): backend packages, output targets, validation and common PDF, SVG, raster and ESC/POS usage patterns.
+15. [Migration to Papercraft](migration-to-papercraft.md): additive user migration path for the Papercraft facade and compatibility bridge.
+16. [Papercraft architecture plan](papercraft-architecture-plan.md): maintainer plan for the current package split, SkiaSharp renderer, diagnostics and release phases.
