@@ -95,11 +95,23 @@ jobs:
       - name: Publish X39.Solutions.Papercraft.Rendering.SkiaSharp
         run: dotnet nuget push "$PACKAGE_OUTPUT_DIRECTORY"/X39.Solutions.Papercraft.Rendering.SkiaSharp.[0-9]*.nupkg --source "$NUGET_SOURCE" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --skip-duplicate
 
+      - name: Publish X39.Solutions.Papercraft.Rendering.Svg
+        run: dotnet nuget push "$PACKAGE_OUTPUT_DIRECTORY"/X39.Solutions.Papercraft.Rendering.Svg.[0-9]*.nupkg --source "$NUGET_SOURCE" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --skip-duplicate
+
+      - name: Publish X39.Solutions.Papercraft.Rendering.PdfSharp
+        run: dotnet nuget push "$PACKAGE_OUTPUT_DIRECTORY"/X39.Solutions.Papercraft.Rendering.PdfSharp.[0-9]*.nupkg --source "$NUGET_SOURCE" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --skip-duplicate
+
+      - name: Publish X39.Solutions.Papercraft.Rendering.EscPos
+        run: dotnet nuget push "$PACKAGE_OUTPUT_DIRECTORY"/X39.Solutions.Papercraft.Rendering.EscPos.[0-9]*.nupkg --source "$NUGET_SOURCE" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --skip-duplicate
+
       - name: Publish X39.Solutions.Papercraft.Controls.QrCode
         run: dotnet nuget push "$PACKAGE_OUTPUT_DIRECTORY"/X39.Solutions.Papercraft.Controls.QrCode.[0-9]*.nupkg --source "$NUGET_SOURCE" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --skip-duplicate
 
       - name: Publish X39.Solutions.Papercraft.Controls.ZXing
         run: dotnet nuget push "$PACKAGE_OUTPUT_DIRECTORY"/X39.Solutions.Papercraft.Controls.ZXing.[0-9]*.nupkg --source "$NUGET_SOURCE" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --skip-duplicate
+
+      - name: Publish X39.Solutions.Papercraft.OpenTelemetry
+        run: dotnet nuget push "$PACKAGE_OUTPUT_DIRECTORY"/X39.Solutions.Papercraft.OpenTelemetry.[0-9]*.nupkg --source "$NUGET_SOURCE" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --skip-duplicate
 
       - name: Publish X39.Solutions.Papercraft
         run: dotnet nuget push "$PACKAGE_OUTPUT_DIRECTORY"/X39.Solutions.Papercraft.[0-9]*.nupkg --source "$NUGET_SOURCE" --api-key "${{ steps.nuget_login.outputs.NUGET_API_KEY }}" --skip-duplicate
