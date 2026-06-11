@@ -1,5 +1,7 @@
 using SkiaSharp;
 using X39.Solutions.Papercraft.Rendering.SkiaSharp.Services;
+using X39.Solutions.Papercraft.Services.TextService;
+using SkiaTextService = X39.Solutions.Papercraft.Rendering.SkiaSharp.Services.TextService.TextService;
 
 namespace X39.Solutions.Papercraft.Rendering.SkiaSharp;
 
@@ -35,14 +37,21 @@ public sealed class SkiaSharpRenderBackend : IPapercraftRenderBackend
     /// <summary>
     /// Creates a new SkiaSharp backend.
     /// </summary>
-    public SkiaSharpRenderBackend(SkiaSharpDisplayListRenderer displayListRenderer)
+    public SkiaSharpRenderBackend(
+        SkiaSharpDisplayListRenderer displayListRenderer,
+        SkPaintCache paintCache)
     {
         ArgumentNullException.ThrowIfNull(displayListRenderer);
+        ArgumentNullException.ThrowIfNull(paintCache);
         _displayListRenderer = displayListRenderer;
+        TextService = new SkiaTextService(paintCache);
     }
 
     /// <inheritdoc />
     public RendererCapabilities Capabilities => StaticCapabilities;
+
+    /// <inheritdoc />
+    public ITextService TextService { get; }
 
     /// <inheritdoc />
     public ValueTask<RenderValidationResult> ValidateAsync(

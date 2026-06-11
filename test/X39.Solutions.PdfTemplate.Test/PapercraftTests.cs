@@ -6,7 +6,9 @@ using X39.Solutions.Papercraft;
 using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Controls.QrCode;
 using X39.Solutions.Papercraft.Controls.ZXing;
+using X39.Solutions.Papercraft.Data;
 using X39.Solutions.Papercraft.Rendering.SkiaSharp;
+using X39.Solutions.Papercraft.Services.TextService;
 
 namespace X39.Solutions.PdfTemplate.Test;
 
@@ -258,6 +260,30 @@ public sealed class PapercraftTests
     }
 
     [Fact]
+    public async Task RenderAsyncUsesSelectedRendererTextService()
+    {
+        var unusedTextService = new RecordingTextService("unused", throwOnUse: true);
+        var selectedTextService = new RecordingTextService("selected");
+        var first = new RecordingRenderer("first", textService: unusedTextService);
+        var selected = new RecordingRenderer("custom", textService: selectedTextService);
+        var generator = CreateRenderer(first, selected);
+        using var reader = CreateReader("<text>Hello selected backend</text>");
+        using var output = new MemoryStream();
+
+        await generator.RenderAsync(
+            reader,
+            new RenderOutput(PapercraftMediaTypes.ApplicationPdf, output),
+            CultureInfo.InvariantCulture,
+            new PapercraftRenderOptions { BackendId = "CUSTOM" });
+
+        Assert.Equal(0, unusedTextService.MeasureCount);
+        Assert.Equal(0, unusedTextService.DrawCount);
+        Assert.True(selectedTextService.MeasureCount > 0);
+        Assert.True(selectedTextService.DrawCount > 0);
+        Assert.Equal(1, selected.RenderCount);
+    }
+
+    [Fact]
     public async Task RenderRasterPagesAsyncSelectsRasterRendererAndWritesPage()
     {
         var first = new RecordingRenderer("pdf", throwOnValidate: true);
@@ -301,6 +327,42 @@ public sealed class PapercraftTests
         Assert.Equal(1, page.Info.PixelWidth);
         Assert.Equal(1, page.Info.PixelHeight);
         Assert.Equal(new byte[] { 1 }, page.Stream.ToArray());
+    }
+
+    [Fact]
+    public async Task RenderRasterPagesAsyncUsesTargetSelectedRendererTextService()
+    {
+        var pdfTextService = new RecordingTextService("pdf", throwOnUse: true);
+        var rasterTextService = new RecordingTextService("raster");
+        var first = new RecordingRenderer("pdf", textService: pdfTextService);
+        var selected = new RecordingRenderer(
+            "raster",
+            outputKinds: RendererOutputKind.RasterImage,
+            mediaTypes: new[] { PapercraftMediaTypes.ImagePng },
+            textService: rasterTextService);
+        var generator = CreateRenderer(first, selected);
+        using var reader = CreateReader("<text>Hello raster backend</text>");
+        var pages = new List<(RasterPageInfo Info, MemoryStream Stream)>();
+
+        await generator.RenderRasterPagesAsync(
+            reader,
+            new RasterPageRenderOutput(
+                PapercraftMediaTypes.ImagePng,
+                (info, _) =>
+                {
+                    var stream = new MemoryStream();
+                    pages.Add((info, stream));
+                    return ValueTask.FromResult<Stream>(stream);
+                },
+                leaveStreamsOpen: true),
+            CultureInfo.InvariantCulture);
+
+        Assert.Equal(0, pdfTextService.MeasureCount);
+        Assert.Equal(0, pdfTextService.DrawCount);
+        Assert.True(rasterTextService.MeasureCount > 0);
+        Assert.True(rasterTextService.DrawCount > 0);
+        Assert.Equal(1, selected.RasterPageRenderCount);
+        Assert.Single(pages);
     }
 
     [Fact]
@@ -650,6 +712,8 @@ public sealed class PapercraftTests
             RendererOutputKind.Pdf,
             new[] { PapercraftMediaTypes.ApplicationPdf });
 
+        public ITextService TextService { get; } = new RecordingTextService("pdf-only");
+
         public ValueTask<RenderValidationResult> ValidateAsync(
             PapercraftDocument document,
             RenderTarget target,
@@ -679,7 +743,8 @@ public sealed class PapercraftTests
             RenderValidationResult? validationResult = null,
             bool throwOnValidate = false,
             RendererOutputKind outputKinds = RendererOutputKind.Pdf,
-            IEnumerable<string>? mediaTypes = null)
+            IEnumerable<string>? mediaTypes = null,
+            ITextService? textService = null)
         {
             Capabilities = new RendererCapabilities(
                 rendererId,
@@ -688,9 +753,12 @@ public sealed class PapercraftTests
                 mediaTypes ?? new[] { PapercraftMediaTypes.ApplicationPdf });
             _validationResult = validationResult;
             _throwOnValidate = throwOnValidate;
+            TextService = textService ?? new RecordingTextService(rendererId);
         }
 
         public RendererCapabilities Capabilities { get; }
+
+        public ITextService TextService { get; }
 
         public int ValidateCount { get; private set; }
 
@@ -786,6 +854,8 @@ public sealed class PapercraftTests
                 [RendererFeatures.Images] = RendererSupportLevel.Unsupported,
             });
 
+        public ITextService TextService { get; } = new RecordingTextService("constrained-printer");
+
         public bool WasValidated { get; private set; }
 
         public ValueTask<RenderValidationResult> ValidateAsync(
@@ -828,6 +898,8 @@ public sealed class PapercraftTests
                 [RendererFeatures.Images] = RendererSupportLevel.Unsupported,
             });
 
+        public ITextService TextService { get; } = new RecordingTextService("feature-limited");
+
         public int ValidateCount { get; private set; }
 
         public ValueTask<RenderValidationResult> ValidateAsync(
@@ -850,5 +922,45 @@ public sealed class PapercraftTests
             RasterPageRenderOutput output,
             CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
+    }
+
+    private sealed class RecordingTextService : ITextService
+    {
+        private readonly string _name;
+        private readonly bool _throwOnUse;
+
+        public RecordingTextService(string name, bool throwOnUse = false)
+        {
+            _name = name;
+            _throwOnUse = throwOnUse;
+        }
+
+        public int MeasureCount { get; private set; }
+
+        public int DrawCount { get; private set; }
+
+        public Size Measure(TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
+        {
+            if (_throwOnUse)
+                throw new InvalidOperationException($"Text service '{_name}' should not be used.");
+
+            MeasureCount++;
+            var fontSize = Math.Max(1F, textStyle.FontSize * dpi / 72.272F * Math.Max(0.01F, textStyle.Scale));
+            var width = text.Length * fontSize * 0.5F;
+            if (float.IsFinite(maxWidth) && maxWidth > 0F)
+                width = Math.Min(width, maxWidth);
+
+            return new Size(Math.Max(1F, width), fontSize);
+        }
+
+        public void Draw(IDrawableCanvas canvas, TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
+        {
+            ArgumentNullException.ThrowIfNull(canvas);
+            if (_throwOnUse)
+                throw new InvalidOperationException($"Text service '{_name}' should not be used.");
+
+            DrawCount++;
+            canvas.DrawText(textStyle, dpi, text.ToString(), 0F, textStyle.FontSize);
+        }
     }
 }

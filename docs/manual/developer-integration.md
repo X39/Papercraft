@@ -76,6 +76,10 @@ services.AddPapercraftCore();
 services.AddTransient<IPapercraftRenderBackend, MyRenderBackend>();
 ```
 
+When `PapercraftRenderer` selects a backend by `BackendId` or render target, it also uses that
+backend's `ITextService` while generating the document. Custom backends must expose a text service
+that matches their rendering behavior.
+
 ## Generate A PDF
 
 Resolve a `PapercraftRenderer`, create an `XmlReader` for the template, and write the PDF to a stream:
@@ -399,14 +403,14 @@ Most requests fit one of these rows:
 | `ITransformer` | XML nodes must be conditionally rewritten, removed or repeated before controls are created. | Implement `Name` and `TransformAsync`, then register with `AddTransformer<TTransformer>()`. |
 | `IResourceResolver` | Image sources must be resolved from application-specific storage. | Register an `IResourceResolver` implementation after `AddPapercraft`. |
 | `IParameterConverter<T>` | A custom control attribute needs custom parsing. | Set the converter on the control property with `ParameterAttribute.Converter`. |
-| `IPapercraftRenderBackend` | The application needs a custom output backend. | Register Core services with `AddPapercraftCore()` and add the backend to DI. |
+| `IPapercraftRenderBackend` | The application needs a custom output backend. | Expose backend capabilities, `ITextService`, and render methods, then register the backend with DI. |
 | `IControlFactory` | Advanced activation behavior is needed. | Replace the DI service only for unusual activation needs; most applications should use `AddControl<TControl>()`. |
 
 Source-checked registration notes:
 
 - `PapercraftRenderer` and `PapercraftGenerator` are registered as transient.
 - `ITemplateData`, `IResourceResolver` and `IControlFactory` are registered as scoped services.
-- `ControlRegistry`, `ControlActivationCache`, `IPropertyAccessCache`, `SkPaintCache`, `ITextService` and `SkiaSharpDisplayListRenderer` are registered as singleton services.
+- `ControlRegistry`, `ControlActivationCache`, `IPropertyAccessCache`, the default unkeyed `ITextService`, `SkPaintCache` and `SkiaSharpDisplayListRenderer` are registered as singleton services.
 - Built-in transformer registrations are transient; custom transformers added with `AddTransformer<TTransformer>()` use the same path.
 - Functions added with `AddFunction<TFunction>()` are scoped by default, and the builder accepts another `ServiceLifetime`.
 - Control registration stores control metadata; a fresh control instance is created for template nodes through the control factory.
@@ -422,7 +426,7 @@ Most applications should not replace them directly.
 | `IDrawableCanvas` | Low-level drawing surface used by controls. Custom controls may call it through the deferred canvas. |
 | `IDeferredCanvas` | Canvas passed to `IControl.Render`; it records drawing work until page-specific values are available. |
 | `IImmediateCanvas` | Canvas exposed inside deferred drawing for page-specific information such as the current page and total pages. |
-| `ITextService` | Shared text measurement and drawing service used by text-based controls. Replacing it changes text behavior globally. |
+| `ITextService` | Text measurement and text display-list service used by text-based controls. `PapercraftRenderer` uses the selected backend's `ITextService`; the unkeyed DI service is a direct-control-activation fallback. |
 | `IPropertyAccessCache` | Expression-evaluation infrastructure that caches property access. It is not a normal application extension point. |
 
 ## Compatibility Package And Legacy API

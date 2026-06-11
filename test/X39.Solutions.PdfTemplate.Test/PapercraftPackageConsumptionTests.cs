@@ -327,6 +327,9 @@ public sealed class PapercraftPackageConsumptionTests
             using System.Threading.Tasks;
             using Microsoft.Extensions.DependencyInjection;
             using X39.Solutions.Papercraft;
+            using X39.Solutions.Papercraft.Abstraction;
+            using X39.Solutions.Papercraft.Data;
+            using X39.Solutions.Papercraft.Services.TextService;
 
             namespace CoreOnlyConsumer;
 
@@ -375,6 +378,8 @@ public sealed class PapercraftPackageConsumptionTests
                     RendererOutputKind.Pdf,
                     new[] { PapercraftMediaTypes.ApplicationPdf });
 
+                public ITextService TextService { get; } = new CoreOnlyTextService();
+
                 public ValueTask<RenderValidationResult> ValidateAsync(
                     PapercraftDocument document,
                     RenderTarget target,
@@ -392,6 +397,15 @@ public sealed class PapercraftPackageConsumptionTests
                     RasterPageRenderOutput output,
                     CancellationToken cancellationToken = default)
                     => ValueTask.CompletedTask;
+            }
+
+            public sealed class CoreOnlyTextService : ITextService
+            {
+                public Size Measure(TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
+                    => new(Math.Max(1F, text.Length), Math.Max(1F, textStyle.FontSize));
+
+                public void Draw(IDrawableCanvas canvas, TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
+                    => canvas.DrawText(textStyle, dpi, text.ToString(), 0F, textStyle.FontSize);
             }
             """);
 

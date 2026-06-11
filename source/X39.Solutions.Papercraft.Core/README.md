@@ -46,6 +46,8 @@ public sealed class MyRenderer : IPapercraftRenderBackend
         RendererOutputKind.Pdf,
         new[] { PapercraftMediaTypes.ApplicationPdf });
 
+    public ITextService TextService { get; } = new MyTextService();
+
     public ValueTask<RenderValidationResult> ValidateAsync(
         PapercraftDocument document,
         RenderTarget target,
@@ -65,6 +67,9 @@ public sealed class MyRenderer : IPapercraftRenderBackend
         => ValueTask.CompletedTask;
 }
 ```
+
+`TextService` is the backend-specific text measurement and text display-list service used while
+generating documents for this renderer.
 
 Register the backend in the application service collection:
 

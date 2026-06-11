@@ -76,9 +76,24 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
         CultureInfo cultureInfo,
         DocumentOptions? documentOptions = default,
         CancellationToken cancellationToken = default)
+        => await GenerateAsync(
+                reader,
+                cultureInfo,
+                documentOptions,
+                _controlFactory,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+    internal async ValueTask<PapercraftDocument> GenerateAsync(
+        XmlReader reader,
+        CultureInfo cultureInfo,
+        DocumentOptions? documentOptions,
+        IControlFactory controlFactory,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(cultureInfo);
+        ArgumentNullException.ThrowIfNull(controlFactory);
         cancellationToken.ThrowIfCancellationRequested();
 
         using var activity = PapercraftActivity.Start(PapercraftActivityNames.GeneratorGenerate);
@@ -93,7 +108,7 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
 
             await using var template = await Template.CreateAsync(
                     rootNode,
-                    _controlFactory,
+                    controlFactory,
                     cultureInfo,
                     options.Context,
                     cancellationToken)

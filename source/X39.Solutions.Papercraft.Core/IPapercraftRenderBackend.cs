@@ -1,3 +1,5 @@
+using X39.Solutions.Papercraft.Services.TextService;
+
 namespace X39.Solutions.Papercraft;
 
 /// <summary>
@@ -9,6 +11,11 @@ public interface IPapercraftRenderBackend
     /// Backend capabilities.
     /// </summary>
     RendererCapabilities Capabilities { get; }
+
+    /// <summary>
+    /// Backend-owned text service used while generating documents for this backend.
+    /// </summary>
+    ITextService TextService { get; }
 
     /// <summary>
     /// Validates whether this backend can render the generated document to the target.

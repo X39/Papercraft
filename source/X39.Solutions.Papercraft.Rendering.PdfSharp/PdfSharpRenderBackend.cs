@@ -1,6 +1,7 @@
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using X39.Solutions.Papercraft.Rendering.PdfSharp.Services;
+using X39.Solutions.Papercraft.Services.TextService;
 
 namespace X39.Solutions.Papercraft.Rendering.PdfSharp;
 
@@ -31,6 +32,9 @@ public sealed class PdfSharpRenderBackend : IPapercraftRenderBackend
         "MIT-licensed PDFsharp backend for PDF output.");
 
     private readonly PdfSharpDisplayListRenderer _displayListRenderer = new();
+
+    /// <inheritdoc />
+    public ITextService TextService { get; } = new PdfSharpTextService();
 
     /// <inheritdoc />
     public RendererCapabilities Capabilities => StaticCapabilities;

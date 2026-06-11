@@ -4,6 +4,9 @@ using System.Text;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
 using X39.Solutions.Papercraft;
+using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Services.TextService;
 
 namespace X39.Solutions.PdfTemplate.Test;
 
@@ -135,6 +138,8 @@ public sealed class PapercraftInstrumentationTests
             RendererOutputKind.Pdf,
             new[] { PapercraftMediaTypes.ApplicationPdf });
 
+        public ITextService TextService { get; } = new MinimalTextService();
+
         public ValueTask<RenderValidationResult> ValidateAsync(
             PapercraftDocument document,
             RenderTarget target,
@@ -152,6 +157,18 @@ public sealed class PapercraftInstrumentationTests
             RasterPageRenderOutput output,
             CancellationToken cancellationToken = default)
             => throw new NotSupportedException();
+    }
+
+    private sealed class MinimalTextService : ITextService
+    {
+        public Size Measure(TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
+            => new(Math.Max(1F, text.Length), Math.Max(1F, textStyle.FontSize));
+
+        public void Draw(IDrawableCanvas canvas, TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
+        {
+            ArgumentNullException.ThrowIfNull(canvas);
+            canvas.DrawText(textStyle, dpi, text.ToString(), 0F, textStyle.FontSize);
+        }
     }
 
     private sealed class ActivityCapture : IDisposable

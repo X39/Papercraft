@@ -1,5 +1,7 @@
 using System.Xml;
 using X39.Solutions.Papercraft.Abstraction;
+using X39.Solutions.Papercraft.Services;
+using X39.Solutions.Papercraft.Services.TextService;
 using static System.String;
 
 namespace X39.Solutions.Papercraft;
@@ -11,6 +13,7 @@ public sealed class PapercraftRenderer
 {
     private readonly PapercraftGenerator _generator;
     private readonly IPapercraftRenderBackend[] _backends;
+    private readonly Func<IPapercraftRenderBackend, IControlFactory?>? _createControlFactory;
 
     /// <summary>
     /// Creates a new Papercraft render facade.
@@ -23,6 +26,27 @@ public sealed class PapercraftRenderer
         ArgumentNullException.ThrowIfNull(backends);
         _generator = generator;
         _backends = backends.ToArray();
+    }
+
+    /// <summary>
+    /// Creates a new Papercraft render facade with backend-aware control activation.
+    /// </summary>
+    public PapercraftRenderer(
+        PapercraftGenerator generator,
+        IEnumerable<IPapercraftRenderBackend> backends,
+        IServiceProvider serviceProvider,
+        ControlActivationCache controlActivationCache,
+        ControlRegistry controlRegistry)
+        : this(generator, backends)
+    {
+        ArgumentNullException.ThrowIfNull(serviceProvider);
+        ArgumentNullException.ThrowIfNull(controlActivationCache);
+        ArgumentNullException.ThrowIfNull(controlRegistry);
+
+        _createControlFactory = (backend) => new ControlFactory(
+            new BackendTextServiceProvider(serviceProvider, backend.TextService),
+            controlActivationCache,
+            controlRegistry);
     }
 
     /// <summary>
@@ -56,10 +80,11 @@ public sealed class PapercraftRenderer
             var renderOptions = options ?? PapercraftRenderOptions.Default;
             var backend = SelectBackend(target, renderOptions);
             PapercraftActivity.SetBackend(activity, backend);
-            var document = await _generator.GenerateAsync(
+            var document = await GenerateDocumentAsync(
                     reader,
                     cultureInfo,
                     renderOptions.DocumentOptions,
+                    backend,
                     cancellationToken)
                 .ConfigureAwait(false);
             PapercraftActivity.SetDocument(activity, document);
@@ -96,10 +121,11 @@ public sealed class PapercraftRenderer
             var renderOptions = options ?? PapercraftRenderOptions.Default;
             var backend = SelectBackend(output.Target, renderOptions);
             PapercraftActivity.SetBackend(activity, backend);
-            var document = await _generator.GenerateAsync(
+            var document = await GenerateDocumentAsync(
                     reader,
                     cultureInfo,
                     renderOptions.DocumentOptions,
+                    backend,
                     cancellationToken)
                 .ConfigureAwait(false);
             PapercraftActivity.SetDocument(activity, document);
@@ -164,10 +190,11 @@ public sealed class PapercraftRenderer
             var renderOptions = options ?? PapercraftRenderOptions.Default;
             var backend = SelectBackend(output.Target, renderOptions);
             PapercraftActivity.SetBackend(activity, backend);
-            var document = await _generator.GenerateAsync(
+            var document = await GenerateDocumentAsync(
                     reader,
                     cultureInfo,
                     renderOptions.DocumentOptions,
+                    backend,
                     cancellationToken)
                 .ConfigureAwait(false);
             PapercraftActivity.SetDocument(activity, document);
@@ -321,6 +348,21 @@ public sealed class PapercraftRenderer
         }
     }
 
+    private async ValueTask<PapercraftDocument> GenerateDocumentAsync(
+        XmlReader reader,
+        CultureInfo cultureInfo,
+        DocumentOptions documentOptions,
+        IPapercraftRenderBackend backend,
+        CancellationToken cancellationToken)
+    {
+        var controlFactory = _createControlFactory?.Invoke(backend);
+        return controlFactory is null
+            ? await _generator.GenerateAsync(reader, cultureInfo, documentOptions, cancellationToken)
+                .ConfigureAwait(false)
+            : await _generator.GenerateAsync(reader, cultureInfo, documentOptions, controlFactory, cancellationToken)
+                .ConfigureAwait(false);
+    }
+
     private static async ValueTask<RenderValidationResult> ValidateBackendAsync(
         IPapercraftRenderBackend backend,
         PapercraftDocument document,
@@ -345,6 +387,30 @@ public sealed class PapercraftRenderer
         {
             PapercraftActivity.SetError(activity, ex);
             throw;
+        }
+    }
+
+    private sealed class BackendTextServiceProvider : IServiceProvider
+    {
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ITextService _textService;
+
+        public BackendTextServiceProvider(IServiceProvider serviceProvider, ITextService textService)
+        {
+            ArgumentNullException.ThrowIfNull(serviceProvider);
+            ArgumentNullException.ThrowIfNull(textService);
+            _serviceProvider = serviceProvider;
+            _textService = textService;
+        }
+
+        public object? GetService(Type serviceType)
+        {
+            ArgumentNullException.ThrowIfNull(serviceType);
+            if (serviceType == typeof(ITextService))
+                return _textService;
+            if (serviceType == typeof(IServiceProvider))
+                return this;
+            return _serviceProvider.GetService(serviceType);
         }
     }
 }

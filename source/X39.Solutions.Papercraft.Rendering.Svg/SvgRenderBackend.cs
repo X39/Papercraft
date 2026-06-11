@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using System.Xml;
 using X39.Solutions.Papercraft.Rendering.Svg.Services;
+using X39.Solutions.Papercraft.Services.TextService;
 
 namespace X39.Solutions.Papercraft.Rendering.Svg;
 
@@ -38,6 +39,9 @@ public sealed class SvgRenderBackend : IPapercraftRenderBackend
 
     /// <inheritdoc />
     public RendererCapabilities Capabilities => StaticCapabilities;
+
+    /// <inheritdoc />
+    public ITextService TextService { get; } = new SvgTextService();
 
     /// <inheritdoc />
     public ValueTask<RenderValidationResult> ValidateAsync(
