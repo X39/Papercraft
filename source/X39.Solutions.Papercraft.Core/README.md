@@ -90,5 +90,7 @@ The source currently exposes the builder through `AddPapercraftCore()` and throu
 
 - [`X39.Solutions.Papercraft`](../X39.Solutions.Papercraft/README.md): default app-facing facade with SkiaSharp already registered.
 - [`X39.Solutions.Papercraft.Rendering.SkiaSharp`](../X39.Solutions.Papercraft.Rendering.SkiaSharp/README.md): built-in PDF and raster backend.
+- [`X39.Solutions.Papercraft.Rendering.Svg`](../X39.Solutions.Papercraft.Rendering.Svg/README.md): optional SVG vector backend.
+- [`X39.Solutions.Papercraft.Rendering.PdfSharp`](../X39.Solutions.Papercraft.Rendering.PdfSharp/README.md): optional PDFsharp backend.
 - [`X39.Solutions.Papercraft.OpenTelemetry`](../X39.Solutions.Papercraft.OpenTelemetry/README.md): optional host/OpenTelemetry registration for Core's activity source.
 - [`X39.Solutions.Papercraft.Controls.QrCode`](../X39.Solutions.Papercraft.Controls.QrCode/README.md) and [`X39.Solutions.Papercraft.Controls.ZXing`](../X39.Solutions.Papercraft.Controls.ZXing/README.md): optional control packages that depend on Core only.

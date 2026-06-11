@@ -41,14 +41,14 @@ dotnet test test/X39.Solutions.PdfTemplate.Test/X39.Solutions.PdfTemplate.Test.c
 
 ## Generated Documentation Assets
 
-Tests under `Samples/Documentation` render XML snippets into PNG preview assets under:
+Tests under `Samples/Documentation` render XML snippets into preview assets under:
 
 ```text
 docs/assets/samples
 ```
 
-Those tests intentionally overwrite stale sample images for the sample being rendered.
-Review image diffs when changing layout, controls, renderer output or sample XML.
+Those tests intentionally overwrite stale PNG, SVG and PDF assets for the sample being rendered.
+Review asset diffs when changing layout, controls, renderer output or sample XML.
 
 ## Runtime Notes
 

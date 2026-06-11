@@ -40,7 +40,7 @@ Begin with the smallest visible template:
 ```
 
 
-![Rendered text sample](../assets/samples/text-basic.png)
+{% include sample-preview.html sample="text-basic" alt="Rendered text sample" %}
 
 Next, read [Introduction](introduction.md), then [First document](first-document.md).
 

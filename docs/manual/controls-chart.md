@@ -41,7 +41,7 @@ Give the chart a fixed `height`, then add a few `data` rows.
 </template>
 ```
 
-![Rendered line chart sample](../assets/samples/chart-line-trend.png)
+{% include sample-preview.html sample="chart-line-trend" alt="Rendered line chart sample" %}
 
 ## Create A Bar Chart
 
@@ -69,7 +69,7 @@ For color formats, see [Colors](layout-fundamentals.md#colors).
 </template>
 ```
 
-![Rendered bar chart sample](../assets/samples/chart-bar-values.png)
+{% include sample-preview.html sample="chart-bar-values" alt="Rendered bar chart sample" %}
 
 ## Create A Pie Chart
 
@@ -94,7 +94,7 @@ Use `pie-label-position` to choose `Outside`, `Inside`, `Legend` or `Auto` place
 </template>
 ```
 
-![Rendered pie chart sample](../assets/samples/chart-pie-share.png)
+{% include sample-preview.html sample="chart-pie-share" alt="Rendered pie chart sample" %}
 
 ## Provide Chart Data
 
@@ -111,7 +111,7 @@ Pie chart `data` elements need `y`; when `x` is omitted, the control can still r
 </lineChart>
 ```
 
-![Rendered line chart sample](../assets/samples/chart-line-trend.png)
+{% include sample-preview.html sample="chart-line-trend" alt="Rendered line chart sample" %}
 
 Invalid or missing values are ignored by the chart data parser.
 If no valid data remains, the chart renders a "No Data" message.

@@ -227,6 +227,65 @@ public sealed class PapercraftPackageConsumptionTests
     }
 
     [Fact]
+    public async Task SvgRendererConsumerCompilesExplicitRendererEntryPoint()
+    {
+        using var project = TemporaryConsumerProject.Create(
+            "SvgRendererConsumer",
+            new[] { ProjectPath("source", "X39.Solutions.Papercraft.Rendering.Svg", "X39.Solutions.Papercraft.Rendering.Svg.csproj") },
+            """
+            using System;
+            using Microsoft.Extensions.DependencyInjection;
+            using X39.Solutions.Papercraft.Rendering.Svg;
+
+            namespace SvgRendererConsumer;
+
+            public static class SvgRendererSmoke
+            {
+                public static void ConfigureExplicitRenderer(IServiceCollection services)
+                    => services.AddPapercraftSvgRenderer();
+
+                public static Type ExplicitRendererType => typeof(SvgRenderBackend);
+            }
+            """);
+
+        await project.BuildAsync();
+        project.AssertAssetsContainLibrary("X39.Solutions.Papercraft.Rendering.Svg");
+        project.AssertAssetsDoesNotContainLibrary("X39.Solutions.PdfTemplate");
+        project.AssertAssetsDoesNotContainLibrary("SkiaSharp");
+        project.AssertAssetsContainLibrary("X39.Solutions.Papercraft.Core");
+    }
+
+    [Fact]
+    public async Task PdfSharpRendererConsumerCompilesExplicitRendererEntryPoint()
+    {
+        using var project = TemporaryConsumerProject.Create(
+            "PdfSharpRendererConsumer",
+            new[] { ProjectPath("source", "X39.Solutions.Papercraft.Rendering.PdfSharp", "X39.Solutions.Papercraft.Rendering.PdfSharp.csproj") },
+            """
+            using System;
+            using Microsoft.Extensions.DependencyInjection;
+            using X39.Solutions.Papercraft.Rendering.PdfSharp;
+
+            namespace PdfSharpRendererConsumer;
+
+            public static class PdfSharpRendererSmoke
+            {
+                public static void ConfigureExplicitRenderer(IServiceCollection services)
+                    => services.AddPapercraftPdfSharpRenderer();
+
+                public static Type ExplicitRendererType => typeof(PdfSharpRenderBackend);
+            }
+            """);
+
+        await project.BuildAsync();
+        project.AssertAssetsContainLibrary("X39.Solutions.Papercraft.Rendering.PdfSharp");
+        project.AssertAssetsDoesNotContainLibrary("X39.Solutions.PdfTemplate");
+        project.AssertAssetsDoesNotContainLibrary("SkiaSharp");
+        project.AssertAssetsContainLibrary("X39.Solutions.Papercraft.Core");
+        project.AssertAssetsContainLibrary("PDFsharp");
+    }
+
+    [Fact]
     public async Task CorePackageConsumerCompilesRendererNeutralContractsWithoutSkiaSharp()
     {
         using var project = TemporaryConsumerProject.Create(

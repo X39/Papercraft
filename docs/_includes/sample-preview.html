@@ -1,0 +1,52 @@
+{% assign sample_name = include.sample %}
+{% assign alt_text = include.alt | default: 'Rendered Papercraft sample' %}
+{% assign png_path = '/assets/samples/' | append: sample_name | append: '.png' | relative_url %}
+{% assign svg_path = '/assets/samples/' | append: sample_name | append: '.svg' | relative_url %}
+{% assign skiasharp_pdf_path = '/assets/samples/' | append: sample_name | append: '-skiasharp.pdf' | relative_url %}
+{% assign pdfsharp_pdf_path = '/assets/samples/' | append: sample_name | append: '-pdfsharp.pdf' | relative_url %}
+
+<figure class="sample-preview" data-sample-preview>
+  <div class="sample-preview__tabs" role="tablist" aria-label="{{ alt_text | escape }} renderer previews">
+    <button class="sample-preview__tab" type="button" role="tab" aria-selected="true" data-preview-tab="skiasharp-png">
+      SkiaSharp PNG
+    </button>
+    <button class="sample-preview__tab" type="button" role="tab" aria-selected="false" data-preview-tab="svg">
+      SVG
+    </button>
+    <button class="sample-preview__tab" type="button" role="tab" aria-selected="false" data-preview-tab="skiasharp-pdf">
+      SkiaSharp PDF
+    </button>
+    <button class="sample-preview__tab" type="button" role="tab" aria-selected="false" data-preview-tab="pdfsharp-pdf">
+      PDFsharp PDF
+    </button>
+  </div>
+
+  <div class="sample-preview__panel" role="tabpanel" data-preview-panel="skiasharp-png">
+    <a href="{{ png_path }}">
+      <img src="{{ png_path }}" alt="{{ alt_text | escape }}">
+    </a>
+  </div>
+
+  <div class="sample-preview__panel" role="tabpanel" data-preview-panel="svg" hidden>
+    <a href="{{ svg_path }}">
+      <img src="{{ svg_path }}" alt="{{ alt_text | escape }} rendered as SVG">
+    </a>
+    <p class="sample-preview__fallback">
+      <a href="{{ svg_path }}">Open SVG</a>
+    </p>
+  </div>
+
+  <div class="sample-preview__panel" role="tabpanel" data-preview-panel="skiasharp-pdf" hidden>
+    <iframe class="sample-preview__frame" title="{{ alt_text | escape }} rendered as SkiaSharp PDF" data-src="{{ skiasharp_pdf_path }}" loading="lazy"></iframe>
+    <p class="sample-preview__fallback">
+      <a href="{{ skiasharp_pdf_path }}">Open SkiaSharp PDF</a>
+    </p>
+  </div>
+
+  <div class="sample-preview__panel" role="tabpanel" data-preview-panel="pdfsharp-pdf" hidden>
+    <iframe class="sample-preview__frame" title="{{ alt_text | escape }} rendered as PDFsharp PDF" data-src="{{ pdfsharp_pdf_path }}" loading="lazy"></iframe>
+    <p class="sample-preview__fallback">
+      <a href="{{ pdfsharp_pdf_path }}">Open PDFsharp PDF</a>
+    </p>
+  </div>
+</figure>

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\PapercraftPackageScaffold.props" />
+    <PropertyGroup>
+        <PackageId>X39.Solutions.Papercraft.Rendering.PdfSharp</PackageId>
+        <AssemblyName>X39.Solutions.Papercraft.Rendering.PdfSharp</AssemblyName>
+        <RootNamespace>X39.Solutions.Papercraft.Rendering.PdfSharp</RootNamespace>
+        <Title>Papercraft PDFsharp renderer</Title>
+        <PackageDescription>
+            <![CDATA[Papercraft PDFsharp renderer package for PDF output.
+The renderer contains a PDFsharp-backed PDF implementation using the MIT-licensed PDFsharp dependency.
+]]>
+        </PackageDescription>
+    </PropertyGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="X39.Solutions.PdfTemplate" />
+        <InternalsVisibleTo Include="X39.Solutions.PdfTemplate.Test" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\X39.Solutions.Papercraft.Core\X39.Solutions.Papercraft.Core.csproj" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+        <PackageReference Include="PDFsharp" Version="6.2.4" />
+    </ItemGroup>
+</Project>

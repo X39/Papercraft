@@ -109,7 +109,7 @@ The application supplies `HasBalanceDue` as a Boolean.
 When it is `true`, the first `border` is included; otherwise, the `@else` border is included.
 Leave out the `@else` block when the section should simply disappear.
 
-![Rendered conditional section sample](../assets/samples/template-language-conditional-section.png)
+{% include sample-preview.html sample="template-language-conditional-section" alt="Rendered conditional section sample" %}
 
 ## Show Optional Values With `@if`
 
@@ -207,7 +207,7 @@ This complete sample chooses one status box from a value named `Status`.
 </template>
 ```
 
-![Rendered switch status sample](../assets/samples/template-language-switch-status.png)
+{% include sample-preview.html sample="template-language-switch-status" alt="Rendered switch status sample" %}
 
 
 ## Lists With `@foreach`
@@ -267,7 +267,7 @@ This complete sample repeats one small block for each task name and prints the z
 </template>
 ```
 
-![Rendered foreach checklist sample](../assets/samples/template-language-foreach-checklist.png)
+{% include sample-preview.html sample="template-language-foreach-checklist" alt="Rendered foreach checklist sample" %}
 
 ## Numeric Ranges With `@for`
 
@@ -331,7 +331,7 @@ This complete sample emits three fixed design steps.
 </template>
 ```
 
-![Rendered numeric range sample](../assets/samples/template-language-for-numbered-steps.png)
+{% include sample-preview.html sample="template-language-for-numbered-steps" alt="Rendered numeric range sample" %}
 
 ## Temporary Values With `@var`
 
@@ -385,7 +385,7 @@ This complete sample uses a fixed label and a value supplied by the application.
 </template>
 ```
 
-![Rendered temporary value sample](../assets/samples/template-language-temporary-value.png)
+{% include sample-preview.html sample="template-language-temporary-value" alt="Rendered temporary value sample" %}
 
 The application supplies `CustomerName`.
 `Label` and `Name` are only available inside the `@var` block.
@@ -474,7 +474,7 @@ This complete sample alternates a background color across three rows.
 </template>
 ```
 
-![Rendered alternating values sample](../assets/samples/template-language-alternating-values.png)
+{% include sample-preview.html sample="template-language-alternating-values" alt="Rendered alternating values sample" %}
 
 ## Common Mistakes
 

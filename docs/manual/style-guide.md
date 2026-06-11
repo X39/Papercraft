@@ -58,7 +58,7 @@ Do not invent attributes, values, functions or transformer syntax.
 
 ## Visual Samples
 
-Visual examples need generated PNG output under `docs/assets/samples`.
+Visual examples need generated preview assets under `docs/assets/samples`.
 Add or extend documentation sample tests before adding images.
 Generated samples should use deterministic file names and avoid machine-specific paths.
 

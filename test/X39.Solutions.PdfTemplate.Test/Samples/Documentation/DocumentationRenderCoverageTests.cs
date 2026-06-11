@@ -5,6 +5,34 @@ namespace X39.Solutions.PdfTemplate.Test.Samples.Documentation;
 [Collection("Samples")]
 public sealed class DocumentationRenderCoverageTests
 {
+    private static readonly byte[] PdfHeader = "%PDF"u8.ToArray();
+
+    private static readonly byte[] PngHeader =
+    {
+        0x89,
+        0x50,
+        0x4E,
+        0x47,
+        0x0D,
+        0x0A,
+        0x1A,
+        0x0A,
+    };
+
+    private static readonly byte[] SvgHeader = "<?xml"u8.ToArray();
+
+    private static readonly string[] RequiredSampleAssetSuffixes =
+    {
+        ".png",
+        ".svg",
+        "-skiasharp.pdf",
+        "-pdfsharp.pdf",
+    };
+
+    private static readonly Regex SamplePreviewIncludeExpression = new(
+        @"\{%\s*include\s+sample-preview\.html\s+sample=""([^""]+)""(?:\s+alt=""([^""]*)"")?\s*%\}",
+        RegexOptions.Compiled);
+
     private static readonly Regex SampleImageReferenceExpression = new(
         @"!\[[^\]]*\]\(\.\./assets/samples/([^\)]+\.png)\)",
         RegexOptions.Compiled);
@@ -24,11 +52,41 @@ public sealed class DocumentationRenderCoverageTests
     }
 
     [Fact]
-    public void ManualSampleImageReferencesExist()
+    public void ManualSamplePreviewReferencesHaveGeneratedAssets()
     {
         var repositoryRoot = GetRepositoryRoot();
         var samplesDirectory = Path.Combine(repositoryRoot, "docs", "assets", "samples");
-        var missing = Directory.EnumerateFiles(GetManualDirectory(), "*.md")
+        var missing = GetDocumentationMarkdownFiles()
+            .SelectMany(
+                (filePath) => SampleImageReferenceExpression
+                    .Matches(File.ReadAllText(filePath))
+                    .Select((match) => Path.GetFileNameWithoutExtension(match.Groups[1].Value))
+                    .Concat(
+                        SamplePreviewIncludeExpression
+                            .Matches(File.ReadAllText(filePath))
+                            .Select((match) => match.Groups[1].Value))
+                    .SelectMany((sample) => RequiredSampleAssetSuffixes.Select((suffix) => new
+                    {
+                        File = Path.GetRelativePath(repositoryRoot, filePath),
+                        Sample = sample,
+                        Asset = $"{sample}{suffix}",
+                    })))
+            .Where((q) => !File.Exists(Path.Combine(samplesDirectory, q.Asset)))
+            .ToArray();
+
+        Assert.True(
+            missing.Length is 0,
+            "Manual sample preview references without checked-in generated assets:"
+            + Environment.NewLine
+            + string.Join(Environment.NewLine, missing.Select((q) => $"{q.File}: {q.Asset}")));
+    }
+
+    [Fact]
+    public void ManualPagesUseSamplePreviewIncludesForGeneratedSamples()
+    {
+        var repositoryRoot = GetRepositoryRoot();
+        var legacyReferences = GetDocumentationMarkdownFiles()
+            .Where((q) => !string.Equals(Path.GetFileName(q), "work-plan.md", StringComparison.OrdinalIgnoreCase))
             .SelectMany(
                 (filePath) => SampleImageReferenceExpression
                     .Matches(File.ReadAllText(filePath))
@@ -37,14 +95,24 @@ public sealed class DocumentationRenderCoverageTests
                         File = Path.GetRelativePath(repositoryRoot, filePath),
                         Image = match.Groups[1].Value,
                     }))
-            .Where((q) => !File.Exists(Path.Combine(samplesDirectory, q.Image)))
             .ToArray();
 
         Assert.True(
-            missing.Length is 0,
-            "Manual sample image references without a checked-in PNG:"
+            legacyReferences.Length is 0,
+            "Generated sample previews should use sample-preview.html includes instead of Markdown images:"
             + Environment.NewLine
-            + string.Join(Environment.NewLine, missing.Select((q) => $"{q.File}: {q.Image}")));
+            + string.Join(Environment.NewLine, legacyReferences.Select((q) => $"{q.File}: {q.Image}")));
+    }
+
+    [Fact]
+    public void RepresentativeDocumentationSampleArtifactsHaveExpectedFormats()
+    {
+        var samplesDirectory = Path.Combine(GetRepositoryRoot(), "docs", "assets", "samples");
+
+        AssertStartsWith(PngHeader, File.ReadAllBytes(Path.Combine(samplesDirectory, "text-basic.png")));
+        AssertStartsWith(SvgHeader, File.ReadAllBytes(Path.Combine(samplesDirectory, "text-basic.svg")));
+        AssertStartsWith(PdfHeader, File.ReadAllBytes(Path.Combine(samplesDirectory, "text-basic-skiasharp.pdf")));
+        AssertStartsWith(PdfHeader, File.ReadAllBytes(Path.Combine(samplesDirectory, "text-basic-pdfsharp.pdf")));
     }
 
     private static IEnumerable<MissingXmlRender> FindXmlSamplesWithoutFollowingRender(string filePath)
@@ -60,7 +128,7 @@ public sealed class DocumentationRenderCoverageTests
             var fenceStart = index;
             var fenceEnd = FindFenceEnd(lines, fenceStart + 1);
             var nextXmlFence = FindNextXmlFence(lines, fenceEnd + 1);
-            if (HasSampleImageReference(lines, fenceEnd + 1, nextXmlFence))
+            if (HasSamplePreviewReference(lines, fenceEnd + 1, nextXmlFence))
             {
                 index = fenceEnd;
                 continue;
@@ -74,11 +142,11 @@ public sealed class DocumentationRenderCoverageTests
         }
     }
 
-    private static bool HasSampleImageReference(string[] lines, int start, int end)
+    private static bool HasSamplePreviewReference(string[] lines, int start, int end)
     {
         for (var index = start; index < end; index++)
         {
-            if (SampleImageReferenceExpression.IsMatch(lines[index]))
+            if (SamplePreviewIncludeExpression.IsMatch(lines[index]))
                 return true;
         }
 
@@ -119,6 +187,17 @@ public sealed class DocumentationRenderCoverageTests
     private static string GetManualDirectory()
         => Path.Combine(GetRepositoryRoot(), "docs", "manual");
 
+    private static IEnumerable<string> GetDocumentationMarkdownFiles()
+    {
+        var repositoryRoot = GetRepositoryRoot();
+        yield return Path.Combine(repositoryRoot, "docs", "index.md");
+
+        foreach (var filePath in Directory.EnumerateFiles(GetManualDirectory(), "*.md"))
+        {
+            yield return filePath;
+        }
+    }
+
     private static string GetRepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
@@ -132,6 +211,11 @@ public sealed class DocumentationRenderCoverageTests
 
         throw new DirectoryNotFoundException("Could not find the repository root from the test output directory.");
     }
+
+    private static void AssertStartsWith(byte[] expected, byte[] actual)
+        => Assert.True(
+            actual.AsSpan().StartsWith(expected),
+            $"Expected file to start with '{Convert.ToHexString(expected)}'.");
 
     private sealed record MissingXmlRender(string File, int Line, string FirstLine);
 }

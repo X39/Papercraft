@@ -27,7 +27,7 @@ This fragment mirrors the activation coverage in `ParagraphControlTests`:
 </paragraph>
 ```
 
-![Rendered rich text paragraph sample](../assets/samples/rich-text-paragraph.png)
+{% include sample-preview.html sample="rich-text-paragraph" alt="Rendered rich text paragraph sample" %}
 
 `paragraph` accepts only `span` and `br` children.
 Do not put `text`, `image`, `table` or other normal controls directly inside a paragraph.
@@ -43,7 +43,7 @@ This fragment mirrors `HyperlinkControlTests`:
     fontsize="14">View invoice</hyperlink>
 ```
 
-![Rendered hyperlink sample](../assets/samples/rich-text-hyperlink.png)
+{% include sample-preview.html sample="rich-text-hyperlink" alt="Rendered hyperlink sample" %}
 
 PDF output creates clickable URI annotations for the visible link text. Raster output keeps the visible text and optional
 underline, but cannot carry clickable PDF annotations.

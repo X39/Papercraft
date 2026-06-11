@@ -30,7 +30,7 @@ These fragments mirror `ListControlTests`:
 </ol>
 ```
 
-![Rendered list marker sample](../assets/samples/lists-basic-markers.png)
+{% include sample-preview.html sample="lists-basic-markers" alt="Rendered list marker sample" %}
 
 Lists accept only `li` children.
 Each `li` can contain normal controls:
@@ -46,7 +46,7 @@ Each `li` can contain normal controls:
 </ul>
 ```
 
-![Rendered nested list sample](../assets/samples/lists-nested-items.png)
+{% include sample-preview.html sample="lists-nested-items" alt="Rendered nested list sample" %}
 
 ## Supported Controls
 

@@ -36,7 +36,7 @@ This sample uses a `LogoImage` template-data value supplied by the documentation
 </template>
 ```
 
-![Rendered image sample](../assets/samples/image-from-template-data.png)
+{% include sample-preview.html sample="image-from-template-data" alt="Rendered image sample" %}
 
 ## Add An Image From Template Data
 
@@ -48,7 +48,7 @@ the right logo or picture for each document.
 <image source="@LogoImage" width="32mm" height="18mm"/>
 ```
 
-![Rendered image sample](../assets/samples/image-from-template-data.png)
+{% include sample-preview.html sample="image-from-template-data" alt="Rendered image sample" %}
 
 The default resolver accepts base64 data and `data:image/...;base64,...` values.
 It does not load arbitrary file paths or internet URLs.
@@ -75,7 +75,7 @@ its original shape, or a percentage width when the image should scale with the a
 <image source="@LogoImage" width="100%" height="auto"/>
 ```
 
-![Rendered image sizing sample](../assets/samples/image-sizing-options.png)
+{% include sample-preview.html sample="image-sizing-options" alt="Rendered image sizing sample" %}
 
 ## Supported Attributes
 

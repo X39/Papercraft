@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:papercraft="https://x39.solutions/papercraft" width="755.905518" height="566.929138" viewBox="0 0 755.905518 566.929138" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Papercraft SVG document</title>
+  <metadata>
+    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-11T16:33:53.1801277Z" />
+  </metadata>
+  <!--Papercraft SVG backend output. Pages: 1. Pages are stacked vertically.-->
+  <!--Page 1 of 1-->
+  <defs>
+    <clipPath id="papercraft-clip-1" clipPathUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="755.905518" height="566.929138" />
+    </clipPath>
+  </defs>
+  <g id="page-1" data-page-index="0" data-page-number="1">
+    <g clip-path="url(#papercraft-clip-1)">
+      <g>
+        <g>
+          <defs>
+            <clipPath id="papercraft-clip-2" clipPathUnits="userSpaceOnUse">
+              <rect x="0" y="0" width="755.905518" height="566.929138" />
+            </clipPath>
+          </defs>
+          <g clip-path="url(#papercraft-clip-2)">
+            <g />
+          </g>
+        </g>
+        <g>
+          <g>
+            <defs>
+              <clipPath id="papercraft-clip-3" clipPathUnits="userSpaceOnUse">
+                <rect x="37.7952957" y="37.7952957" width="680.314941" height="0" />
+              </clipPath>
+            </defs>
+            <g clip-path="url(#papercraft-clip-3)">
+              <g />
+            </g>
+          </g>
+          <g>
+            <defs>
+              <clipPath id="papercraft-clip-4" clipPathUnits="userSpaceOnUse">
+                <rect x="37.7952957" y="37.7952957" width="680.314941" height="491.338562" />
+              </clipPath>
+            </defs>
+            <g clip-path="url(#papercraft-clip-4)">
+              <g>
+                <g>
+                  <defs>
+                    <clipPath id="papercraft-clip-5" clipPathUnits="userSpaceOnUse">
+                      <rect x="37.7952957" y="37.7952957" width="317.480499" height="90.7087097" />
+                    </clipPath>
+                  </defs>
+                  <g clip-path="url(#papercraft-clip-5)">
+                    <rect x="37.7952957" y="37.7952957" width="6.28674269" height="90.7087097" fill="#000000" />
+                    <rect x="47.2254105" y="37.7952957" width="3.14337134" height="90.7087097" fill="#000000" />
+                    <rect x="56.6555252" y="37.7952957" width="3.14337134" height="90.7087097" fill="#000000" />
+                    <rect x="72.3723755" y="37.7952957" width="3.14337134" height="90.7087097" fill="#000000" />
+                    <rect x="78.6591187" y="37.7952957" width="3.14337134" height="90.7087097" fill="#000000" />
+                    <rect x="91.232605" y="37.7952957" width="6.28674269" height="90.7087097" fill="#000000" />
+                    <rect x="106.949463" y="37.7952957" width="3.14337134" height="90.7087097" fill="#000000" />
+                    <rect x="119.522949" y="37.7952957" width="3.14337134" height="90.7087097" fill="#000000" />
+                    <rect x="125.809692" y="37.7952957" width="6.28674269" height="90.7087097" fill="#000000" />
+                    <rect x="141.52655" y="37.7952957" width="3.14337134" height="90.7087097" fill="#000000" />
+                    <rect x="154.100037" y="37.7952957" width="3.14337134" height="90.7087097" fill="#000000" />
+                    <rect x="166.673523" y="37.7952957" width="6.28674269" height="90.7087097" fill="#000000" />
+                    <rect x="176.103638" y="37.7952957" width="3.14337134" height="90.7087097" fill="#000000" />
+                    <rect x="185.533752" y="37.7952957" width="9.43011379" height="90.7087097" fill="#000000" />
+                    <rect x="201.25061" y="37.7952957" width="6.28674269" height="90.7087097" fill="#000000" />
+                    <rect x="210.680725" y="37.7952957" width="6.28674269" height="90.7087097" fill="#000000" />
+                    <rect x="223.254211" y="37.7952957" width="9.43011379" height="90.7087097" fill="#000000" />
+                    <rect x="238.971069" y="37.7952957" width="3.14337134" height="90.7087097" fill="#000000" />
+                    <rect x="245.257812" y="37.7952957" width="6.28674269" height="90.7087097" fill="#000000" />
+                    <rect x="257.831299" y="37.7952957" width="3.14337134" height="90.7087097" fill="#000000" />
+                    <rect x="264.118042" y="37.7952957" width="9.43011379" height="90.7087097" fill="#000000" />
+                    <rect x="279.8349" y="37.7952957" width="3.14337134" height="90.7087097" fill="#000000" />
+                    <rect x="295.551727" y="37.7952957" width="3.14337134" height="90.7087097" fill="#000000" />
+                    <rect x="301.83847" y="37.7952957" width="6.28674269" height="90.7087097" fill="#000000" />
+                    <rect x="314.411957" y="37.7952957" width="6.28674269" height="90.7087097" fill="#000000" />
+                    <rect x="330.128815" y="37.7952957" width="9.43011379" height="90.7087097" fill="#000000" />
+                    <rect x="342.702301" y="37.7952957" width="3.14337134" height="90.7087097" fill="#000000" />
+                    <rect x="348.989044" y="37.7952957" width="6.28674269" height="90.7087097" fill="#000000" />
+                  </g>
+                </g>
+                <g>
+                  <defs>
+                    <clipPath id="papercraft-clip-6" clipPathUnits="userSpaceOnUse">
+                      <rect x="37.7952957" y="128.503998" width="680.314941" height="22.6771774" />
+                    </clipPath>
+                  </defs>
+                  <g clip-path="url(#papercraft-clip-6)" />
+                </g>
+                <g>
+                  <defs>
+                    <clipPath id="papercraft-clip-7" clipPathUnits="userSpaceOnUse">
+                      <rect x="37.7952957" y="151.181183" width="317.480499" height="105.826828" />
+                    </clipPath>
+                  </defs>
+                  <g clip-path="url(#papercraft-clip-7)">
+                    <rect x="37.7952957" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="44.4790955" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="57.8466949" y="151.181183" width="6.68380022" height="105.826828" fill="#000000" />
+                    <rect x="67.8723984" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="74.5561981" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="84.5818939" y="151.181183" width="10.0257006" height="105.826828" fill="#000000" />
+                    <rect x="97.9494934" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="104.633301" y="151.181183" width="13.3676004" height="105.826828" fill="#000000" />
+                    <rect x="121.342796" y="151.181183" width="13.3676004" height="105.826828" fill="#000000" />
+                    <rect x="138.052307" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="151.419891" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="161.445602" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="168.129395" y="151.181183" width="6.68380022" height="105.826828" fill="#000000" />
+                    <rect x="181.497009" y="151.181183" width="6.68380022" height="105.826828" fill="#000000" />
+                    <rect x="191.522705" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="198.206512" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="204.890289" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="221.599792" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="228.2836" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="244.993103" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="251.67691" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="268.386414" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="275.07019" y="151.181183" width="10.0257006" height="105.826828" fill="#000000" />
+                    <rect x="288.437805" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="298.463501" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="315.173004" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="321.856812" y="151.181183" width="6.68380022" height="105.826828" fill="#000000" />
+                    <rect x="335.224396" y="151.181183" width="6.68380022" height="105.826828" fill="#000000" />
+                    <rect x="345.250092" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                    <rect x="351.933899" y="151.181183" width="3.34190011" height="105.826828" fill="#000000" />
+                  </g>
+                </g>
+                <g>
+                  <defs>
+                    <clipPath id="papercraft-clip-8" clipPathUnits="userSpaceOnUse">
+                      <rect x="37.7952957" y="257.007996" width="680.314941" height="22.6771774" />
+                    </clipPath>
+                  </defs>
+                  <g clip-path="url(#papercraft-clip-8)" />
+                </g>
+                <g>
+                  <defs>
+                    <clipPath id="papercraft-clip-9" clipPathUnits="userSpaceOnUse">
+                      <rect x="37.7952957" y="279.685181" width="166.299301" height="166.299301" />
+                    </clipPath>
+                  </defs>
+                  <g clip-path="url(#papercraft-clip-9)">
+                    <rect x="37.7952957" y="279.685181" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="65.5118484" y="279.685181" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="93.2283936" y="279.685181" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="120.944946" y="279.685181" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="148.661499" y="279.685181" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="176.378052" y="279.685181" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="37.7952957" y="293.543457" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="65.5118484" y="293.543457" width="27.7165508" height="13.8582754" fill="#000000" />
+                    <rect x="148.661499" y="293.543457" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="176.378052" y="293.543457" width="27.7165508" height="13.8582754" fill="#000000" />
+                    <rect x="37.7952957" y="307.401733" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="120.944946" y="307.401733" width="27.7165508" height="13.8582754" fill="#000000" />
+                    <rect x="37.7952957" y="321.26001" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="65.5118484" y="321.26001" width="55.4331017" height="13.8582754" fill="#000000" />
+                    <rect x="176.378052" y="321.26001" width="27.7165508" height="13.8582754" fill="#000000" />
+                    <rect x="37.7952957" y="335.118286" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="93.2283936" y="335.118286" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="176.378052" y="335.118286" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="37.7952957" y="348.976562" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="79.3701172" y="348.976562" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="107.08667" y="348.976562" width="41.5748253" height="13.8582754" fill="#000000" />
+                    <rect x="176.378052" y="348.976562" width="27.7165508" height="13.8582754" fill="#000000" />
+                    <rect x="37.7952957" y="362.834839" width="41.5748253" height="13.8582754" fill="#000000" />
+                    <rect x="107.08667" y="362.834839" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="148.661499" y="362.834839" width="41.5748253" height="13.8582754" fill="#000000" />
+                    <rect x="37.7952957" y="376.693115" width="27.7165508" height="13.8582754" fill="#000000" />
+                    <rect x="79.3701172" y="376.693115" width="27.7165508" height="13.8582754" fill="#000000" />
+                    <rect x="120.944946" y="376.693115" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="148.661499" y="376.693115" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="190.236328" y="376.693115" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="37.7952957" y="390.551392" width="27.7165508" height="13.8582754" fill="#000000" />
+                    <rect x="107.08667" y="390.551392" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="134.803223" y="390.551392" width="55.4331017" height="13.8582754" fill="#000000" />
+                    <rect x="37.7952957" y="404.409668" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="65.5118484" y="404.409668" width="27.7165508" height="13.8582754" fill="#000000" />
+                    <rect x="107.08667" y="404.409668" width="69.2913742" height="13.8582754" fill="#000000" />
+                    <rect x="190.236328" y="404.409668" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="37.7952957" y="418.267944" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="93.2283936" y="418.267944" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="134.803223" y="418.267944" width="27.7165508" height="13.8582754" fill="#000000" />
+                    <rect x="176.378052" y="418.267944" width="13.8582754" height="13.8582754" fill="#000000" />
+                    <rect x="37.7952957" y="432.126221" width="166.299301" height="13.8582754" fill="#000000" />
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+          <g>
+            <defs>
+              <clipPath id="papercraft-clip-10" clipPathUnits="userSpaceOnUse">
+                <rect x="37.7952957" y="529.13385" width="680.314941" height="0" />
+              </clipPath>
+            </defs>
+            <g clip-path="url(#papercraft-clip-10)">
+              <g />
+            </g>
+          </g>
+        </g>
+        <g>
+          <g />
+        </g>
+        <g>
+          <defs>
+            <clipPath id="papercraft-clip-11" clipPathUnits="userSpaceOnUse">
+              <rect x="0" y="0" width="755.905518" height="566.929138" />
+            </clipPath>
+          </defs>
+          <g clip-path="url(#papercraft-clip-11)">
+            <g />
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -33,7 +33,7 @@ Start with a simple variable in a `text` control.
 </template>
 ```
 
-![Rendered variable insertion sample](../assets/samples/template-data-insert-variable.png)
+{% include sample-preview.html sample="template-data-insert-variable" alt="Rendered variable insertion sample" %}
 
 The application must supply values named `OrderNumber`, `CustomerName` and `DeliveryDate`.
 If you do not know the available names, ask the application team for the template data list.
@@ -144,7 +144,7 @@ Use this when the application decides a value such as a color.
 </template>
 ```
 
-![Rendered variable attribute sample](../assets/samples/template-data-variable-attribute.png)
+{% include sample-preview.html sample="template-data-variable-attribute" alt="Rendered variable attribute sample" %}
 
 In this example, `AccentBorder` must contain a valid color value such as `#2f5597`,
 and `AccentBackground` must contain a valid color value such as `#eaf2ff`.
@@ -176,7 +176,7 @@ This example assumes the application supplies a function named `statusLabel` and
 </template>
 ```
 
-![Rendered function call sample](../assets/samples/template-data-call-function.png)
+{% include sample-preview.html sample="template-data-call-function" alt="Rendered function call sample" %}
 
 Inside the parentheses, write the variable name without a leading `@`.
 

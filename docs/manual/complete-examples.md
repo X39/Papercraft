@@ -112,7 +112,7 @@ the application developer.
 </template>
 ```
 
-![Rendered complete invoice preview](../assets/samples/complete-invoice-preview.png)
+{% include sample-preview.html sample="complete-invoice-preview" alt="Rendered complete invoice preview" %}
 
 This example combines smaller topics from [First document](first-document.md), [Styles](styles.md),
 [Border control](controls-border.md), [Line control](controls-line.md), [Table control](controls-table.md),
@@ -213,7 +213,7 @@ It keeps the data literal so the layout is clear before you connect it to applic
 </template>
 ```
 
-![Rendered complete report preview](../assets/samples/complete-report-preview.png)
+{% include sample-preview.html sample="complete-report-preview" alt="Rendered complete report preview" %}
 
 This example combines smaller topics from [First document](first-document.md), [Border control](controls-border.md),
 [Line control](controls-line.md), [Table control](controls-table.md) and
@@ -383,7 +383,7 @@ alternating row backgrounds.
 </template>
 ```
 
-![Rendered complete table-heavy preview](../assets/samples/complete-table-heavy-preview.png)
+{% include sample-preview.html sample="complete-table-heavy-preview" alt="Rendered complete table-heavy preview" %}
 
 This example combines smaller topics from [First document](first-document.md), [Layout fundamentals](layout-fundamentals.md),
 [Border control](controls-border.md), [Table control](controls-table.md),
@@ -469,7 +469,7 @@ It uses one image value supplied by the application as `LogoImage`.
 </template>
 ```
 
-![Rendered complete product sheet preview](../assets/samples/complete-product-sheet-preview.png)
+{% include sample-preview.html sample="complete-product-sheet-preview" alt="Rendered complete product sheet preview" %}
 
 This example combines smaller topics from [Template data](template-data.md), [Image control](controls-image.md),
 [Border control](controls-border.md), [Line control](controls-line.md), [Table control](controls-table.md) and
@@ -568,7 +568,7 @@ It uses literal values so the chart XML stays visible and easy to compare with t
 </template>
 ```
 
-![Rendered complete chart dashboard preview](../assets/samples/complete-chart-dashboard-preview.png)
+{% include sample-preview.html sample="complete-chart-dashboard-preview" alt="Rendered complete chart dashboard preview" %}
 
 This example combines smaller topics from [First document](first-document.md), [Border control](controls-border.md),
 [Line control](controls-line.md), [Table control](controls-table.md), [Chart controls](controls-chart.md) and

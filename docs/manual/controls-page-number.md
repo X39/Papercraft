@@ -44,7 +44,7 @@ Use `mode="CurrentTotal"` when the reader should see both the current page and t
 </template>
 ```
 
-![Rendered page number footer sample](../assets/samples/page-number-footer.png)
+{% include sample-preview.html sample="page-number-footer" alt="Rendered page number footer sample" %}
 
 ## Choose What To Show
 
@@ -70,7 +70,7 @@ Use `suffix` for text after the final number.
 <pageNumber mode="CurrentTotal" prefix="Page " delimiter=" of "/>
 ```
 
-![Rendered page number footer sample](../assets/samples/page-number-footer.png)
+{% include sample-preview.html sample="page-number-footer" alt="Rendered page number footer sample" %}
 
 For a one-page document, this prints `Page 1 of 1`.
 
@@ -112,7 +112,7 @@ Put the fixed label in one `td` and the `pageNumber` control in another `td`.
 </template>
 ```
 
-![Rendered footer label and page number sample](../assets/samples/page-number-footer-with-label.png)
+{% include sample-preview.html sample="page-number-footer-with-label" alt="Rendered footer label and page number sample" %}
 
 Use this pattern for report names, confidentiality labels, document IDs or other short footer notes.
 For wider layouts, adjust the `td` widths; the example uses `2*` for the label and `1*` for the page number.

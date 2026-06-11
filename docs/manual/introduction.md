@@ -36,7 +36,7 @@ Start with one `body` section and one visible control.
 </template>
 ```
 
-![Rendered text sample](../assets/samples/text-basic.png)
+{% include sample-preview.html sample="text-basic" alt="Rendered text sample" %}
 
 After that, move to [First document](first-document.md) to learn where repeated headers,
 footers, background content and fixed areas fit into a full template.

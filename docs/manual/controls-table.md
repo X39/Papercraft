@@ -57,7 +57,7 @@ Each `th` or `tr` contains `td` cells.
 </template>
 ```
 
-![Rendered basic table sample](../assets/samples/table-basic-rows-and-columns.png)
+{% include sample-preview.html sample="table-basic-rows-and-columns" alt="Rendered basic table sample" %}
 
 ## Add A Table Header
 
@@ -78,7 +78,7 @@ when the table continues on a later page.
 </table>
 ```
 
-![Rendered basic table sample](../assets/samples/table-basic-rows-and-columns.png)
+{% include sample-preview.html sample="table-basic-rows-and-columns" alt="Rendered basic table sample" %}
 
 For page-break behavior and repeated headers, see
 [A table breaks or overflows unexpectedly](troubleshooting.md#a-table-breaks-or-overflows-unexpectedly).
@@ -124,7 +124,7 @@ Use cell `background`, `borderThickness` and `borderColor` when the cell itself 
 </template>
 ```
 
-![Rendered two-column table layout sample](../assets/samples/table-two-column-layout.png)
+{% include sample-preview.html sample="table-two-column-layout" alt="Rendered two-column table layout sample" %}
 
 Use this pattern for addresses, small summary blocks or side-by-side labels.
 For many repeated rows, keep using normal table rows instead of nesting large layouts inside one cell.
@@ -164,7 +164,7 @@ For fixed and percent length formats, see [Lengths](layout-fundamentals.md#lengt
 </template>
 ```
 
-![Rendered table column widths sample](../assets/samples/table-column-widths.png)
+{% include sample-preview.html sample="table-column-widths" alt="Rendered table column widths sample" %}
 
 ## Align Numbers To The Right
 
@@ -177,7 +177,7 @@ The table controls position the cell; the text control positions the text inside
 </td>
 ```
 
-![Rendered basic table sample](../assets/samples/table-basic-rows-and-columns.png)
+{% include sample-preview.html sample="table-basic-rows-and-columns" alt="Rendered basic table sample" %}
 
 
 ## Create An Invoice Line-Item Table
@@ -204,7 +204,7 @@ The full invoice preview uses the same structure:
 </table>
 ```
 
-![Rendered complete invoice preview](../assets/samples/complete-invoice-preview.png)
+{% include sample-preview.html sample="complete-invoice-preview" alt="Rendered complete invoice preview" %}
 
 For a full document shape, see the generated [Invoice example](complete-examples.md#invoice-example).
 If invoice rows come from application data, start with [Repeat rows from data](#repeat-rows-from-data) when each row
@@ -254,7 +254,7 @@ Set `background` on the row when the whole row should share the same fill.
 </template>
 ```
 
-![Rendered alternating table rows sample](../assets/samples/table-alternating-rows.png)
+{% include sample-preview.html sample="table-alternating-rows" alt="Rendered alternating table rows sample" %}
 
 For more transformer syntax, see [Template language](template-language.md).
 
@@ -290,7 +290,7 @@ Keep the repeated block small: one loop, one row and the cells that belong to th
 </template>
 ```
 
-![Rendered repeated data rows sample](../assets/samples/table-repeated-data-rows.png)
+{% include sample-preview.html sample="table-repeated-data-rows" alt="Rendered repeated data rows sample" %}
 
 The application must supply `Tasks` as a collection of text values.
 The loop creates a temporary `TaskName` value for the current item.

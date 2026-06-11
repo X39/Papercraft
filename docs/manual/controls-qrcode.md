@@ -48,7 +48,7 @@ Use `qrCode` for QR symbols. The value can be supplied as an attribute or as ele
 </qrCode>
 ```
 
-![Rendered QR code sample](../assets/samples/qrcode-basic.png)
+{% include sample-preview.html sample="qrcode-basic" alt="Rendered QR code sample" %}
 
 | Attribute | Values | Default |
 |-----------|--------|---------|

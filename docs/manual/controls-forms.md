@@ -43,7 +43,7 @@ These fragments mirror `CheckboxControlTests` and `SignatureControlTests`:
     textPlacement="Above"/>
 ```
 
-![Rendered checkbox and signature sample](../assets/samples/forms-checkbox-and-signature.png)
+{% include sample-preview.html sample="forms-checkbox-and-signature" alt="Rendered checkbox and signature sample" %}
 
 `checkbox` can also use element text as its label:
 
@@ -51,7 +51,7 @@ These fragments mirror `CheckboxControlTests` and `SignatureControlTests`:
 <checkbox>Element Label</checkbox>
 ```
 
-![Rendered checkbox element-label sample](../assets/samples/forms-checkbox-element-label.png)
+{% include sample-preview.html sample="forms-checkbox-element-label" alt="Rendered checkbox element-label sample" %}
 
 When `checkbox` has a non-empty `label`, the label text wins over child controls.
 Without a label, child controls render to the right of the checkbox square.

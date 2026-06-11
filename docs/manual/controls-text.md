@@ -31,7 +31,7 @@ Start with plain text inside a `body`.
 </template>
 ```
 
-![Rendered basic text sample](../assets/samples/text-basic.png)
+{% include sample-preview.html sample="text-basic" alt="Rendered basic text sample" %}
 
 ## Change Size And Color
 
@@ -50,7 +50,7 @@ See [Layout fundamentals](layout-fundamentals.md) for supported color formats.
 </template>
 ```
 
-![Rendered text size and color sample](../assets/samples/text-font-size-and-color.png)
+{% include sample-preview.html sample="text-font-size-and-color" alt="Rendered text size and color sample" %}
 
 ## Align Text
 
@@ -70,7 +70,7 @@ For the shared alignment model, see [Alignment](layout-fundamentals.md#alignment
 </template>
 ```
 
-![Rendered text alignment sample](../assets/samples/text-alignment.png)
+{% include sample-preview.html sample="text-alignment" alt="Rendered text alignment sample" %}
 
 ## Add Padding Around Text
 
@@ -91,7 +91,7 @@ When the padding should be visible, put the text inside a `border` with a backgr
 </template>
 ```
 
-![Rendered text padding sample](../assets/samples/text-padding.png)
+{% include sample-preview.html sample="text-padding" alt="Rendered text padding sample" %}
 
 ## Make Text Bold, Italic Or Decorated
 
@@ -115,7 +115,7 @@ Use `decoration` for underline, strike-through and double underline.
 </template>
 ```
 
-![Rendered text style and weight sample](../assets/samples/text-style-and-weight.png)
+{% include sample-preview.html sample="text-style-and-weight" alt="Rendered text style and weight sample" %}
 
 Decoration values can be combined, for example `decoration="underline, strikeThrough"`.
 
@@ -136,7 +136,7 @@ The application must supply the value.
 </template>
 ```
 
-![Rendered variable insertion sample](../assets/samples/template-data-insert-variable.png)
+{% include sample-preview.html sample="template-data-insert-variable" alt="Rendered variable insertion sample" %}
 
 The application supplies the values named `OrderNumber`, `CustomerName` and `DeliveryDate`.
 For missing values, functions and data-backed attributes, see [Template data](template-data.md).

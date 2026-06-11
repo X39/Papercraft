@@ -36,7 +36,7 @@ These fragments mirror `BlockControlTests`, `FlowControlTests` and `ColumnsContr
 </columns>
 ```
 
-![Rendered flow helper sample](../assets/samples/flow-block-spacer-columns.png)
+{% include sample-preview.html sample="flow-block-spacer-columns" alt="Rendered flow helper sample" %}
 
 `block` and `columns` can contain normal controls.
 `spacer` and `pageBreak` are leaf controls and should not contain child controls.

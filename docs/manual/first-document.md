@@ -37,7 +37,7 @@ Start with a complete XML file containing one `body` section and one visible con
 </template>
 ```
 
-![Rendered minimal first document](../assets/samples/first-document-minimal.png)
+{% include sample-preview.html sample="first-document-minimal" alt="Rendered minimal first document" %}
 
 ## Choose A Section
 
@@ -101,7 +101,7 @@ Use `header` and `footer` for content that should appear around the body on each
 </template>
 ```
 
-![Rendered header and footer sample](../assets/samples/first-document-header-footer.png)
+{% include sample-preview.html sample="first-document-header-footer" alt="Rendered header and footer sample" %}
 
 ## Understand Page Margins
 
@@ -121,7 +121,7 @@ The XML places a border in the body; the margin leaves space around the body are
 </template>
 ```
 
-![Rendered page margin sample](../assets/samples/first-document-page-margin.png)
+{% include sample-preview.html sample="first-document-page-margin" alt="Rendered page margin sample" %}
 
 If your document needs different page margins, use the page setup exposed by your application.
 Developer-facing setup details belong in the [developer integration appendix](developer-integration.md).
@@ -153,7 +153,7 @@ They are useful for watermarks, draft marks and page-wide marks that should not 
 </template>
 ```
 
-![Rendered background and foreground sample](../assets/samples/first-document-background-foreground.png)
+{% include sample-preview.html sample="first-document-background-foreground" alt="Rendered background and foreground sample" %}
 
 ## Use Fixed Areas
 
@@ -181,7 +181,7 @@ plus a page position such as `top`, `left`, `right` or `bottom`.
 </template>
 ```
 
-![Rendered fixed area sample](../assets/samples/first-document-fixed-area.png)
+{% include sample-preview.html sample="first-document-fixed-area" alt="Rendered fixed area sample" %}
 
 ## Next Steps
 

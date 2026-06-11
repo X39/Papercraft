@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:papercraft="https://x39.solutions/papercraft" width="755.905518" height="340.157501" viewBox="0 0 755.905518 340.157501" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Papercraft SVG document</title>
+  <metadata>
+    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-11T16:33:53.4514829Z" />
+  </metadata>
+  <!--Papercraft SVG backend output. Pages: 1. Pages are stacked vertically.-->
+  <!--Page 1 of 1-->
+  <defs>
+    <clipPath id="papercraft-clip-1" clipPathUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="755.905518" height="340.157501" />
+    </clipPath>
+  </defs>
+  <g id="page-1" data-page-index="0" data-page-number="1">
+    <g clip-path="url(#papercraft-clip-1)">
+      <g>
+        <g>
+          <defs>
+            <clipPath id="papercraft-clip-2" clipPathUnits="userSpaceOnUse">
+              <rect x="0" y="0" width="755.905518" height="340.157501" />
+            </clipPath>
+          </defs>
+          <g clip-path="url(#papercraft-clip-2)">
+            <g />
+          </g>
+        </g>
+        <g>
+          <g>
+            <defs>
+              <clipPath id="papercraft-clip-3" clipPathUnits="userSpaceOnUse">
+                <rect x="37.7952957" y="37.7952957" width="680.314941" height="0" />
+              </clipPath>
+            </defs>
+            <g clip-path="url(#papercraft-clip-3)">
+              <g />
+            </g>
+          </g>
+          <g>
+            <defs>
+              <clipPath id="papercraft-clip-4" clipPathUnits="userSpaceOnUse">
+                <rect x="37.7952957" y="37.7952957" width="680.314941" height="264.566925" />
+              </clipPath>
+            </defs>
+            <g clip-path="url(#papercraft-clip-4)">
+              <g>
+                <g>
+                  <defs>
+                    <clipPath id="papercraft-clip-5" clipPathUnits="userSpaceOnUse">
+                      <rect x="37.7952957" y="37.7952957" width="200.456238" height="53.2572937" />
+                    </clipPath>
+                  </defs>
+                  <g clip-path="url(#papercraft-clip-5)">
+                    <text x="37.7952957" y="71.4601517" font-family="Arial" font-size="37.1928253" font-weight="700" fill="#000000" xml:space="preserve">Build steps</text>
+                  </g>
+                </g>
+                <g>
+                  <defs>
+                    <clipPath id="papercraft-clip-6" clipPathUnits="userSpaceOnUse">
+                      <rect x="37.7952957" y="98.6116486" width="680.31488" height="53.0456657" />
+                    </clipPath>
+                  </defs>
+                  <g clip-path="url(#papercraft-clip-6)">
+                    <g>
+                      <rect x="37.7952957" y="98.6116486" width="680.31488" height="53.0456657" fill="#ECFEFF" />
+                      <rect x="37.7952957" y="98.6116486" width="2.65663028" height="53.0456657" fill="#0891B2" />
+                      <rect x="37.7952957" y="98.6116486" width="680.31488" height="2.65663028" fill="#0891B2" />
+                      <rect x="715.453552" y="98.6116486" width="2.65663028" height="53.0456657" fill="#0891B2" />
+                      <rect x="37.7952957" y="149.000687" width="680.31488" height="2.65663028" fill="#0891B2" />
+                      <g>
+                        <defs>
+                          <clipPath id="papercraft-clip-7" clipPathUnits="userSpaceOnUse">
+                            <rect x="48.0109863" y="108.827339" width="69.1255722" height="32.6142883" />
+                          </clipPath>
+                        </defs>
+                        <g clip-path="url(#papercraft-clip-7)">
+                          <text x="48.0109863" y="130.469025" font-family="Arial" font-size="23.9096737" fill="#000000" xml:space="preserve">Step 1</text>
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+                <g>
+                  <defs>
+                    <clipPath id="papercraft-clip-8" clipPathUnits="userSpaceOnUse">
+                      <rect x="37.7952957" y="159.21637" width="680.31488" height="53.0456657" />
+                    </clipPath>
+                  </defs>
+                  <g clip-path="url(#papercraft-clip-8)">
+                    <g>
+                      <rect x="37.7952957" y="159.21637" width="680.31488" height="53.0456657" fill="#ECFEFF" />
+                      <rect x="37.7952957" y="159.21637" width="2.65663028" height="53.0456657" fill="#0891B2" />
+                      <rect x="37.7952957" y="159.21637" width="680.31488" height="2.65663028" fill="#0891B2" />
+                      <rect x="715.453552" y="159.21637" width="2.65663028" height="53.0456657" fill="#0891B2" />
+                      <rect x="37.7952957" y="209.605408" width="680.31488" height="2.65663028" fill="#0891B2" />
+                      <g>
+                        <defs>
+                          <clipPath id="papercraft-clip-9" clipPathUnits="userSpaceOnUse">
+                            <rect x="48.0109863" y="169.432068" width="69.1255722" height="32.6142883" />
+                          </clipPath>
+                        </defs>
+                        <g clip-path="url(#papercraft-clip-9)">
+                          <text x="48.0109863" y="191.073761" font-family="Arial" font-size="23.9096737" fill="#000000" xml:space="preserve">Step 2</text>
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+                <g>
+                  <defs>
+                    <clipPath id="papercraft-clip-10" clipPathUnits="userSpaceOnUse">
+                      <rect x="37.7952957" y="219.821106" width="680.31488" height="53.0456657" />
+                    </clipPath>
+                  </defs>
+                  <g clip-path="url(#papercraft-clip-10)">
+                    <g>
+                      <rect x="37.7952957" y="219.821106" width="680.31488" height="53.0456657" fill="#ECFEFF" />
+                      <rect x="37.7952957" y="219.821106" width="2.65663028" height="53.0456657" fill="#0891B2" />
+                      <rect x="37.7952957" y="219.821106" width="680.31488" height="2.65663028" fill="#0891B2" />
+                      <rect x="715.453552" y="219.821106" width="2.65663028" height="53.0456657" fill="#0891B2" />
+                      <rect x="37.7952957" y="270.210144" width="680.31488" height="2.65663028" fill="#0891B2" />
+                      <g>
+                        <defs>
+                          <clipPath id="papercraft-clip-11" clipPathUnits="userSpaceOnUse">
+                            <rect x="48.0109863" y="230.036804" width="69.1255722" height="32.6142883" />
+                          </clipPath>
+                        </defs>
+                        <g clip-path="url(#papercraft-clip-11)">
+                          <text x="48.0109863" y="251.678497" font-family="Arial" font-size="23.9096737" fill="#000000" xml:space="preserve">Step 3</text>
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+          <g>
+            <defs>
+              <clipPath id="papercraft-clip-12" clipPathUnits="userSpaceOnUse">
+                <rect x="37.7952957" y="302.362213" width="680.314941" height="0" />
+              </clipPath>
+            </defs>
+            <g clip-path="url(#papercraft-clip-12)">
+              <g />
+            </g>
+          </g>
+        </g>
+        <g>
+          <g />
+        </g>
+        <g>
+          <defs>
+            <clipPath id="papercraft-clip-13" clipPathUnits="userSpaceOnUse">
+              <rect x="0" y="0" width="755.905518" height="340.157501" />
+            </clipPath>
+          </defs>
+          <g clip-path="url(#papercraft-clip-13)">
+            <g />
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

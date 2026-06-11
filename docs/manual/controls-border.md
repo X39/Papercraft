@@ -43,7 +43,7 @@ Use `padding` to keep the text away from the border line.
 </template>
 ```
 
-![Rendered border with background sample](../assets/samples/border-with-background.png)
+{% include sample-preview.html sample="border-with-background" alt="Rendered border with background sample" %}
 
 ## Draw Only A Bottom Border
 
@@ -69,7 +69,7 @@ For the shared thickness format, see [Thickness values](layout-fundamentals.md#t
 </template>
 ```
 
-![Rendered bottom border sample](../assets/samples/border-bottom-rule.png)
+{% include sample-preview.html sample="border-bottom-rule" alt="Rendered bottom border sample" %}
 
 ## Control The Box Size
 

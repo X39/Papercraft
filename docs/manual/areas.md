@@ -47,7 +47,7 @@ Give it a width, a height and one horizontal plus one vertical position.
 </template>
 ```
 
-![Rendered fixed area sample](../assets/samples/first-document-fixed-area.png)
+{% include sample-preview.html sample="first-document-fixed-area" alt="Rendered fixed area sample" %}
 
 ## Position An Area
 

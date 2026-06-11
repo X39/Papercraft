@@ -50,7 +50,7 @@ Start with one visible box and change only one spacing value at a time.
 </template>
 ```
 
-![Rendered spacing and padding sample](../assets/samples/layout-spacing-and-padding.png)
+{% include sample-preview.html sample="layout-spacing-and-padding" alt="Rendered spacing and padding sample" %}
 
 ## Available Space
 
@@ -221,7 +221,7 @@ Try margin, padding, width or alignment changes first if content is being cut of
 </template>
 ```
 
-![Rendered clipping sample](../assets/samples/layout-clip-overflow.png)
+{% include sample-preview.html sample="layout-clip-overflow" alt="Rendered clipping sample" %}
 
 ## Alignment
 
@@ -267,7 +267,7 @@ If fixed page coordinates matter, use [Areas](areas.md).
 </template>
 ```
 
-![Rendered alignment sample](../assets/samples/layout-alignment.png)
+{% include sample-preview.html sample="layout-alignment" alt="Rendered alignment sample" %}
 
 ## Orientation Values
 
@@ -331,7 +331,7 @@ Lengths are used for values such as margins, padding, line length, line thicknes
 </template>
 ```
 
-![Rendered lengths and colors sample](../assets/samples/layout-lengths-and-colors.png)
+{% include sample-preview.html sample="layout-lengths-and-colors" alt="Rendered lengths and colors sample" %}
 
 ## Compare Length Units
 
@@ -357,7 +357,7 @@ Percentages are useful when a length should grow or shrink with the available sp
 </template>
 ```
 
-![Rendered length unit comparison sample](../assets/samples/layout-length-unit-comparison.png)
+{% include sample-preview.html sample="layout-length-unit-comparison" alt="Rendered length unit comparison sample" %}
 
 The first three lines are fixed physical lengths and are almost the same size.
 The percentage line is relative to the current available width, so it changes when the parent space changes.

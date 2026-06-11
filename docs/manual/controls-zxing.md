@@ -46,7 +46,7 @@ Use `barcode` when the format should be selected by an attribute.
 <barcode format="DataMatrix" width="22mm" height="22mm">ABC123</barcode>
 ```
 
-![Rendered generic barcode sample](../assets/samples/zxing-generic-barcode.png)
+{% include sample-preview.html sample="zxing-generic-barcode" alt="Rendered generic barcode sample" %}
 
 | Attribute | Values | Default |
 |-----------|--------|---------|
@@ -73,7 +73,7 @@ Use aliases when the barcode format is fixed and should be visible from the XML 
 <dataMatrix value="ABC123" width="22mm" height="22mm"/>
 ```
 
-![Rendered barcode alias sample](../assets/samples/zxing-alias-barcodes.png)
+{% include sample-preview.html sample="zxing-alias-barcodes" alt="Rendered barcode alias sample" %}
 
 | Element | Format |
 |---------|--------|

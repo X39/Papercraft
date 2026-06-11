@@ -49,7 +49,7 @@ Inside the style block, add empty control elements with the attributes to reuse.
 </template>
 ```
 
-![Rendered shared style sample](../assets/samples/styles-shared-text-and-border.png)
+{% include sample-preview.html sample="styles-shared-text-and-border" alt="Rendered shared style sample" %}
 
 Both `border` controls get the shared thickness, padding, margin and top alignment.
 The second `border` overrides only `color` and `background`.

@@ -33,7 +33,7 @@ Use a leaf control when the part draws itself and does not need children.
 </template>
 ```
 
-![Rendered text sample](../assets/samples/text-basic.png)
+{% include sample-preview.html sample="text-basic" alt="Rendered text sample" %}
 
 Use a container control when other controls need to sit inside it.
 
@@ -54,7 +54,7 @@ Use a container control when other controls need to sit inside it.
 </template>
 ```
 
-![Rendered border container sample](../assets/samples/border-with-background.png)
+{% include sample-preview.html sample="border-with-background" alt="Rendered border container sample" %}
 
 ## Leaf Controls
 

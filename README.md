@@ -61,6 +61,8 @@ The source tree now follows this partial Papercraft package split:
 | `X39.Solutions.Papercraft` | Batteries-included facade for normal PDF users. |
 | `X39.Solutions.Papercraft.Core` | Renderer-neutral contracts plus the current shared parsing, layout, control, data and validation runtime. |
 | `X39.Solutions.Papercraft.Rendering.SkiaSharp` | SkiaSharp PDF/raster renderer and runtime services. |
+| `X39.Solutions.Papercraft.Rendering.Svg` | Dependency-free SVG vector renderer. |
+| `X39.Solutions.Papercraft.Rendering.PdfSharp` | PDFsharp-backed PDF renderer. |
 | `X39.Solutions.Papercraft.OpenTelemetry` | Optional host/OpenTelemetry integration for Papercraft renderer activity tracing. |
 | `X39.Solutions.Papercraft.Controls.QrCode` | Optional QR code control package backed by `Net.Codecrete.QrCodeGenerator`. |
 | `X39.Solutions.Papercraft.Controls.ZXing` | Optional general barcode control package backed by `ZXing.Net`. |
@@ -76,6 +78,8 @@ public entry points and contributor notes:
 | `X39.Solutions.Papercraft` | [`source/X39.Solutions.Papercraft/README.md`](source/X39.Solutions.Papercraft/README.md) |
 | `X39.Solutions.Papercraft.Core` | [`source/X39.Solutions.Papercraft.Core/README.md`](source/X39.Solutions.Papercraft.Core/README.md) |
 | `X39.Solutions.Papercraft.Rendering.SkiaSharp` | [`source/X39.Solutions.Papercraft.Rendering.SkiaSharp/README.md`](source/X39.Solutions.Papercraft.Rendering.SkiaSharp/README.md) |
+| `X39.Solutions.Papercraft.Rendering.Svg` | [`source/X39.Solutions.Papercraft.Rendering.Svg/README.md`](source/X39.Solutions.Papercraft.Rendering.Svg/README.md) |
+| `X39.Solutions.Papercraft.Rendering.PdfSharp` | [`source/X39.Solutions.Papercraft.Rendering.PdfSharp/README.md`](source/X39.Solutions.Papercraft.Rendering.PdfSharp/README.md) |
 | `X39.Solutions.Papercraft.OpenTelemetry` | [`source/X39.Solutions.Papercraft.OpenTelemetry/README.md`](source/X39.Solutions.Papercraft.OpenTelemetry/README.md) |
 | `X39.Solutions.Papercraft.Controls.QrCode` | [`source/X39.Solutions.Papercraft.Controls.QrCode/README.md`](source/X39.Solutions.Papercraft.Controls.QrCode/README.md) |
 | `X39.Solutions.Papercraft.Controls.ZXing` | [`source/X39.Solutions.Papercraft.Controls.ZXing/README.md`](source/X39.Solutions.Papercraft.Controls.ZXing/README.md) |

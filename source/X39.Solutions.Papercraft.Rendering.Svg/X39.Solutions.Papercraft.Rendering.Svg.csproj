@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\PapercraftPackageScaffold.props" />
+    <PropertyGroup>
+        <PackageId>X39.Solutions.Papercraft.Rendering.Svg</PackageId>
+        <AssemblyName>X39.Solutions.Papercraft.Rendering.Svg</AssemblyName>
+        <RootNamespace>X39.Solutions.Papercraft.Rendering.Svg</RootNamespace>
+        <Title>Papercraft SVG renderer</Title>
+        <PackageDescription>
+            <![CDATA[Papercraft SVG renderer package for dependency-free vector image output.
+The renderer emits SVG XML from Papercraft display lists without native rendering dependencies.
+]]>
+        </PackageDescription>
+    </PropertyGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="X39.Solutions.PdfTemplate" />
+        <InternalsVisibleTo Include="X39.Solutions.PdfTemplate.Test" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\X39.Solutions.Papercraft.Core\X39.Solutions.Papercraft.Core.csproj" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+    </ItemGroup>
+</Project>

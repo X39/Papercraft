@@ -32,7 +32,7 @@ Start with a horizontal separator between two text controls.
 </template>
 ```
 
-![Rendered horizontal separator sample](../assets/samples/line-horizontal-separator.png)
+{% include sample-preview.html sample="line-horizontal-separator" alt="Rendered horizontal separator sample" %}
 
 ## Draw A Horizontal Line
 
@@ -43,7 +43,7 @@ For a simple separator, give the line a small `thickness`, a useful `length` and
 <line thickness="1pt" length="100%" color="#666666" margin="0 1mm"/>
 ```
 
-![Rendered horizontal separator sample](../assets/samples/line-horizontal-separator.png)
+{% include sample-preview.html sample="line-horizontal-separator" alt="Rendered horizontal separator sample" %}
 
 ### Choose Length And Thickness
 
@@ -108,7 +108,7 @@ For fixed-position content, see [First document](first-document.md#use-fixed-are
 </template>
 ```
 
-![Rendered vertical divider sample](../assets/samples/line-vertical-divider.png)
+{% include sample-preview.html sample="line-vertical-divider" alt="Rendered vertical divider sample" %}
 
 ## Use Lines As Header Or Table Separators
 
@@ -136,7 +136,7 @@ Use a horizontal `line` after header content when every page should have the sam
 </template>
 ```
 
-![Rendered header rule sample](../assets/samples/line-header-rule.png)
+{% include sample-preview.html sample="line-header-rule" alt="Rendered header rule sample" %}
 
 Inside a table, use a vertical `line` in a narrow `td` when it should separate two neighboring blocks.
 Use a `border` with bottom thickness instead when every row needs a horizontal rule.
