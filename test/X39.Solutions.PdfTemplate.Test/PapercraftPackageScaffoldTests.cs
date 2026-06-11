@@ -75,6 +75,7 @@ public sealed class PapercraftPackageScaffoldTests
     [InlineData("X39.Solutions.Papercraft.Rendering.SkiaSharp")]
     [InlineData("X39.Solutions.Papercraft.Rendering.Svg")]
     [InlineData("X39.Solutions.Papercraft.Rendering.PdfSharp")]
+    [InlineData("X39.Solutions.Papercraft.Rendering.EscPos")]
     [InlineData("X39.Solutions.Papercraft")]
     [InlineData("X39.Solutions.Papercraft.OpenTelemetry")]
     [InlineData("X39.Solutions.Papercraft.Controls.QrCode")]
@@ -95,6 +96,7 @@ public sealed class PapercraftPackageScaffoldTests
         var skiaSharp = LoadProject("X39.Solutions.Papercraft.Rendering.SkiaSharp");
         var svg = LoadProject("X39.Solutions.Papercraft.Rendering.Svg");
         var pdfSharp = LoadProject("X39.Solutions.Papercraft.Rendering.PdfSharp");
+        var escPos = LoadProject("X39.Solutions.Papercraft.Rendering.EscPos");
         var facade = LoadProject("X39.Solutions.Papercraft");
         var openTelemetry = LoadProject("X39.Solutions.Papercraft.OpenTelemetry");
         var qrCodeControls = LoadProject("X39.Solutions.Papercraft.Controls.QrCode");
@@ -147,6 +149,20 @@ public sealed class PapercraftPackageScaffoldTests
             new[] { "Microsoft.Extensions.DependencyInjection.Abstractions", "PDFsharp" },
             GetPackageReferences(pdfSharp),
             StringComparer.OrdinalIgnoreCase);
+
+        Assert.Equal(
+            new[]
+            {
+                @"..\X39.Solutions.Papercraft.Core\X39.Solutions.Papercraft.Core.csproj",
+            },
+            GetProjectReferences(escPos),
+            StringComparer.OrdinalIgnoreCase);
+        Assert.Equal(
+            new[] { "Microsoft.Extensions.DependencyInjection.Abstractions" },
+            GetPackageReferences(escPos),
+            StringComparer.OrdinalIgnoreCase);
+        Assert.DoesNotContain(GetProjectReferences(escPos), ReferencesSkiaSharp);
+        Assert.DoesNotContain(GetPackageReferences(escPos), ReferencesSkiaSharp);
 
         Assert.Equal(
             new[]
@@ -218,7 +234,7 @@ public sealed class PapercraftPackageScaffoldTests
             GetPackageReferences(zxingControls),
             StringComparer.OrdinalIgnoreCase);
 
-        foreach (var project in new[] { core, skiaSharp, svg, pdfSharp, facade, openTelemetry, compatibility })
+        foreach (var project in new[] { core, skiaSharp, svg, pdfSharp, escPos, facade, openTelemetry, compatibility })
         {
             Assert.DoesNotContain(GetPackageReferences(project), ReferencesBarcodeDependency);
             Assert.DoesNotContain(GetProjectReferences(project), ReferencesBarcodePackage);

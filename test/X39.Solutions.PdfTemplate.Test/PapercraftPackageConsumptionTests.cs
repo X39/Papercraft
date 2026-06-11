@@ -286,6 +286,36 @@ public sealed class PapercraftPackageConsumptionTests
     }
 
     [Fact]
+    public async Task EscPosRendererConsumerCompilesExplicitRendererEntryPoint()
+    {
+        using var project = TemporaryConsumerProject.Create(
+            "EscPosRendererConsumer",
+            new[] { ProjectPath("source", "X39.Solutions.Papercraft.Rendering.EscPos", "X39.Solutions.Papercraft.Rendering.EscPos.csproj") },
+            """
+            using System;
+            using Microsoft.Extensions.DependencyInjection;
+            using X39.Solutions.Papercraft.Rendering.EscPos;
+
+            namespace EscPosRendererConsumer;
+
+            public static class EscPosRendererSmoke
+            {
+                public static void ConfigureExplicitRenderer(IServiceCollection services)
+                    => services.AddPapercraftEscPosRenderer();
+
+                public static Type ExplicitRendererType => typeof(EscPosRenderBackend);
+            }
+            """);
+
+        await project.BuildAsync();
+        project.AssertAssetsContainLibrary("X39.Solutions.Papercraft.Rendering.EscPos");
+        project.AssertAssetsDoesNotContainLibrary("X39.Solutions.PdfTemplate");
+        project.AssertAssetsDoesNotContainLibrary("SkiaSharp");
+        project.AssertAssetsDoesNotContainLibrary("PDFsharp");
+        project.AssertAssetsContainLibrary("X39.Solutions.Papercraft.Core");
+    }
+
+    [Fact]
     public async Task CorePackageConsumerCompilesRendererNeutralContractsWithoutSkiaSharp()
     {
         using var project = TemporaryConsumerProject.Create(
