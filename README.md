@@ -207,7 +207,9 @@ The publish workflow is defined in `.github/workflows/main.yml`.
 The GitHub Pages source lives under [`docs`](docs/index.md).
 The Pages table of contents is maintained in [`docs/_data/navigation.yml`](docs/_data/navigation.yml).
 Executable documentation samples live under `test/X39.Solutions.PdfTemplate.Test/Samples`
-and write generated preview assets under `docs/assets/samples`.
+and write generated preview assets to ignored test output by default.
+Set `PAPERCRAFT_UPDATE_DOCUMENTATION_SAMPLE_ASSETS=true` when running those tests to regenerate checked-in assets under
+`docs/assets/samples`.
 
 ## Contributing
 

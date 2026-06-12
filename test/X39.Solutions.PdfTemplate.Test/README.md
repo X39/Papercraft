@@ -41,13 +41,21 @@ dotnet test test/X39.Solutions.PdfTemplate.Test/X39.Solutions.PdfTemplate.Test.c
 
 ## Generated Documentation Assets
 
-Tests under `Samples/Documentation` render XML snippets into preview assets under:
+Tests under `Samples/Documentation` render XML snippets into preview assets under an ignored test-output folder by default:
 
 ```text
-docs/assets/samples
+test/X39.Solutions.PdfTemplate.Test/TestResults/documentation-samples
 ```
 
-Those tests intentionally overwrite stale PNG, SVG and PDF assets for the sample being rendered.
+To regenerate the checked-in documentation assets, opt in explicitly:
+
+```powershell
+$env:PAPERCRAFT_UPDATE_DOCUMENTATION_SAMPLE_ASSETS = "true"
+dotnet test test/X39.Solutions.PdfTemplate.Test/X39.Solutions.PdfTemplate.Test.csproj --filter FullyQualifiedName~DocumentationSamples
+Remove-Item Env:PAPERCRAFT_UPDATE_DOCUMENTATION_SAMPLE_ASSETS
+```
+
+The opt-in path intentionally overwrites stale PNG, SVG and PDF assets under `docs/assets/samples` for the sample being rendered.
 Review asset diffs when changing layout, controls, renderer output or sample XML.
 
 ## Runtime Notes

@@ -115,6 +115,42 @@ public sealed class DocumentationRenderCoverageTests
         AssertStartsWith(PdfHeader, File.ReadAllBytes(Path.Combine(samplesDirectory, "text-basic-pdfsharp.pdf")));
     }
 
+    [Fact]
+    public void DocumentationSampleOutputDirectoryDefaultsToTestResults()
+    {
+        using var _ = EnvironmentVariableScope.Set(
+            DocumentationSampleBase.UpdateDocumentationSampleAssetsEnvironmentVariable,
+            null);
+        var repositoryRoot = GetRepositoryRoot();
+
+        var outputDirectory = DocumentationSampleBase.GetSampleOutputDirectory();
+
+        Assert.Equal(
+            Path.Combine(
+                repositoryRoot,
+                "test",
+                "X39.Solutions.PdfTemplate.Test",
+                "TestResults",
+                "documentation-samples"),
+            outputDirectory);
+        Assert.NotEqual(Path.Combine(repositoryRoot, "docs", "assets", "samples"), outputDirectory);
+    }
+
+    [Theory]
+    [InlineData("1")]
+    [InlineData("true")]
+    [InlineData("yes")]
+    public void DocumentationSampleOutputDirectoryCanTargetCheckedInAssetsWhenOptedIn(string value)
+    {
+        using var _ = EnvironmentVariableScope.Set(
+            DocumentationSampleBase.UpdateDocumentationSampleAssetsEnvironmentVariable,
+            value);
+
+        Assert.Equal(
+            Path.Combine(GetRepositoryRoot(), "docs", "assets", "samples"),
+            DocumentationSampleBase.GetSampleOutputDirectory());
+    }
+
     private static IEnumerable<MissingXmlRender> FindXmlSamplesWithoutFollowingRender(string filePath)
     {
         var repositoryRoot = GetRepositoryRoot();
@@ -218,4 +254,23 @@ public sealed class DocumentationRenderCoverageTests
             $"Expected file to start with '{Convert.ToHexString(expected)}'.");
 
     private sealed record MissingXmlRender(string File, int Line, string FirstLine);
+
+    private sealed class EnvironmentVariableScope : IDisposable
+    {
+        private readonly string _name;
+        private readonly string? _previousValue;
+
+        private EnvironmentVariableScope(string name, string? value)
+        {
+            _name = name;
+            _previousValue = Environment.GetEnvironmentVariable(name);
+            Environment.SetEnvironmentVariable(name, value);
+        }
+
+        public static EnvironmentVariableScope Set(string name, string? value)
+            => new(name, value);
+
+        public void Dispose()
+            => Environment.SetEnvironmentVariable(_name, _previousValue);
+    }
 }

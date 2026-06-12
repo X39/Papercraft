@@ -14,6 +14,7 @@ namespace X39.Solutions.PdfTemplate.Test.Samples.Documentation;
 public abstract class DocumentationSampleBase : SampleBase
 {
     private const float DocumentationPreviewDotsPerInch = 192F;
+    internal const string UpdateDocumentationSampleAssetsEnvironmentVariable = "PAPERCRAFT_UPDATE_DOCUMENTATION_SAMPLE_ASSETS";
 
     protected static DocumentOptions CompactDocumentOptions { get; } = new()
     {
@@ -84,8 +85,26 @@ public abstract class DocumentationSampleBase : SampleBase
         AssertDocumentationArtifactsExist(outputDirectory, sampleName);
     }
 
-    private static string GetSampleOutputDirectory()
-        => Path.Combine(GetRepositoryRoot(), "docs", "assets", "samples");
+    internal static string GetSampleOutputDirectory()
+    {
+        var repositoryRoot = GetRepositoryRoot();
+        return ShouldUpdateCheckedInDocumentationSampleAssets()
+            ? Path.Combine(repositoryRoot, "docs", "assets", "samples")
+            : Path.Combine(
+                repositoryRoot,
+                "test",
+                "X39.Solutions.PdfTemplate.Test",
+                "TestResults",
+                "documentation-samples");
+    }
+
+    private static bool ShouldUpdateCheckedInDocumentationSampleAssets()
+    {
+        var value = Environment.GetEnvironmentVariable(UpdateDocumentationSampleAssetsEnvironmentVariable);
+        return string.Equals(value, "1", StringComparison.OrdinalIgnoreCase)
+               || string.Equals(value, "true", StringComparison.OrdinalIgnoreCase)
+               || string.Equals(value, "yes", StringComparison.OrdinalIgnoreCase);
+    }
 
     private static DocumentOptions WithDocumentationPreviewDensity(DocumentOptions documentOptions)
         => documentOptions with { DotsPerInch = DocumentationPreviewDotsPerInch };
