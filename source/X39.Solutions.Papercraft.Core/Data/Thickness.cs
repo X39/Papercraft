@@ -148,6 +148,8 @@ public readonly record struct Thickness(Length Left, Length Top, Length Right, L
     /// <inheritdoc />
     public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Thickness result)
     {
+        result = default;
+
         var partCount = 1;
         var wasSeparator = false;
         foreach (var t in s)
@@ -165,45 +167,46 @@ public readonly record struct Thickness(Length Left, Length Top, Length Right, L
         }
 
         if (partCount is not 1 and not 2 and not 4)
-        {
-            result = default;
             return false;
-        }
-#pragma warning disable CA2201
 
-        var left = partCount switch
+        Length left;
+        Length top;
+        Length right;
+        Length bottom;
+        switch (partCount)
         {
-            1 => Length.Parse(s, provider),
-            2 => Length.Parse(s[..s.IndexOf(' ')], provider),
-            4 => Length.Parse(s[..s.IndexOf(' ')], provider),
-            _ => throw new Exception(
-                "Impossible exception as it is checked before. If this is ever thrown, something is seriously wrong."),
-        };
-        var top = partCount switch
-        {
-            1 => left,
-            2 => Length.Parse(s[(s.IndexOf(' ') + 1)..], provider),
-            4 => Length.Parse(s[(s.IndexOf(' ') + 1)..], provider),
-            _ => throw new Exception(
-                "Impossible exception as it is checked before. If this is ever thrown, something is seriously wrong."),
-        };
-        var right = partCount switch
-        {
-            1 => left,
-            2 => left,
-            4 => Length.Parse(s[(s.LastIndexOf(' ') + 1)..], provider),
-            _ => throw new Exception(
-                "Impossible exception as it is checked before. If this is ever thrown, something is seriously wrong."),
-        };
-        var bottom = partCount switch
-        {
-            1 => left,
-            2 => top,
-            4 => Length.Parse(s[(s.LastIndexOf(' ') + 1)..], provider),
-            _ => throw new Exception(
-                "Impossible exception as it is checked before. If this is ever thrown, something is seriously wrong."),
-        };
-#pragma warning restore CA2201
+            case 1:
+                if (!Length.TryParse(s, provider, out left))
+                    return false;
+                top    = left;
+                right  = left;
+                bottom = left;
+                break;
+            case 2:
+                if (!Length.TryParse(s[..s.IndexOf(' ')], provider, out left)
+                    || !Length.TryParse(s[(s.LastIndexOf(' ') + 1)..], provider, out top))
+                    return false;
+                right  = left;
+                bottom = top;
+                break;
+            case 4:
+                var separatorIndex = s.IndexOf(' ');
+                if (!Length.TryParse(s[..separatorIndex], provider, out left))
+                    return false;
+                s              = s[(separatorIndex + 1)..];
+                separatorIndex = s.IndexOf(' ');
+                if (!Length.TryParse(s[..separatorIndex], provider, out top))
+                    return false;
+                s              = s[(separatorIndex + 1)..];
+                separatorIndex = s.IndexOf(' ');
+                if (!Length.TryParse(s[..separatorIndex], provider, out right)
+                    || !Length.TryParse(s[(separatorIndex + 1)..], provider, out bottom))
+                    return false;
+                break;
+            default:
+                return false;
+        }
+
         result = new Thickness(left, top, right, bottom);
         return true;
     }
