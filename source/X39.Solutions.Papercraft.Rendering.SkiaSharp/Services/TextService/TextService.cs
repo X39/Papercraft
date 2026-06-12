@@ -34,6 +34,9 @@ internal class TextService : ITextLayoutService
     {
         var skPaint = _paintCache.Get(textStyle, dpi);
         var lines = Layout(textStyle, skPaint, text, maxWidth, out var height);
+        if (lines.Count is 0)
+            return Size.Zero;
+
         var resultWidth = lines
             .Select((q) => q.Width)
             .DefaultIfEmpty()
