@@ -15,12 +15,12 @@ public sealed class SkPaintCache : IDisposable
     private readonly record struct TextPaintKey(TextStyle TextStyle, float Dpi);
     // ReSharper restore NotAccessedPositionalProperty.Local
 
-    private readonly Dictionary<StrokePaintKey, SKPaint> _strokePaints     = new();
-    private readonly ReaderWriterLockSlim                _strokePaintsLock = new();
-    private readonly Dictionary<TextPaintKey, SKPaint>   _textPaints       = new();
-    private readonly ReaderWriterLockSlim                _textPaintsLock   = new();
-    private readonly Dictionary<Color, SKPaint>          _fillPaintKey     = new();
-    private readonly ReaderWriterLockSlim                _fillPaintKeyLock = new();
+    private readonly Dictionary<StrokePaintKey, SKPaint>   _strokePaints     = new();
+    private readonly ReaderWriterLockSlim                  _strokePaintsLock = new();
+    private readonly Dictionary<TextPaintKey, SkTextPaint> _textPaints       = new();
+    private readonly ReaderWriterLockSlim                  _textPaintsLock   = new();
+    private readonly Dictionary<Color, SKPaint>            _fillPaintKey     = new();
+    private readonly ReaderWriterLockSlim                  _fillPaintKeyLock = new();
 
     /// <inheritdoc />
     public void Dispose()
@@ -36,8 +36,8 @@ public sealed class SkPaintCache : IDisposable
             _textPaintsLock,
             () =>
             {
-                foreach (var skPaint in _textPaints.Values)
-                    skPaint.Dispose();
+                foreach (var textPaint in _textPaints.Values)
+                    textPaint.Dispose();
             });
     }
 
@@ -115,45 +115,58 @@ public sealed class SkPaintCache : IDisposable
     /// <returns>A <see cref="SKPaint"/> for the given <see cref="TextStyle"/>.</returns>
     /// <exception cref="InvalidEnumArgumentException">Thrown when the <see cref="EFontStyle"/> is not supported, indicating a programming error, not a user one.</exception>
     public SKPaint Get(TextStyle textStyle, float dpi)
+        => GetText(textStyle, dpi).Paint;
+
+    internal SkTextPaint GetText(TextStyle textStyle, float dpi)
     {
         var key = new TextPaintKey(textStyle, dpi);
         return WithUpgradeableReadLock(
             _textPaintsLock,
             () =>
             {
-                if (_textPaints.TryGetValue(key, out var paint))
-                    return paint;
+                if (_textPaints.TryGetValue(key, out var textPaint))
+                    return textPaint;
                 return WithWriteLock(
                     _textPaintsLock,
                     () =>
                     {
-                        if (_textPaints.TryGetValue(key, out var paint2))
-                            return paint2;
-                        return _textPaints[key] = new SKPaint
-                        {
-                            Color       = textStyle.Foreground.ToSkColor(),
-                            StrokeWidth = textStyle.StrokeThickness,
-                            StrokeCap   = SKStrokeCap.Round,
-                            Typeface = SKTypeface.FromFamilyName(
-                                textStyle.FontFamily.Family,
-                                textStyle.FontFamily.Weight,
-                                textStyle.FontFamily.LetterSpacing,
-                                textStyle.FontFamily.Style switch
-                                {
-                                    EFontStyle.Upright => SKFontStyleSlant.Upright,
-                                    EFontStyle.Italic  => SKFontStyleSlant.Italic,
-                                    EFontStyle.Oblique => SKFontStyleSlant.Oblique,
-                                    _ => throw new InvalidEnumArgumentException(
-                                        nameof(textStyle.FontFamily.Style),
-                                        (int) textStyle.FontFamily.Style,
-                                        typeof(EFontStyle)),
-                                }),
-                            TextScaleX = textStyle.Scale,
-                            TextSkewX  = textStyle.Rotation,
-                            TextSize   = textStyle.FontSize * dpi / 72.272F,
-                        };
+                        if (_textPaints.TryGetValue(key, out var textPaint2))
+                            return textPaint2;
+                        return _textPaints[key] = CreateTextPaint(textStyle, dpi);
                     });
             });
+    }
+
+    private static SkTextPaint CreateTextPaint(TextStyle textStyle, float dpi)
+    {
+        var typeface = SKTypeface.FromFamilyName(
+            textStyle.FontFamily.Family,
+            textStyle.FontFamily.Weight,
+            textStyle.FontFamily.LetterSpacing,
+            textStyle.FontFamily.Style switch
+            {
+                EFontStyle.Upright => SKFontStyleSlant.Upright,
+                EFontStyle.Italic  => SKFontStyleSlant.Italic,
+                EFontStyle.Oblique => SKFontStyleSlant.Oblique,
+                _ => throw new InvalidEnumArgumentException(
+                    nameof(textStyle.FontFamily.Style),
+                    (int) textStyle.FontFamily.Style,
+                    typeof(EFontStyle)),
+            });
+
+        return new SkTextPaint(
+            new SKPaint
+            {
+                Color       = textStyle.Foreground.ToSkColor(),
+                StrokeWidth = textStyle.StrokeThickness,
+                StrokeCap   = SKStrokeCap.Round,
+            },
+            new SKFont(
+                typeface,
+                textStyle.FontSize * dpi / 72.272F,
+                textStyle.Scale,
+                textStyle.Rotation),
+            typeface);
     }
 
     private static T WithUpgradeableReadLock<T>(ReaderWriterLockSlim readerWriterLockSlim, Func<T> action)
@@ -193,5 +206,28 @@ public sealed class SkPaintCache : IDisposable
         {
             readerWriterLockSlim.ExitWriteLock();
         }
+    }
+}
+
+internal sealed class SkTextPaint : IDisposable
+{
+    private readonly SKTypeface? _typeface;
+
+    public SkTextPaint(SKPaint paint, SKFont font, SKTypeface? typeface)
+    {
+        Paint     = paint;
+        Font      = font;
+        _typeface = typeface;
+    }
+
+    public SKPaint Paint { get; }
+
+    public SKFont Font { get; }
+
+    public void Dispose()
+    {
+        Paint.Dispose();
+        Font.Dispose();
+        _typeface?.Dispose();
     }
 }

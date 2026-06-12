@@ -32,8 +32,8 @@ internal class TextService : ITextLayoutService
 
     public Size Measure(TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
     {
-        var skPaint = _paintCache.Get(textStyle, dpi);
-        var lines = Layout(textStyle, skPaint, text, maxWidth, out var height);
+        var textPaint = _paintCache.GetText(textStyle, dpi);
+        var lines = Layout(textStyle, textPaint, text, maxWidth, out var height);
         if (lines.Count is 0)
             return Size.Zero;
 
@@ -51,7 +51,11 @@ internal class TextService : ITextLayoutService
             : new ReadOnlySpanPair<char>(text[..index], text[(index + 1)..]);
     }
 
-    private static ReadOnlySpanPair<char> DivideAndConquer(ReadOnlySpan<char> text, SKPaint skPaint, float maxWidth, out float leftWidth)
+    private static ReadOnlySpanPair<char> DivideAndConquer(
+        ReadOnlySpan<char> text,
+        SkTextPaint textPaint,
+        float maxWidth,
+        out float leftWidth)
     {
         if (text.IsEmpty)
         {
@@ -60,19 +64,19 @@ internal class TextService : ITextLayoutService
         }
 
         var end = text.Length;
-        leftWidth = skPaint.MeasureText(text);
+        leftWidth = textPaint.Font.MeasureText(text, textPaint.Paint);
         while (leftWidth > maxWidth)
         {
             var breakIndex = LastWhitespaceBefore(text, end);
             if (breakIndex < 0)
             {
                 end       = FirstTokenEnd(text);
-                leftWidth = ConstrainLineWidth(skPaint.MeasureText(text[..end]), maxWidth);
+                leftWidth = ConstrainLineWidth(textPaint.Font.MeasureText(text[..end], textPaint.Paint), maxWidth);
                 return new ReadOnlySpanPair<char>(text[..end], text[end..]);
             }
 
             end       = breakIndex;
-            leftWidth = skPaint.MeasureText(text[..end]);
+            leftWidth = textPaint.Font.MeasureText(text[..end], textPaint.Paint);
         }
         return new ReadOnlySpanPair<char>(text[..end], text[end..]);
     }
@@ -110,8 +114,8 @@ internal class TextService : ITextLayoutService
 
     public void Draw(IDrawableCanvas canvas, TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
     {
-        var skPaint = _paintCache.Get(textStyle, dpi);
-        foreach (var line in Layout(textStyle, skPaint, text, maxWidth, out _))
+        var textPaint = _paintCache.GetText(textStyle, dpi);
+        foreach (var line in Layout(textStyle, textPaint, text, maxWidth, out _))
         {
             canvas.DrawText(textStyle, dpi, line.Text, line.X, line.BaselineY);
         }
@@ -123,20 +127,21 @@ internal class TextService : ITextLayoutService
         ReadOnlySpan<char> text,
         float maxWidth)
     {
-        var skPaint = _paintCache.Get(textStyle, dpi);
-        return Layout(textStyle, skPaint, text, maxWidth, out _);
+        var textPaint = _paintCache.GetText(textStyle, dpi);
+        return Layout(textStyle, textPaint, text, maxWidth, out _);
     }
 
     private static IReadOnlyList<TextLineLayout> Layout(
         TextStyle textStyle,
-        SKPaint skPaint,
+        SkTextPaint textPaint,
         ReadOnlySpan<char> text,
         float maxWidth,
         out float height)
     {
-        height = skPaint.FontMetrics.Bottom
-                 + -skPaint.FontMetrics.Top
-                 + SkiaTextDecorationRenderer.GetDecorationExtraHeight(textStyle, skPaint);
+        var metrics = textPaint.Font.Metrics;
+        height = metrics.Bottom
+                 + -metrics.Top
+                 + SkiaTextDecorationRenderer.GetDecorationExtraHeight(textStyle, textPaint);
         var right = text;
         var left = text;
         var y = 0F;
@@ -150,12 +155,12 @@ internal class TextService : ITextLayoutService
                 right = remainder;
                 continue;
             }
-            var (divided, _) = DivideAndConquer(trimmedFullLine, skPaint, maxWidth, out var width);
+            var (divided, _) = DivideAndConquer(trimmedFullLine, textPaint, maxWidth, out var width);
             left             = divided;
             right            = right[(left.Length + fullLine.Length - trimmedFullLine.Length)..];
             var lineText = left.ToString();
-            var baselineY = y - skPaint.FontMetrics.Ascent;
-            var (lineTop, lineHeight) = GetRenderedLineBounds(textStyle, skPaint, lineText, width, baselineY);
+            var baselineY = y - metrics.Ascent;
+            var (lineTop, lineHeight) = GetRenderedLineBounds(textStyle, textPaint, lineText, width, baselineY);
             lines.Add(
                 new TextLineLayout(
                     lineText,
@@ -172,19 +177,18 @@ internal class TextService : ITextLayoutService
 
     private static (float Top, float Height) GetRenderedLineBounds(
         TextStyle textStyle,
-        SKPaint skPaint,
+        SkTextPaint textPaint,
         string text,
         float width,
         float baselineY)
     {
-        var textBounds = new SKRect();
-        _ = skPaint.MeasureText(text, ref textBounds);
+        _ = textPaint.Font.MeasureText(text, out var textBounds, textPaint.Paint);
         var top = baselineY + textBounds.Top;
         var bottom = baselineY + textBounds.Bottom;
 
         foreach (var decorationLine in SkiaTextDecorationRenderer.GetDecorationLines(
                      textStyle,
-                     skPaint,
+                     textPaint,
                      width,
                      0F,
                      baselineY))

@@ -21,7 +21,7 @@ public sealed class SkiaTextDecorationRendererTests : IDisposable
             Foreground = Colors.Red,
             Decoration = TextDecoration.DoubleUnderline,
         };
-        var paint = _paintCache.Get(textStyle, Dpi);
+        var paint = _paintCache.GetText(textStyle, Dpi);
 
         var lines = SkiaTextDecorationRenderer.GetDecorationLines(textStyle, paint, 50F, 2F, 20F);
 
@@ -39,7 +39,7 @@ public sealed class SkiaTextDecorationRendererTests : IDisposable
             Foreground = Colors.Blue,
             Decoration = TextDecoration.Underline | TextDecoration.StrikeThrough,
         };
-        var paint = _paintCache.Get(textStyle, Dpi);
+        var paint = _paintCache.GetText(textStyle, Dpi);
 
         var lines = SkiaTextDecorationRenderer.GetDecorationLines(textStyle, paint, 40F, 1F, 18F);
 

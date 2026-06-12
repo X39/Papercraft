@@ -22,8 +22,8 @@ internal static class SkiaTextDecorationRenderer
         float x,
         float y)
     {
-        var textPaint = paintCache.Get(textStyle, dpi);
-        canvas.DrawText(text, x, y, textPaint);
+        var textPaint = paintCache.GetText(textStyle, dpi);
+        canvas.DrawText(text, x, y, textPaint.Font, textPaint.Paint);
 
         foreach (var line in GetDecorationLines(textStyle, textPaint, text, x, y))
         {
@@ -38,15 +38,15 @@ internal static class SkiaTextDecorationRenderer
 
     public static IReadOnlyList<DecorationLine> GetDecorationLines(
         TextStyle textStyle,
-        SKPaint textPaint,
+        SkTextPaint textPaint,
         string text,
         float x,
         float y)
-        => GetDecorationLines(textStyle, textPaint, textPaint.MeasureText(text), x, y);
+        => GetDecorationLines(textStyle, textPaint, textPaint.Font.MeasureText(text, textPaint.Paint), x, y);
 
     public static IReadOnlyList<DecorationLine> GetDecorationLines(
         TextStyle textStyle,
-        SKPaint textPaint,
+        SkTextPaint textPaint,
         float width,
         float x,
         float y)
@@ -55,7 +55,7 @@ internal static class SkiaTextDecorationRenderer
             return [];
 
         var decorations = textStyle.Decoration;
-        var metrics = textPaint.FontMetrics;
+        var metrics = textPaint.Font.Metrics;
         var lines = new List<DecorationLine>(3);
 
         if (decorations.HasFlag(TextDecoration.DoubleUnderline))
@@ -74,18 +74,18 @@ internal static class SkiaTextDecorationRenderer
         return lines;
     }
 
-    public static float GetDecorationExtraHeight(TextStyle textStyle, SKPaint textPaint)
+    public static float GetDecorationExtraHeight(TextStyle textStyle, SkTextPaint textPaint)
     {
         if (textStyle.Decoration is TextDecoration.None)
             return 0F;
 
-        var metrics = textPaint.FontMetrics;
+        var metrics = textPaint.Font.Metrics;
         var requiredBottom = metrics.Bottom;
         if (textStyle.Decoration.HasFlag(TextDecoration.Underline)
             || textStyle.Decoration.HasFlag(TextDecoration.DoubleUnderline))
         {
             var thickness = GetUnderlineThickness(metrics, textPaint);
-            var underlineBottom = GetUnderlineTop(metrics, textPaint) + thickness;
+            var underlineBottom = GetUnderlineTop(metrics) + thickness;
             if (textStyle.Decoration.HasFlag(TextDecoration.DoubleUnderline))
                 underlineBottom += GetDoubleUnderlineGap(thickness, textPaint) + thickness;
             requiredBottom = Math.Max(requiredBottom, underlineBottom);
@@ -97,7 +97,7 @@ internal static class SkiaTextDecorationRenderer
     private static void AddUnderline(
         ICollection<DecorationLine> lines,
         TextStyle textStyle,
-        SKPaint textPaint,
+        SkTextPaint textPaint,
         SKFontMetrics metrics,
         float width,
         float x,
@@ -105,7 +105,7 @@ internal static class SkiaTextDecorationRenderer
         bool isSecondLine)
     {
         var thickness = GetUnderlineThickness(metrics, textPaint);
-        var lineY = y + GetUnderlineTop(metrics, textPaint) + thickness / 2F;
+        var lineY = y + GetUnderlineTop(metrics) + thickness / 2F;
         if (isSecondLine)
             lineY += thickness + GetDoubleUnderlineGap(thickness, textPaint);
 
@@ -115,7 +115,7 @@ internal static class SkiaTextDecorationRenderer
     private static void AddStrikeThrough(
         ICollection<DecorationLine> lines,
         TextStyle textStyle,
-        SKPaint textPaint,
+        SkTextPaint textPaint,
         SKFontMetrics metrics,
         float width,
         float x,
@@ -127,18 +127,18 @@ internal static class SkiaTextDecorationRenderer
         lines.Add(new DecorationLine(textStyle.Foreground, thickness, x, lineY, x + width, lineY));
     }
 
-    private static float GetUnderlineTop(SKFontMetrics metrics, SKPaint textPaint)
+    private static float GetUnderlineTop(SKFontMetrics metrics)
         => metrics.UnderlinePosition ?? Math.Max(1F, metrics.Descent * 0.5F);
 
-    private static float GetUnderlineThickness(SKFontMetrics metrics, SKPaint textPaint)
+    private static float GetUnderlineThickness(SKFontMetrics metrics, SkTextPaint textPaint)
         => GetDecorationThickness(metrics.UnderlineThickness, textPaint);
 
-    private static float GetStrikeThroughThickness(SKFontMetrics metrics, SKPaint textPaint)
+    private static float GetStrikeThroughThickness(SKFontMetrics metrics, SkTextPaint textPaint)
         => GetDecorationThickness(metrics.StrikeoutThickness, textPaint);
 
-    private static float GetDecorationThickness(float? metricThickness, SKPaint textPaint)
-        => Math.Max(1F, metricThickness.GetValueOrDefault(textPaint.TextSize / 14F));
+    private static float GetDecorationThickness(float? metricThickness, SkTextPaint textPaint)
+        => Math.Max(1F, metricThickness.GetValueOrDefault(textPaint.Font.Size / 14F));
 
-    private static float GetDoubleUnderlineGap(float thickness, SKPaint textPaint)
-        => Math.Max(thickness, textPaint.TextSize * 0.08F);
+    private static float GetDoubleUnderlineGap(float thickness, SkTextPaint textPaint)
+        => Math.Max(thickness, textPaint.Font.Size * 0.08F);
 }
