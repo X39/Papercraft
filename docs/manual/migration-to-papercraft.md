@@ -59,6 +59,7 @@ expanded renderer support.
 | `AddPdfTemplateService()` | `AddPapercraft()` |
 | `PdfTemplateServiceBuilder` | `PapercraftServiceBuilder` |
 | `Generator.GeneratePdfAsync(...)` | `PapercraftRenderer.GeneratePdfAsync(...)` |
+| `Generator.GenerateLoweredXmlAsync(...)` | `PapercraftRenderer.GenerateLoweredXmlAsync(...)` |
 | `DocumentOptions` | `PapercraftRenderOptions.DocumentOptions` |
 | implicit Skia renderer choice | renderer capability validation through `ValidateAsync(...)` |
 
@@ -81,6 +82,8 @@ if (!result.IsSupported)
 
 Unsupported diagnostics block rendering. Degraded diagnostics are warnings unless
 `PapercraftRenderOptions.TreatDegradedAsUnsupported` is enabled.
+`RenderTarget.LoweredXml` is a diagnostic target that stops before backend rendering, so it is supported without a
+registered render backend.
 
 ## Compatibility Notes
 

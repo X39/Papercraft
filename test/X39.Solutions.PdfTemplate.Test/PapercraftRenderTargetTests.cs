@@ -14,6 +14,34 @@ public sealed class PapercraftRenderTargetTests
     }
 
     [Fact]
+    public void FromMediaTypeClassifiesLoweredXml()
+    {
+        var target = RenderTarget.FromMediaType(PapercraftMediaTypes.ApplicationPapercraftLoweredXml);
+
+        Assert.Equal(RendererOutputKind.LoweredXml, target.OutputKind);
+        Assert.Equal(PapercraftMediaTypes.ApplicationPapercraftLoweredXml, target.MediaType);
+        Assert.Equal(RenderTarget.LoweredXml, target);
+    }
+
+    [Fact]
+    public void RenderOutputInfersLoweredXmlFromMediaType()
+    {
+        using var stream = new MemoryStream();
+
+        var output = new RenderOutput(PapercraftMediaTypes.ApplicationPapercraftLoweredXml, stream);
+
+        Assert.Equal(RenderTarget.LoweredXml, output.Target);
+        Assert.Same(stream, output.Stream);
+        Assert.Equal(PapercraftMediaTypes.ApplicationPapercraftLoweredXml, output.MediaType);
+    }
+
+    [Fact]
+    public void RendererFeaturesMapsLoweredXmlOutputKind()
+    {
+        Assert.Equal(RendererFeatures.LoweredXmlOutput, RendererFeatures.ForOutputKind(RendererOutputKind.LoweredXml));
+    }
+
+    [Fact]
     public void RenderOutputCanCarryExplicitOutputKindForCustomMediaTypes()
     {
         using var stream = new MemoryStream();

@@ -58,6 +58,7 @@ await using var output = File.Create("document.pdf");
 await generator.GeneratePdfAsync(output, reader, CultureInfo.InvariantCulture);
 ```
 
+`Generator.GenerateLoweredXmlAsync()` writes backend-free lowered XML diagnostics for the same template data.
 `Generator.GenerateBitmapsAsync()` is still available for callers that expect SkiaSharp bitmap output.
 
 ## Migration Notes
@@ -67,6 +68,7 @@ Existing code can keep using:
 - `services.AddPdfTemplateService()`
 - `Generator`
 - `Generator.TemplateData`
+- `Generator.GenerateLoweredXmlAsync(...)`
 - `PdfTemplateServiceBuilder`
 
 New code can move incrementally to:

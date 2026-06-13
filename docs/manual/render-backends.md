@@ -9,6 +9,7 @@ The template parser, data binding and layout runtime live in Core; each backend 
 display list is written to a stream.
 
 Use this chapter when an application needs to choose between PDF, raster image, SVG or printer-command output.
+Lowered XML is also exposed as a render target for diagnostics, but it is not produced by a backend.
 
 ## Backend Packages
 
@@ -21,6 +22,7 @@ Use this chapter when an application needs to choose between PDF, raster image, 
 | `X39.Solutions.Papercraft.Rendering.EscPos` | `escpos` | `application/vnd.papercraft.escpos` | First-pass ESC/POS receipt-printer command streams. |
 
 `X39.Solutions.Papercraft.Core` contains the backend contracts and runtime, but it does not register a backend by itself.
+It can still write lowered XML through `RenderTarget.LoweredXml`, because that target stops before backend rendering.
 
 ## Default PDF And Raster Output
 
@@ -89,6 +91,32 @@ if (!validation.IsSupported)
 
 Unsupported diagnostics block rendering. Degraded diagnostics are warnings unless
 `PapercraftRenderOptions.TreatDegradedAsUnsupported` is enabled.
+
+## Lowered XML Diagnostics
+
+Use lowered XML output when you need to inspect the template after data binding, function evaluation, transformer
+expansion and style application, but before controls are created and before layout or backend rendering starts.
+
+```csharp
+await renderer.RenderAsync(
+    reader,
+    new RenderOutput(RenderTarget.LoweredXml, output),
+    CultureInfo.CurrentUICulture);
+```
+
+The convenience method is equivalent:
+
+```csharp
+await renderer.GenerateLoweredXmlAsync(
+    output,
+    reader,
+    CultureInfo.CurrentUICulture);
+```
+
+The lowered XML media type is `PapercraftMediaTypes.ApplicationPapercraftLoweredXml`
+(`application/vnd.papercraft.lowered+xml`).
+This target bypasses backend selection, so `BackendId`, backend capability validation, backend text services,
+layout and display-list rendering do not apply.
 
 ## SVG Output
 

@@ -18,6 +18,11 @@ public sealed record RenderTarget(string MediaType, RendererOutputKind OutputKin
     public static RenderTarget ImagePng { get; } = new(PapercraftMediaTypes.ImagePng, RendererOutputKind.RasterImage);
 
     /// <summary>
+    /// A lowered XML render target.
+    /// </summary>
+    public static RenderTarget LoweredXml { get; } = new(PapercraftMediaTypes.ApplicationPapercraftLoweredXml, RendererOutputKind.LoweredXml);
+
+    /// <summary>
     /// Creates a render target from a media type.
     /// </summary>
     /// <param name="mediaType">The output media type.</param>
@@ -28,6 +33,8 @@ public sealed record RenderTarget(string MediaType, RendererOutputKind OutputKin
         var normalized = mediaType.Trim();
         if (string.Equals(normalized, PapercraftMediaTypes.ApplicationPdf, StringComparison.OrdinalIgnoreCase))
             return new RenderTarget(normalized, RendererOutputKind.Pdf);
+        if (string.Equals(normalized, PapercraftMediaTypes.ApplicationPapercraftLoweredXml, StringComparison.OrdinalIgnoreCase))
+            return new RenderTarget(normalized, RendererOutputKind.LoweredXml);
         if (string.Equals(normalized, "image/svg+xml", StringComparison.OrdinalIgnoreCase))
             return new RenderTarget(normalized, RendererOutputKind.VectorImage);
         if (string.Equals(normalized, PapercraftMediaTypes.ImagePng, StringComparison.OrdinalIgnoreCase)

@@ -14,4 +14,9 @@ public static class PapercraftMediaTypes
     /// PNG raster image output.
     /// </summary>
     public const string ImagePng = "image/png";
+
+    /// <summary>
+    /// Lowered Papercraft XML output.
+    /// </summary>
+    public const string ApplicationPapercraftLoweredXml = "application/vnd.papercraft.lowered+xml";
 }

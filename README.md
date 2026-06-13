@@ -10,6 +10,8 @@ Papercraft is a template-driven document rendering engine for XML templates in .
 The current default backend renders through SkiaSharp and supports PDF output, raster output,
 and built-in controls for text, rich text, borders, images, lines, tables, lists, page numbers,
 charts and related layout elements.
+Papercraft also exposes a backend-free lowered XML target for diagnosing the template after data binding and
+transformer expansion, before controls and layout run.
 
 The existing `X39.Solutions.PdfTemplate` package remains the compatibility bridge during the
 Papercraft migration. Existing users can keep `services.AddPdfTemplateService()` and `Generator`;
@@ -160,6 +162,7 @@ Common extension points are documented in the
 [developer integration appendix](https://x39.github.io/X39.Solutions.PdfTemplate/manual/developer-integration.html):
 
 - Set template variables with `generator.TemplateData.SetVariable("Name", value)`.
+- Diagnose generated template structure with `GenerateLoweredXmlAsync(...)` or `RenderTarget.LoweredXml`.
 - Add custom functions with `services.AddPapercraft((builder) => builder.AddFunction<MyFunction>())`.
 - Add custom controls with `services.AddPapercraft((builder) => builder.AddControl<TControl>())`.
 - Add custom transformers with `services.AddPapercraft((builder) => builder.AddTransformer<TTransformer>())`.

@@ -17,9 +17,9 @@ Use [renderer backends](render-backends.md) for output-format choices such as Sk
 
 Start with the Papercraft facade package and the default renderer:
 `X39.Solutions.Papercraft`, `AddPapercraft()`, `PapercraftRenderer`, `PapercraftRenderOptions`,
-`DocumentOptions`, `IFunction`, `ITransformer`, `IControl`, `ITemplateData`, `IResourceResolver`,
-`IDrawableCanvas`, `IDeferredCanvas`, `IImmediateCanvas`, `IPropertyAccessCache`, `ITextService`
-and `IParameterConverter<T>`.
+`DocumentOptions`, `IFunction`, `ITransformer`, `IControl`, `ITemplateData`, `XmlTemplateReader`,
+`XmlNodeInformation`, `IResourceResolver`, `IDrawableCanvas`, `IDeferredCanvas`, `IImmediateCanvas`,
+`IPropertyAccessCache`, `ITextService` and `IParameterConverter<T>`.
 
 Use `X39.Solutions.PdfTemplate`, `AddPdfTemplateService()` and `Generator` only when maintaining
 existing compatibility-package consumers.
@@ -186,6 +186,59 @@ if (!result.IsSupported)
 Validation reads the XML template. Create a new `XmlReader` for the actual render after validation.
 Unsupported diagnostics block rendering. Degraded diagnostics are warnings unless
 `PapercraftRenderOptions.TreatDegradedAsUnsupported` is enabled.
+
+## Inspect Lowered XML Nodes
+
+Use lowered XML output when you need to diagnose what the template language produced before controls, layout or
+render backends are involved. This is the easiest way to inspect variable substitution, function results, transformer
+expansion and style application.
+
+`PapercraftRenderer` handles `RenderTarget.LoweredXml` directly. It reads the source XML, evaluates template-data
+expressions in text and attributes, runs the registered `ITransformer` implementations, applies style nodes, writes the
+materialized XML tree to the supplied stream and stops there.
+
+The convenience method is:
+
+```csharp
+using System.Globalization;
+using System.Xml;
+using X39.Solutions.Papercraft;
+
+renderer.TemplateData.SetVariable("CustomerName", customer.Name);
+
+using var reader = XmlReader.Create(xmlTemplateStream);
+await using var output = File.Create("template.lowered.xml");
+
+await renderer.GenerateLoweredXmlAsync(
+    output,
+    reader,
+    CultureInfo.CurrentUICulture);
+```
+
+The same output is available through `RenderAsync(...)`:
+
+```csharp
+using var reader = XmlReader.Create(xmlTemplateStream);
+await using var output = File.Create("template.lowered.xml");
+
+await renderer.RenderAsync(
+    reader,
+    new RenderOutput(RenderTarget.LoweredXml, output),
+    CultureInfo.CurrentUICulture);
+```
+
+`RenderTarget.FromMediaType(PapercraftMediaTypes.ApplicationPapercraftLoweredXml)` resolves to the same target.
+The output media type is `application/vnd.papercraft.lowered+xml`.
+
+Lowered XML output bypasses `IPapercraftRenderBackend` selection. `BackendId`, backend capability validation,
+backend-owned `ITextService` instances, layout, display-list generation and control rendering do not apply.
+`ValidateAsync(..., RenderTarget.LoweredXml, ...)` only verifies that the template can be read and lowered.
+
+Use `PapercraftGenerator.ReadLoweredXmlAsync(...)` when application code needs the in-memory
+`XmlNodeInformation` tree instead of serialized XML.
+
+Lowered XML reads consume the `XmlReader`, just like validation and rendering. Create a new `XmlReader` if you render
+the same template after inspection.
 
 ## Trace Renderer Activity
 
@@ -403,6 +456,8 @@ Most requests fit one of these rows:
 | `IContentControl` | A custom control must contain child controls. | Implement `CanAdd` and child storage, or derive from an existing content-control base. |
 | `IInitializeControlAsync` | A control needs async setup or request context before rendering. | Implement it on the control; `DocumentOptions.Context` is passed to `InitializeControlAsync`. |
 | `ITransformer` | XML nodes must be conditionally rewritten, removed or repeated before controls are created. | Implement `Name` and `TransformAsync`, then register with `AddTransformer<TTransformer>()`. |
+| `RenderTarget.LoweredXml` | The application needs serialized lowered XML before controls, layout or backend rendering. | Use `GenerateLoweredXmlAsync(...)` or `RenderAsync(...)` with `new RenderOutput(RenderTarget.LoweredXml, stream)`. |
+| `PapercraftGenerator.ReadLoweredXmlAsync(...)` and `XmlNodeInformation` | The application needs the in-memory lowered template tree before controls are created. | Resolve a `PapercraftGenerator`, set its `TemplateData` and call `ReadLoweredXmlAsync(...)`. |
 | `IResourceResolver` | Image sources must be resolved from application-specific storage. | Register an `IResourceResolver` implementation after `AddPapercraft`. |
 | `IParameterConverter<T>` | A custom control attribute needs custom parsing. | Set the converter on the control property with `ParameterAttribute.Converter`. |
 | `IPapercraftRenderBackend` | The application needs a custom output backend. | Expose backend capabilities, `ITextService`, and render methods, then register the backend with DI. |
@@ -461,6 +516,8 @@ await generator.GeneratePdfAsync(
     CultureInfo.CurrentUICulture);
 ```
 
+`Generator.GenerateLoweredXmlAsync(...)` writes the same backend-free lowered XML diagnostic output as
+`PapercraftRenderer.GenerateLoweredXmlAsync(...)`.
 `Generator.GenerateBitmapsAsync(...)` remains the legacy SkiaSharp bitmap API.
 For new raster workflows, prefer the renderer-neutral `PapercraftRenderer.RenderRasterPagesAsync(...)`.
 

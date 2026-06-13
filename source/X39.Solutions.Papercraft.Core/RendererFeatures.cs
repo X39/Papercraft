@@ -31,6 +31,11 @@ public static class RendererFeatures
     public const string CustomOutput = "output.custom";
 
     /// <summary>
+    /// Lowered XML output.
+    /// </summary>
+    public const string LoweredXmlOutput = "output.lowered-xml";
+
+    /// <summary>
     /// Multiple rendered pages in one document.
     /// </summary>
     public const string Multipage = "document.multipage";
@@ -93,6 +98,7 @@ public static class RendererFeatures
             RendererOutputKind.VectorImage     => VectorImageOutput,
             RendererOutputKind.PrinterCommands => PrinterCommandOutput,
             RendererOutputKind.Custom          => CustomOutput,
+            RendererOutputKind.LoweredXml      => LoweredXmlOutput,
             _                                  => CustomOutput,
         };
 }

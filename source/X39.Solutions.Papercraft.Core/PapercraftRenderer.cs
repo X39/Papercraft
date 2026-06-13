@@ -78,6 +78,18 @@ public sealed class PapercraftRenderer
         try
         {
             var renderOptions = options ?? PapercraftRenderOptions.Default;
+            if (IsLoweredXmlTarget(target))
+            {
+                _ = await _generator.ReadLoweredXmlAsync(
+                        reader,
+                        cultureInfo,
+                        renderOptions.DocumentOptions,
+                        cancellationToken)
+                    .ConfigureAwait(false);
+                PapercraftActivity.SetValidation(activity, RenderValidationResult.Supported);
+                return RenderValidationResult.Supported;
+            }
+
             var backend = SelectBackend(target, renderOptions);
             PapercraftActivity.SetBackend(activity, backend);
             var document = await GenerateDocumentAsync(
@@ -119,6 +131,19 @@ public sealed class PapercraftRenderer
         try
         {
             var renderOptions = options ?? PapercraftRenderOptions.Default;
+            if (IsLoweredXmlTarget(output.Target))
+            {
+                var lowered = await _generator.ReadLoweredXmlAsync(
+                        reader,
+                        cultureInfo,
+                        renderOptions.DocumentOptions,
+                        cancellationToken)
+                    .ConfigureAwait(false);
+                await LoweredXmlWriter.WriteAsync(lowered, output.Stream, cancellationToken)
+                    .ConfigureAwait(false);
+                return;
+            }
+
             var backend = SelectBackend(output.Target, renderOptions);
             PapercraftActivity.SetBackend(activity, backend);
             var document = await GenerateDocumentAsync(
@@ -156,6 +181,9 @@ public sealed class PapercraftRenderer
         PapercraftActivity.SetDocument(activity, document);
         try
         {
+            if (IsLoweredXmlTarget(output.Target))
+                throw new InvalidOperationException("Lowered XML output requires the template-based RenderAsync overload.");
+
             var renderOptions = options ?? PapercraftRenderOptions.Default;
             var backend = SelectBackend(output.Target, renderOptions);
             PapercraftActivity.SetBackend(activity, backend);
@@ -252,6 +280,26 @@ public sealed class PapercraftRenderer
         await RenderAsync(
                 reader,
                 new RenderOutput(PapercraftMediaTypes.ApplicationPdf, outputStream),
+                cultureInfo,
+                options,
+                cancellationToken)
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Writes the lowered XML produced from the supplied template before backend rendering.
+    /// </summary>
+    public async Task GenerateLoweredXmlAsync(
+        Stream outputStream,
+        XmlReader reader,
+        CultureInfo cultureInfo,
+        PapercraftRenderOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(outputStream);
+        await RenderAsync(
+                reader,
+                new RenderOutput(RenderTarget.LoweredXml, outputStream),
                 cultureInfo,
                 options,
                 cancellationToken)
@@ -389,6 +437,10 @@ public sealed class PapercraftRenderer
             throw;
         }
     }
+
+    private static bool IsLoweredXmlTarget(RenderTarget target)
+        => target.OutputKind is RendererOutputKind.LoweredXml
+           || string.Equals(target.MediaType, PapercraftMediaTypes.ApplicationPapercraftLoweredXml, StringComparison.OrdinalIgnoreCase);
 
     private sealed class BackendTextServiceProvider : IServiceProvider
     {

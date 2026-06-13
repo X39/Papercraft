@@ -35,4 +35,9 @@ public enum RendererOutputKind
     /// Backend-defined custom output.
     /// </summary>
     Custom = 16,
+
+    /// <summary>
+    /// Lowered XML output produced before backend rendering.
+    /// </summary>
+    LoweredXml = 32,
 }

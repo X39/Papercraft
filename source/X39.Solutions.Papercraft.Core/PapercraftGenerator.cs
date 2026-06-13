@@ -100,11 +100,8 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
         try
         {
             var options = documentOptions ?? DocumentOptions.Default;
-            using var templateDataScope = TemplateData.Scope("Document");
-            XmlNodeInformation rootNode;
-            using (var templateReader = new XmlTemplateReader(options, cultureInfo, TemplateData, _transformers))
-                rootNode = await templateReader.ReadAsync(reader, cancellationToken)
-                    .ConfigureAwait(false);
+            var rootNode = await ReadLoweredXmlAsync(reader, cultureInfo, options, cancellationToken)
+                .ConfigureAwait(false);
 
             await using var template = await Template.CreateAsync(
                     rootNode,
@@ -125,6 +122,27 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
             PapercraftActivity.SetError(activity, ex);
             throw;
         }
+    }
+
+    /// <summary>
+    /// Reads the supplied template through the same lowering step used before control creation.
+    /// </summary>
+    /// <returns>The materialized XML node tree after expression evaluation, transformer expansion and style application.</returns>
+    public async ValueTask<XmlNodeInformation> ReadLoweredXmlAsync(
+        XmlReader reader,
+        CultureInfo cultureInfo,
+        DocumentOptions? documentOptions = default,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(reader);
+        ArgumentNullException.ThrowIfNull(cultureInfo);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var options = documentOptions ?? DocumentOptions.Default;
+        using var templateDataScope = TemplateData.Scope("Document");
+        using var templateReader = new XmlTemplateReader(options, cultureInfo, TemplateData, _transformers);
+        return await templateReader.ReadAsync(reader, cancellationToken)
+            .ConfigureAwait(false);
     }
 
     private static RenderLayout MeasureAndArrange(

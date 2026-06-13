@@ -1,12 +1,14 @@
 using System.Globalization;
 using System.Text;
 using System.Xml;
+using System.Xml.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using X39.Solutions.Papercraft;
 using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Controls.QrCode;
 using X39.Solutions.Papercraft.Controls.ZXing;
 using X39.Solutions.Papercraft.Data;
+using X39.Solutions.Papercraft.Display;
 using X39.Solutions.Papercraft.Rendering.SkiaSharp;
 using X39.Solutions.Papercraft.Services.TextService;
 
@@ -230,6 +232,191 @@ public sealed class PapercraftTests
             CultureInfo.InvariantCulture);
 
         Assert.StartsWith("%PDF", Encoding.ASCII.GetString(output.ToArray(), 0, 4), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task RenderAsyncWritesLoweredXmlWithoutSelectingBackend()
+    {
+        var backend = new RecordingRenderer("pdf", throwOnValidate: true);
+        var generator = CreateRenderer(backend);
+        generator.TemplateData.SetVariable("CustomerName", "Mira");
+        generator.TemplateData.SetVariable("AccentColor", "#123456");
+        generator.TemplateData.SetVariable("ShowNotice", true);
+        await using var output = new MemoryStream();
+        using var reader = CreateReader(
+            """
+            <body.style>
+                <text foreground="@AccentColor"/>
+            </body.style>
+            <text>Hello @CustomerName</text>
+            @if ShowNotice {
+                <text>Shown</text>
+            }
+            """);
+
+        await generator.RenderAsync(
+            reader,
+            new RenderOutput(RenderTarget.LoweredXml, output),
+            CultureInfo.InvariantCulture);
+
+        Assert.Equal(0, backend.ValidateCount);
+        Assert.Equal(0, backend.RenderCount);
+
+        var xml = Encoding.UTF8.GetString(output.ToArray());
+        var document = XDocument.Parse(xml);
+        XNamespace ns = Constants.ControlsNamespace;
+        var body = document.Root?.Element(ns + "body");
+
+        Assert.NotNull(body);
+        Assert.Null(body!.Element(ns + "body.style"));
+        var texts = body.Elements(ns + "text").ToArray();
+        Assert.Collection(
+            texts,
+            (text) =>
+            {
+                Assert.Equal("Hello Mira", text.Value);
+                Assert.Equal("#123456", (string?)text.Attribute("foreground"));
+            },
+            (text) =>
+            {
+                Assert.Equal("Shown", text.Value);
+                Assert.Equal("#123456", (string?)text.Attribute("foreground"));
+            });
+    }
+
+    [Fact]
+    public async Task AddPapercraftCoreCanRenderLoweredXmlWithoutBackends()
+    {
+        var services = new ServiceCollection();
+        services.AddPapercraftCore();
+
+        await using var serviceProvider = services.BuildServiceProvider();
+        var renderer = serviceProvider.GetRequiredService<PapercraftRenderer>();
+        await using var output = new MemoryStream();
+        using var reader = CreateReader("<text>core diagnostics</text>");
+
+        await renderer.RenderAsync(
+            reader,
+            new RenderOutput(PapercraftMediaTypes.ApplicationPapercraftLoweredXml, output),
+            CultureInfo.InvariantCulture);
+
+        var document = XDocument.Parse(Encoding.UTF8.GetString(output.ToArray()));
+        XNamespace ns = Constants.ControlsNamespace;
+        Assert.Equal("core diagnostics", document.Root?.Element(ns + "body")?.Element(ns + "text")?.Value);
+    }
+
+    [Fact]
+    public async Task LoweredXmlRenderDoesNotRequireRegisteredControls()
+    {
+        var services = new ServiceCollection();
+        services.AddPapercraftCore();
+
+        await using var serviceProvider = services.BuildServiceProvider();
+        var renderer = serviceProvider.GetRequiredService<PapercraftRenderer>();
+        renderer.TemplateData.SetVariable("Value", "kept");
+        await using var output = new MemoryStream();
+        using var reader = CreateReader("""<notRegistered value="@Value">debug node</notRegistered>""");
+
+        await renderer.GenerateLoweredXmlAsync(output, reader, CultureInfo.InvariantCulture);
+
+        var document = XDocument.Parse(Encoding.UTF8.GetString(output.ToArray()));
+        XNamespace ns = Constants.ControlsNamespace;
+        var lowered = document.Root?.Element(ns + "body")?.Element(ns + "notRegistered");
+        Assert.NotNull(lowered);
+        Assert.Equal("debug node", lowered!.Value);
+        Assert.Equal("kept", (string?)lowered.Attribute("value"));
+    }
+
+    [Fact]
+    public async Task ValidateAsyncSupportsLoweredXmlWithoutSelectingBackend()
+    {
+        var backend = new RecordingRenderer("pdf", throwOnValidate: true);
+        var generator = CreateRenderer(backend);
+        using var reader = CreateReader("<text>diagnostic</text>");
+
+        var validation = await generator.ValidateAsync(
+            reader,
+            RenderTarget.LoweredXml,
+            CultureInfo.InvariantCulture);
+
+        Assert.Same(RenderValidationResult.Supported, validation);
+        Assert.Equal(0, backend.ValidateCount);
+        Assert.Equal(0, backend.RenderCount);
+    }
+
+    [Fact]
+    public async Task GenerateLoweredXmlAsyncWritesLoweredXml()
+    {
+        var services = new ServiceCollection();
+        services.AddPapercraft();
+
+        await using var serviceProvider = services.BuildServiceProvider();
+        var generator = serviceProvider.GetRequiredService<PapercraftRenderer>();
+        generator.TemplateData.SetVariable("Name", "diagnostics");
+        await using var output = new MemoryStream();
+        using var reader = CreateReader("<text>@Name</text>");
+
+        await generator.GenerateLoweredXmlAsync(output, reader, CultureInfo.InvariantCulture);
+
+        var document = XDocument.Parse(Encoding.UTF8.GetString(output.ToArray()));
+        XNamespace ns = Constants.ControlsNamespace;
+        Assert.Equal("diagnostics", document.Root?.Element(ns + "body")?.Element(ns + "text")?.Value);
+    }
+
+    [Fact]
+    public async Task PapercraftGeneratorReadsLoweredXmlTree()
+    {
+        var services = new ServiceCollection();
+        services.AddPapercraftCore();
+
+        await using var serviceProvider = services.BuildServiceProvider();
+        var generator = serviceProvider.GetRequiredService<PapercraftGenerator>();
+        generator.TemplateData.SetVariable("Name", "tree diagnostics");
+        using var reader = CreateReader("<text>@Name</text>");
+
+        var lowered = await generator.ReadLoweredXmlAsync(reader, CultureInfo.InvariantCulture);
+
+        Assert.Equal("tree diagnostics", lowered["body", Constants.ControlsNamespace]?["text", Constants.ControlsNamespace]?.TextContent);
+    }
+
+    [Fact]
+    public async Task CompatibilityGeneratorWritesLoweredXml()
+    {
+        var services = new ServiceCollection();
+        services.AddPdfTemplateService();
+
+        await using var serviceProvider = services.BuildServiceProvider();
+        using var generator = serviceProvider.GetRequiredService<Generator>();
+        generator.TemplateData.SetVariable("Name", "legacy diagnostics");
+        await using var output = new MemoryStream();
+        using var reader = CreateReader("<text>@Name</text>");
+
+        await generator.GenerateLoweredXmlAsync(output, reader, CultureInfo.InvariantCulture);
+
+        var document = XDocument.Parse(Encoding.UTF8.GetString(output.ToArray()));
+        XNamespace ns = Constants.ControlsNamespace;
+        Assert.Equal("legacy diagnostics", document.Root?.Element(ns + "body")?.Element(ns + "text")?.Value);
+    }
+
+    [Fact]
+    public async Task GeneratedDocumentCannotRenderLoweredXml()
+    {
+        var generator = CreateRenderer(new RecordingRenderer("pdf"));
+        var document = new PapercraftDocument(
+            new[]
+            {
+                new PapercraftPage(0, 1, 1, new Size(1, 1), 96 / 25.4F, new DisplayList()),
+            },
+            CultureInfo.InvariantCulture,
+            DocumentOptions.Default);
+        await using var output = new MemoryStream();
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await generator.RenderAsync(
+                document,
+                new RenderOutput(RenderTarget.LoweredXml, output)));
+
+        Assert.Contains("template-based", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

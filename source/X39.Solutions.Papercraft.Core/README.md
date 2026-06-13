@@ -13,6 +13,7 @@ Use this package when you need Papercraft contracts without taking a dependency 
 | Core DI entry point | `services.AddPapercraftCore()` |
 | Backend-neutral generation | `PapercraftGenerator` |
 | Render facade and contracts | `PapercraftRenderer`, `IPapercraftRenderBackend`, `RenderTarget`, `RenderOutput` |
+| Lowered XML diagnostics | `RenderTarget.LoweredXml`, `PapercraftMediaTypes.ApplicationPapercraftLoweredXml` |
 | Capability validation | `RendererCapabilities`, `RenderValidationResult`, `RenderDiagnostic` |
 | Activity tracing | `PapercraftInstrumentation.ActivitySource` |
 | Built-in controls | Text, paragraph, border, image, line, table, lists, charts, page numbers, columns, blocks and related layout controls |
@@ -31,7 +32,15 @@ var builder = services.AddPapercraftCore();
 ```
 
 `AddPapercraftCore()` registers parser/runtime services, default controls, default transformers, `PapercraftGenerator`, and `PapercraftRenderer`.
-It does not register a render backend, so rendering through `PapercraftRenderer` requires an `IPapercraftRenderBackend` registration.
+It does not register a render backend. Normal PDF, raster, SVG or printer-command rendering through `PapercraftRenderer`
+requires an `IPapercraftRenderBackend` registration. Lowered XML output is the exception because it stops before backend rendering:
+
+```csharp
+await renderer.RenderAsync(
+    reader,
+    new RenderOutput(RenderTarget.LoweredXml, output),
+    CultureInfo.InvariantCulture);
+```
 
 ## Implement A Renderer
 

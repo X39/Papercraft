@@ -1,7 +1,7 @@
 # X39.Solutions.Papercraft
 
 `X39.Solutions.Papercraft` is the default application-facing package for Papercraft.
-It combines the renderer-neutral core runtime with the SkiaSharp renderer so normal consumers can register one package and render XML templates to PDF or raster output.
+It combines the renderer-neutral core runtime with the SkiaSharp renderer so normal consumers can register one package and render XML templates to PDF, raster output or backend-free lowered XML diagnostics.
 
 Use this package when you are writing an application and want the current default Papercraft stack.
 Use `X39.Solutions.Papercraft.Core` instead when you are implementing a custom renderer or building a package that must not depend on SkiaSharp.
@@ -60,7 +60,8 @@ await using var output = File.Create("document.pdf");
 await renderer.GeneratePdfAsync(output, reader, CultureInfo.InvariantCulture);
 ```
 
-The same renderer can validate templates before rendering and can write page-by-page PNG raster output through `RenderRasterPagesAsync`.
+The same renderer can validate templates before rendering, write page-by-page PNG raster output through
+`RenderRasterPagesAsync`, and write lowered XML diagnostics through `GenerateLoweredXmlAsync`.
 
 ## Template Data
 

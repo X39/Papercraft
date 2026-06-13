@@ -56,6 +56,22 @@ public sealed class Generator : IDisposable, IAsyncDisposable
             cancellationToken);
 
     /// <summary>
+    /// Writes the lowered XML produced from the supplied template before backend rendering.
+    /// </summary>
+    public Task GenerateLoweredXmlAsync(
+        Stream outputStream,
+        XmlReader reader,
+        CultureInfo cultureInfo,
+        DocumentOptions? documentOptions = default,
+        CancellationToken cancellationToken = default)
+        => _renderer.GenerateLoweredXmlAsync(
+            outputStream,
+            reader,
+            cultureInfo,
+            CreateRenderOptions(documentOptions),
+            cancellationToken);
+
+    /// <summary>
     /// Generates SkiaSharp bitmaps from the given template reader.
     /// </summary>
     public async Task<IReadOnlyCollection<SKBitmap>> GenerateBitmapsAsync(

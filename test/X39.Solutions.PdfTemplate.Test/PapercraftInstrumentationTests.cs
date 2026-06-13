@@ -46,6 +46,38 @@ public sealed class PapercraftInstrumentationTests
     }
 
     [Fact]
+    public async Task LoweredXmlEmitsTemplateActivitiesWithoutBackendOrLayoutActivities()
+    {
+        using var capture = ActivityCapture.Start();
+        var services = new ServiceCollection();
+        services.AddPapercraftCore();
+
+        await using var serviceProvider = services.BuildServiceProvider();
+        var renderer = serviceProvider.GetRequiredService<PapercraftRenderer>();
+        await using var output = new MemoryStream();
+        using var reader = CreateReader("<text>instrumented lowered xml</text>");
+
+        await renderer.GenerateLoweredXmlAsync(output, reader, CultureInfo.InvariantCulture);
+        var activities = capture.Snapshot();
+
+        Assert.Contains(activities, (q) => q.Name == "Papercraft.Renderer.Render");
+        Assert.Contains(activities, (q) => q.Name == "Papercraft.Template.ReadXml");
+        Assert.Contains(activities, (q) => q.Name == "Papercraft.Template.Transform");
+        Assert.Contains(activities, (q) => q.Name == "Papercraft.Template.Materialize");
+        Assert.DoesNotContain(activities, (q) => q.Name == "Papercraft.Renderer.SelectBackend");
+        Assert.DoesNotContain(activities, (q) => q.Name == "Papercraft.Renderer.BackendRender");
+        Assert.DoesNotContain(activities, (q) => q.Name == "Papercraft.Template.Create");
+        Assert.DoesNotContain(activities, (q) => q.Name == "Papercraft.Generator.Generate");
+        Assert.DoesNotContain(activities, (q) => q.Name == "Papercraft.Generator.MeasureArrange");
+        Assert.DoesNotContain(activities, (q) => q.Name == "Papercraft.Generator.ComposePages");
+
+        var renderActivity = Assert.Single(activities, (q) => q.Name == "Papercraft.Renderer.Render");
+        Assert.Equal(PapercraftMediaTypes.ApplicationPapercraftLoweredXml, renderActivity.Tag("papercraft.target.media_type"));
+        Assert.Equal(RendererOutputKind.LoweredXml.ToString(), renderActivity.Tag("papercraft.target.output_kind"));
+        Assert.Equal(ActivityStatusCode.Unset, renderActivity.Status);
+    }
+
+    [Fact]
     public async Task RenderRasterPagesEmitsRasterPageAndEncodeActivities()
     {
         using var capture = ActivityCapture.Start();
