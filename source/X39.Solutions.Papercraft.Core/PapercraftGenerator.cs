@@ -343,10 +343,11 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
                 {
                     areaCanvas.Translate(tuple.left, tuple.top);
                     areaCanvas.Clip(0, 0, tuple.width, tuple.height);
+                    var localAreaCanvas = new RelativeDeferredCanvas(areaCanvas, areaCanvas.Translation, tuple.size);
                     foreach (var (control, (_, size)) in area.Controls.Zip(layout.AreaSizes.Where((q) => q.areaIndex == areaIndex)))
                     {
-                        _ = control.Render(areaCanvas, options.DotsPerInch, tuple.size, cultureInfo);
-                        areaCanvas.Translate(0F, size.Height);
+                        _ = control.Render(localAreaCanvas, options.DotsPerInch, tuple.size, cultureInfo);
+                        localAreaCanvas.Translate(0F, size.Height);
                     }
                 }
             }
@@ -413,7 +414,6 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
 
                 using (displayCanvas.CreateState())
                 {
-                    displayCanvas.Translate(0, i * layout.OriginalPageSize.Height);
                     areaCanvas.Render(displayCanvas);
                 }
 
