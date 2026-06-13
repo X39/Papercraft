@@ -2,7 +2,7 @@
 <svg version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:papercraft="https://x39.solutions/papercraft" width="755.905518" height="340.157501" viewBox="0 0 755.905518 340.157501" role="img" xmlns="http://www.w3.org/2000/svg">
   <title>Papercraft SVG document</title>
   <metadata>
-    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-11T17:43:00.6274093Z" />
+    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-13T13:16:18.5030423Z" />
   </metadata>
   <!--Papercraft SVG backend output. Pages: 1. Pages are stacked vertically.-->
   <!--Page 1 of 1-->
@@ -46,24 +46,24 @@
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-5" clipPathUnits="userSpaceOnUse">
-                      <rect x="37.7952957" y="37.7952957" width="114.546432" height="30.4327393" />
+                      <rect x="37.7952957" y="37.7952957" width="114.546432" height="30.4370956" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-5)">
-                    <text x="37.7952957" y="57.0323563" font-family="Arial" font-size="21.2530422" font-weight="700" fill="#000000" xml:space="preserve">Default clip</text>
+                    <text x="37.7952957" y="57.0351105" font-family="Arial" font-size="21.2530422" font-weight="700" fill="#000000" xml:space="preserve">Default clip</text>
                   </g>
                 </g>
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-6" clipPathUnits="userSpaceOnUse">
-                      <rect x="37.7952957" y="68.228035" width="650.078735" height="44.1085968" />
+                      <rect x="37.7952957" y="68.2323914" width="665.196838" height="44.1127472" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-6)">
                     <g>
                       <defs>
                         <clipPath id="papercraft-clip-7" clipPathUnits="userSpaceOnUse">
-                          <rect x="37.7952957" y="68.228035" width="650.078735" height="44.1085968" />
+                          <rect x="37.7952957" y="68.2323914" width="665.196838" height="44.1127472" />
                         </clipPath>
                       </defs>
                       <g clip-path="url(#papercraft-clip-7)">
@@ -72,7 +72,7 @@
                           <g>
                             <defs>
                               <clipPath id="papercraft-clip-8" clipPathUnits="userSpaceOnUse">
-                                <rect x="37.7952957" y="68.228035" width="166.299301" height="44.1085968" />
+                                <rect x="37.7952957" y="68.2323914" width="166.299301" height="44.1127472" />
                               </clipPath>
                             </defs>
                             <g clip-path="url(#papercraft-clip-8)">
@@ -81,11 +81,11 @@
                                 <g>
                                   <defs>
                                     <clipPath id="papercraft-clip-9" clipPathUnits="userSpaceOnUse">
-                                      <rect x="45.3543549" y="75.7870941" width="340.157684" height="7.96989107" />
+                                      <rect x="45.3543549" y="75.7914505" width="340.157684" height="7.96989107" />
                                     </clipPath>
                                   </defs>
                                   <g clip-path="url(#papercraft-clip-9)">
-                                    <line x1="45.3543549" y1="79.7720413" x2="385.512024" y2="79.7720413" fill="none" stroke="#2563EB" stroke-width="7.96989107" stroke-linecap="butt" />
+                                    <line x1="45.3543549" y1="79.7763977" x2="385.512024" y2="79.7763977" fill="none" stroke="#2563EB" stroke-width="7.96989107" stroke-linecap="butt" />
                                   </g>
                                 </g>
                               </g>
@@ -94,7 +94,7 @@
                           <g>
                             <defs>
                               <clipPath id="papercraft-clip-10" clipPathUnits="userSpaceOnUse">
-                                <rect x="204.094604" y="68.228035" width="483.779419" height="44.1085968" />
+                                <rect x="204.094604" y="68.2323914" width="498.897522" height="44.1127472" />
                               </clipPath>
                             </defs>
                             <g clip-path="url(#papercraft-clip-10)">
@@ -103,11 +103,11 @@
                                 <g>
                                   <defs>
                                     <clipPath id="papercraft-clip-11" clipPathUnits="userSpaceOnUse">
-                                      <rect x="211.653656" y="75.7870941" width="81.4942169" height="28.9904785" />
+                                      <rect x="211.653656" y="75.7914505" width="81.4942169" height="28.9946289" />
                                     </clipPath>
                                   </defs>
                                   <g clip-path="url(#papercraft-clip-11)">
-                                    <text x="211.653656" y="95.0241547" font-family="Arial" font-size="21.2530422" fill="#475569" xml:space="preserve">Next cell</text>
+                                    <text x="211.653656" y="95.0312653" font-family="Arial" font-size="21.2530422" fill="#475569" xml:space="preserve">Next cell</text>
                                   </g>
                                 </g>
                               </g>
@@ -121,24 +121,24 @@
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-12" clipPathUnits="userSpaceOnUse">
-                      <rect x="37.7952957" y="112.336632" width="117.618164" height="30.4327393" />
+                      <rect x="37.7952957" y="112.345139" width="117.618164" height="30.4370956" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-12)">
-                    <text x="37.7952957" y="131.5737" font-family="Arial" font-size="21.2530422" font-weight="700" fill="#000000" xml:space="preserve">clip="false"</text>
+                    <text x="37.7952957" y="131.584961" font-family="Arial" font-size="21.2530422" font-weight="700" fill="#000000" xml:space="preserve">clip="false"</text>
                   </g>
                 </g>
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-13" clipPathUnits="userSpaceOnUse">
-                      <rect x="37.7952957" y="142.769379" width="680.314941" height="44.1085968" />
+                      <rect x="37.7952957" y="142.782227" width="680.314941" height="44.1127472" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-13)">
                     <g>
                       <defs>
                         <clipPath id="papercraft-clip-14" clipPathUnits="userSpaceOnUse">
-                          <rect x="37.7952957" y="142.769379" width="680.314941" height="44.1085968" />
+                          <rect x="37.7952957" y="142.782227" width="680.314941" height="44.1127472" />
                         </clipPath>
                       </defs>
                       <g clip-path="url(#papercraft-clip-14)">
@@ -150,11 +150,11 @@
                               <g>
                                 <defs>
                                   <clipPath id="papercraft-clip-15" clipPathUnits="userSpaceOnUse">
-                                    <rect x="45.3543549" y="150.32843" width="340.157684" height="7.96989107" />
+                                    <rect x="45.3543549" y="150.341278" width="340.157684" height="7.96989107" />
                                   </clipPath>
                                 </defs>
                                 <g clip-path="url(#papercraft-clip-15)">
-                                  <line x1="45.3543549" y1="154.31337" x2="385.512024" y2="154.31337" fill="none" stroke="#DC2626" stroke-width="7.96989107" stroke-linecap="butt" />
+                                  <line x1="45.3543549" y1="154.326218" x2="385.512024" y2="154.326218" fill="none" stroke="#DC2626" stroke-width="7.96989107" stroke-linecap="butt" />
                                 </g>
                               </g>
                             </g>
@@ -162,7 +162,7 @@
                           <g>
                             <defs>
                               <clipPath id="papercraft-clip-16" clipPathUnits="userSpaceOnUse">
-                                <rect x="204.094604" y="142.769379" width="514.015625" height="44.1085968" />
+                                <rect x="204.094604" y="142.782227" width="514.015625" height="44.1127472" />
                               </clipPath>
                             </defs>
                             <g clip-path="url(#papercraft-clip-16)">
@@ -171,11 +171,11 @@
                                 <g>
                                   <defs>
                                     <clipPath id="papercraft-clip-17" clipPathUnits="userSpaceOnUse">
-                                      <rect x="211.653656" y="150.32843" width="81.4942169" height="28.9904785" />
+                                      <rect x="211.653656" y="150.341278" width="81.4942169" height="28.9946289" />
                                     </clipPath>
                                   </defs>
                                   <g clip-path="url(#papercraft-clip-17)">
-                                    <text x="211.653656" y="169.565491" font-family="Arial" font-size="21.2530422" fill="#475569" xml:space="preserve">Next cell</text>
+                                    <text x="211.653656" y="169.581085" font-family="Arial" font-size="21.2530422" fill="#475569" xml:space="preserve">Next cell</text>
                                   </g>
                                 </g>
                               </g>

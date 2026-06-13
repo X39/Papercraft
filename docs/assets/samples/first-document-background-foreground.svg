@@ -2,7 +2,7 @@
 <svg version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:papercraft="https://x39.solutions/papercraft" width="755.905518" height="453.543335" viewBox="0 0 755.905518 453.543335" role="img" xmlns="http://www.w3.org/2000/svg">
   <title>Papercraft SVG document</title>
   <metadata>
-    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-11T17:43:02.6241326Z" />
+    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-13T13:16:20.7238862Z" />
   </metadata>
   <!--Papercraft SVG backend output. Pages: 1. Pages are stacked vertically.-->
   <!--Page 1 of 1-->
@@ -59,22 +59,22 @@
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-6" clipPathUnits="userSpaceOnUse">
-                      <rect x="45.3543549" y="45.3543549" width="236.232559" height="57.980957" />
+                      <rect x="45.3543549" y="45.3543549" width="236.232559" height="57.9892578" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-6)">
-                    <text x="45.3543549" y="83.828476" font-family="Arial" font-size="42.5060844" fill="#000000" xml:space="preserve">Draft invoice</text>
+                    <text x="45.3543549" y="83.8339844" font-family="Arial" font-size="42.5060844" fill="#000000" xml:space="preserve">Draft invoice</text>
                   </g>
                 </g>
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-7" clipPathUnits="userSpaceOnUse">
-                      <rect x="45.3543549" y="103.335312" width="659.290649" height="86.9714355" />
+                      <rect x="45.3543549" y="103.343613" width="659.290649" height="86.9838867" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-7)">
-                    <text x="45.3543549" y="132.190903" font-family="Arial" font-size="31.8795643" fill="#000000" xml:space="preserve">The body is rendered between the background</text>
-                    <text x="45.3543549" y="175.67662" font-family="Arial" font-size="31.8795643" fill="#000000" xml:space="preserve">and foreground layers.</text>
+                    <text x="45.3543549" y="132.203339" font-family="Arial" font-size="31.8795643" fill="#000000" xml:space="preserve">The body is rendered between the background</text>
+                    <text x="45.3543549" y="175.695282" font-family="Arial" font-size="31.8795643" fill="#000000" xml:space="preserve">and foreground layers.</text>
                   </g>
                 </g>
               </g>
@@ -105,11 +105,11 @@
               <g>
                 <defs>
                   <clipPath id="papercraft-clip-10" clipPathUnits="userSpaceOnUse">
-                    <rect x="271.697937" y="183.275299" width="212.509674" height="86.9927521" />
+                    <rect x="271.697937" y="183.279724" width="212.509674" height="86.9838867" />
                   </clipPath>
                 </defs>
                 <g clip-path="url(#papercraft-clip-10)">
-                  <text x="271.697937" y="241.000626" font-family="Arial" font-size="63.7591286" fill="#B91C1C" fill-opacity="0.4" xml:space="preserve">DRAFT</text>
+                  <text x="271.697937" y="240.999176" font-family="Arial" font-size="63.7591286" fill="#B91C1C" fill-opacity="0.4" xml:space="preserve">DRAFT</text>
                 </g>
               </g>
             </g>

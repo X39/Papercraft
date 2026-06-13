@@ -2,7 +2,7 @@
 <svg version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:papercraft="https://x39.solutions/papercraft" width="755.905518" height="453.543335" viewBox="0 0 755.905518 453.543335" role="img" xmlns="http://www.w3.org/2000/svg">
   <title>Papercraft SVG document</title>
   <metadata>
-    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-11T17:43:02.6241326Z" />
+    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-13T13:16:20.7238862Z" />
   </metadata>
   <!--Papercraft SVG backend output. Pages: 1. Pages are stacked vertically.-->
   <!--Page 1 of 1-->
@@ -59,12 +59,12 @@
                       <g>
                         <defs>
                           <clipPath id="papercraft-clip-6" clipPathUnits="userSpaceOnUse">
-                            <rect x="116.042519" y="116.042519" width="435.946808" height="86.9714355" />
+                            <rect x="116.042519" y="116.042519" width="435.946808" height="86.9838867" />
                           </clipPath>
                         </defs>
                         <g clip-path="url(#papercraft-clip-6)">
-                          <text x="116.042519" y="144.898102" font-family="Arial" font-size="31.8795643" fill="#000000" xml:space="preserve">The page margin leaves space</text>
-                          <text x="116.042519" y="188.38382" font-family="Arial" font-size="31.8795643" fill="#000000" xml:space="preserve">around this content area.</text>
+                          <text x="116.042519" y="144.902237" font-family="Arial" font-size="31.8795643" fill="#000000" xml:space="preserve">The page margin leaves space</text>
+                          <text x="116.042519" y="188.394196" font-family="Arial" font-size="31.8795643" fill="#000000" xml:space="preserve">around this content area.</text>
                         </g>
                       </g>
                     </g>

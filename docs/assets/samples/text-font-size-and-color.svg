@@ -2,7 +2,7 @@
 <svg version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:papercraft="https://x39.solutions/papercraft" width="755.905518" height="340.157501" viewBox="0 0 755.905518 340.157501" role="img" xmlns="http://www.w3.org/2000/svg">
   <title>Papercraft SVG document</title>
   <metadata>
-    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-11T17:43:00.6274093Z" />
+    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-13T13:16:18.5030423Z" />
   </metadata>
   <!--Papercraft SVG backend output. Pages: 1. Pages are stacked vertically.-->
   <!--Page 1 of 1-->
@@ -46,21 +46,21 @@
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-5" clipPathUnits="userSpaceOnUse">
-                      <rect x="37.7952957" y="37.7952957" width="223.265915" height="32.6142883" />
+                      <rect x="37.7952957" y="37.7952957" width="223.265915" height="32.6189575" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-5)">
-                    <text x="37.7952957" y="59.4369888" font-family="Arial" font-size="23.9096737" fill="#475569" xml:space="preserve">Small supporting text</text>
+                    <text x="37.7952957" y="59.4400864" font-family="Arial" font-size="23.9096737" fill="#475569" xml:space="preserve">Small supporting text</text>
                   </g>
                 </g>
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-6" clipPathUnits="userSpaceOnUse">
-                      <rect x="37.7952957" y="70.409584" width="425.400787" height="65.2285767" />
+                      <rect x="37.7952957" y="70.4142532" width="425.400787" height="65.237915" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-6)">
-                    <text x="37.7952957" y="113.69297" font-family="Arial" font-size="47.8193474" fill="#1D4ED8" xml:space="preserve">Larger blue heading</text>
+                    <text x="37.7952957" y="113.703842" font-family="Arial" font-size="47.8193474" fill="#1D4ED8" xml:space="preserve">Larger blue heading</text>
                   </g>
                 </g>
               </g>

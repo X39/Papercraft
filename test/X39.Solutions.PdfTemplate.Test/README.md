@@ -50,9 +50,7 @@ test/X39.Solutions.PdfTemplate.Test/TestResults/documentation-samples
 To regenerate the checked-in documentation assets, opt in explicitly:
 
 ```powershell
-$env:PAPERCRAFT_UPDATE_DOCUMENTATION_SAMPLE_ASSETS = "true"
-dotnet test test/X39.Solutions.PdfTemplate.Test/X39.Solutions.PdfTemplate.Test.csproj --filter FullyQualifiedName~DocumentationSamples
-Remove-Item Env:PAPERCRAFT_UPDATE_DOCUMENTATION_SAMPLE_ASSETS
+./scripts/Render-DocumentationSamples.ps1
 ```
 
 The opt-in path intentionally overwrites stale PNG, SVG and PDF assets under `docs/assets/samples` for the sample being rendered.

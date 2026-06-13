@@ -2,7 +2,7 @@
 <svg version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:papercraft="https://x39.solutions/papercraft" width="755.905518" height="453.543335" viewBox="0 0 755.905518 453.543335" role="img" xmlns="http://www.w3.org/2000/svg">
   <title>Papercraft SVG document</title>
   <metadata>
-    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-11T17:43:02.6241326Z" />
+    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-13T13:16:20.7238862Z" />
   </metadata>
   <!--Papercraft SVG backend output. Pages: 1. Pages are stacked vertically.-->
   <!--Page 1 of 1-->
@@ -46,21 +46,21 @@
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-5" clipPathUnits="userSpaceOnUse">
-                      <rect x="45.3543549" y="45.3543549" width="259.976196" height="57.980957" />
+                      <rect x="45.3543549" y="45.3543549" width="259.976196" height="57.9892578" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-5)">
-                    <text x="45.3543549" y="83.828476" font-family="Arial" font-size="42.5060844" fill="#000000" xml:space="preserve">Shipping note</text>
+                    <text x="45.3543549" y="83.8339844" font-family="Arial" font-size="42.5060844" fill="#000000" xml:space="preserve">Shipping note</text>
                   </g>
                 </g>
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-6" clipPathUnits="userSpaceOnUse">
-                      <rect x="45.3543549" y="103.335312" width="522.775085" height="43.4857178" />
+                      <rect x="45.3543549" y="103.343613" width="522.775085" height="43.4919434" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-6)">
-                    <text x="45.3543549" y="132.190903" font-family="Arial" font-size="31.8795643" fill="#000000" xml:space="preserve">The body uses the normal page flow.</text>
+                    <text x="45.3543549" y="132.203339" font-family="Arial" font-size="31.8795643" fill="#000000" xml:space="preserve">The body uses the normal page flow.</text>
                   </g>
                 </g>
               </g>
@@ -102,11 +102,11 @@
                       <g>
                         <defs>
                           <clipPath id="papercraft-clip-10" clipPathUnits="userSpaceOnUse">
-                            <rect x="501.554138" y="48.0109863" width="132.869141" height="32.6142883" />
+                            <rect x="501.554138" y="48.0109863" width="132.869141" height="32.6189575" />
                           </clipPath>
                         </defs>
                         <g clip-path="url(#papercraft-clip-10)">
-                          <text x="501.554138" y="69.6526794" font-family="Arial" font-size="23.9096737" fill="#000000" xml:space="preserve">APPROVED</text>
+                          <text x="501.554138" y="69.655777" font-family="Arial" font-size="23.9096737" fill="#000000" xml:space="preserve">APPROVED</text>
                         </g>
                       </g>
                     </g>

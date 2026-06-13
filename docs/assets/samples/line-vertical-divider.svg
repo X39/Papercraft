@@ -2,7 +2,7 @@
 <svg version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:papercraft="https://x39.solutions/papercraft" width="755.905518" height="340.157501" viewBox="0 0 755.905518 340.157501" role="img" xmlns="http://www.w3.org/2000/svg">
   <title>Papercraft SVG document</title>
   <metadata>
-    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-11T17:43:00.6274093Z" />
+    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-13T13:16:18.5030423Z" />
   </metadata>
   <!--Papercraft SVG backend output. Pages: 1. Pages are stacked vertically.-->
   <!--Page 1 of 1-->
@@ -71,11 +71,11 @@
                                 <g>
                                   <defs>
                                     <clipPath id="papercraft-clip-8" clipPathUnits="userSpaceOnUse">
-                                      <rect x="37.7952957" y="37.7952957" width="93.0586014" height="32.6142883" />
+                                      <rect x="37.7952957" y="37.7952957" width="93.0586014" height="32.6189575" />
                                     </clipPath>
                                   </defs>
                                   <g clip-path="url(#papercraft-clip-8)">
-                                    <text x="37.7952957" y="59.4369888" font-family="Arial" font-size="23.9096737" fill="#000000" xml:space="preserve">Left note</text>
+                                    <text x="37.7952957" y="59.4400864" font-family="Arial" font-size="23.9096737" fill="#000000" xml:space="preserve">Left note</text>
                                   </g>
                                 </g>
                               </g>
@@ -115,11 +115,11 @@
                                 <g>
                                   <defs>
                                     <clipPath id="papercraft-clip-12" clipPathUnits="userSpaceOnUse">
-                                      <rect x="393.070892" y="37.7952957" width="108.994499" height="32.6142883" />
+                                      <rect x="393.070892" y="37.7952957" width="108.994499" height="32.6189575" />
                                     </clipPath>
                                   </defs>
                                   <g clip-path="url(#papercraft-clip-12)">
-                                    <text x="393.070892" y="59.4369888" font-family="Arial" font-size="23.9096737" fill="#000000" xml:space="preserve">Right note</text>
+                                    <text x="393.070892" y="59.4400864" font-family="Arial" font-size="23.9096737" fill="#000000" xml:space="preserve">Right note</text>
                                   </g>
                                 </g>
                               </g>

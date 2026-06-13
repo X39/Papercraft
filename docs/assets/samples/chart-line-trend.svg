@@ -2,7 +2,7 @@
 <svg version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:papercraft="https://x39.solutions/papercraft" width="907.08667" height="604.724426" viewBox="0 0 907.08667 604.724426" role="img" xmlns="http://www.w3.org/2000/svg">
   <title>Papercraft SVG document</title>
   <metadata>
-    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-11T17:43:03.4137145Z" />
+    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-13T13:16:21.4969447Z" />
   </metadata>
   <!--Papercraft SVG backend output. Pages: 1. Pages are stacked vertically.-->
   <!--Page 1 of 1-->
@@ -58,33 +58,33 @@
                       </defs>
                       <g clip-path="url(#papercraft-clip-6)">
                         <g>
-                          <text x="396.709869" y="75.4601517" font-family="Arial" font-size="37.1928253" fill="#000000" xml:space="preserve">Orders</text>
+                          <text x="396.709869" y="75.4649734" font-family="Arial" font-size="37.1928253" fill="#000000" xml:space="preserve">Orders</text>
                         </g>
-                        <line x1="51.7952957" y1="100.528633" x2="51.7952957" y2="439.543549" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
-                        <line x1="214.094513" y1="100.528633" x2="214.094513" y2="439.543549" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
-                        <line x1="376.393738" y1="100.528633" x2="376.393738" y2="439.543549" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
-                        <line x1="538.692932" y1="100.528633" x2="538.692932" y2="439.543549" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
-                        <line x1="700.992188" y1="100.528633" x2="700.992188" y2="439.543549" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
-                        <line x1="863.291382" y1="100.528633" x2="863.291382" y2="439.543549" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
-                        <line x1="51.7952957" y1="100.528633" x2="863.291382" y2="100.528633" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
-                        <line x1="51.7952957" y1="168.331604" x2="863.291382" y2="168.331604" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
-                        <line x1="51.7952957" y1="236.134613" x2="863.291382" y2="236.134613" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
-                        <line x1="51.7952957" y1="303.937592" x2="863.291382" y2="303.937592" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
-                        <line x1="51.7952957" y1="371.74057" x2="863.291382" y2="371.74057" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
+                        <line x1="51.7952957" y1="100.535896" x2="51.7952957" y2="439.543549" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
+                        <line x1="214.094513" y1="100.535896" x2="214.094513" y2="439.543549" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
+                        <line x1="376.393738" y1="100.535896" x2="376.393738" y2="439.543549" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
+                        <line x1="538.692932" y1="100.535896" x2="538.692932" y2="439.543549" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
+                        <line x1="700.992188" y1="100.535896" x2="700.992188" y2="439.543549" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
+                        <line x1="863.291382" y1="100.535896" x2="863.291382" y2="439.543549" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
+                        <line x1="51.7952957" y1="100.535896" x2="863.291382" y2="100.535896" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
+                        <line x1="51.7952957" y1="168.337433" x2="863.291382" y2="168.337433" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
+                        <line x1="51.7952957" y1="236.138947" x2="863.291382" y2="236.138947" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
+                        <line x1="51.7952957" y1="303.940491" x2="863.291382" y2="303.940491" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
+                        <line x1="51.7952957" y1="371.742004" x2="863.291382" y2="371.742004" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
                         <line x1="51.7952957" y1="439.543549" x2="863.291382" y2="439.543549" fill="none" stroke="#CCCCCC" stroke-width="1" stroke-linecap="butt" />
                         <line x1="51.7952957" y1="439.543549" x2="863.291382" y2="439.543549" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="butt" />
-                        <line x1="51.7952957" y1="100.528633" x2="51.7952957" y2="439.543549" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="butt" />
-                        <line x1="119.419968" y1="411.292297" x2="344.835541" y2="280.901947" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="butt" />
-                        <line x1="344.835541" y1="280.901947" x2="570.251099" y2="346.097137" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="butt" />
-                        <line x1="570.251099" y1="346.097137" x2="795.666687" y2="128.779877" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="butt" />
-                        <line x1="117.419968" y1="411.292297" x2="121.419968" y2="411.292297" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
-                        <line x1="119.419968" y1="409.292297" x2="119.419968" y2="413.292297" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
-                        <line x1="342.835541" y1="280.901947" x2="346.835541" y2="280.901947" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
-                        <line x1="344.835541" y1="278.901947" x2="344.835541" y2="282.901947" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
-                        <line x1="568.251099" y1="346.097137" x2="572.251099" y2="346.097137" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
-                        <line x1="570.251099" y1="344.097137" x2="570.251099" y2="348.097137" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
-                        <line x1="793.666687" y1="128.779877" x2="797.666687" y2="128.779877" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
-                        <line x1="795.666687" y1="126.779884" x2="795.666687" y2="130.779877" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
+                        <line x1="51.7952957" y1="100.535896" x2="51.7952957" y2="439.543549" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="butt" />
+                        <line x1="119.419968" y1="411.292908" x2="344.835541" y2="280.905365" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="butt" />
+                        <line x1="344.835541" y1="280.905365" x2="570.251099" y2="346.099121" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="butt" />
+                        <line x1="570.251099" y1="346.099121" x2="795.666687" y2="128.78653" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="butt" />
+                        <line x1="117.419968" y1="411.292908" x2="121.419968" y2="411.292908" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
+                        <line x1="119.419968" y1="409.292908" x2="119.419968" y2="413.292908" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
+                        <line x1="342.835541" y1="280.905365" x2="346.835541" y2="280.905365" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
+                        <line x1="344.835541" y1="278.905365" x2="344.835541" y2="282.905365" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
+                        <line x1="568.251099" y1="346.099121" x2="572.251099" y2="346.099121" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
+                        <line x1="570.251099" y1="344.099121" x2="570.251099" y2="348.099121" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
+                        <line x1="793.666687" y1="128.78653" x2="797.666687" y2="128.78653" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
+                        <line x1="795.666687" y1="126.786537" x2="795.666687" y2="130.78653" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="butt" />
                       </g>
                     </g>
                   </g>

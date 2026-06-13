@@ -2,7 +2,7 @@
 <svg version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:papercraft="https://x39.solutions/papercraft" width="755.905518" height="340.157501" viewBox="0 0 755.905518 340.157501" role="img" xmlns="http://www.w3.org/2000/svg">
   <title>Papercraft SVG document</title>
   <metadata>
-    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-11T17:43:00.6274093Z" />
+    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-13T13:16:18.5030423Z" />
   </metadata>
   <!--Papercraft SVG backend output. Pages: 1. Pages are stacked vertically.-->
   <!--Page 1 of 1-->
@@ -46,61 +46,61 @@
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-5" clipPathUnits="userSpaceOnUse">
-                      <rect x="37.7952957" y="37.7952957" width="136.375427" height="45.6491089" />
+                      <rect x="37.7952957" y="37.7952957" width="136.375427" height="45.6556473" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-5)">
-                    <text x="37.7952957" y="66.6508865" font-family="Arial" font-size="31.8795643" font-weight="700" fill="#000000" xml:space="preserve">Bold text</text>
+                    <text x="37.7952957" y="66.655014" font-family="Arial" font-size="31.8795643" font-weight="700" fill="#000000" xml:space="preserve">Bold text</text>
                   </g>
                 </g>
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-6" clipPathUnits="userSpaceOnUse">
-                      <rect x="37.7952957" y="83.4444046" width="125.790405" height="42.1472168" />
+                      <rect x="37.7952957" y="83.450943" width="125.790405" height="42.1532516" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-6)">
-                    <text x="37.7952957" y="112.299995" font-family="Arial" font-size="31.8795643" font-style="italic" fill="#000000" xml:space="preserve">Italic text</text>
+                    <text x="37.7952957" y="112.310669" font-family="Arial" font-size="31.8795643" font-style="italic" fill="#000000" xml:space="preserve">Italic text</text>
                   </g>
                 </g>
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-7" clipPathUnits="userSpaceOnUse">
-                      <rect x="37.7952957" y="125.591621" width="315.308807" height="45.6491089" />
+                      <rect x="37.7952957" y="125.604195" width="315.308807" height="45.6556473" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-7)">
-                    <text x="37.7952957" y="154.447205" font-family="Arial" font-size="31.8795643" font-weight="600" fill="#166534" xml:space="preserve">Semi-bold green text</text>
+                    <text x="37.7952957" y="154.463913" font-family="Arial" font-size="31.8795643" font-weight="600" fill="#166534" xml:space="preserve">Semi-bold green text</text>
                   </g>
                 </g>
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-8" clipPathUnits="userSpaceOnUse">
-                      <rect x="37.7952957" y="171.240723" width="214.424316" height="43.4857178" />
+                      <rect x="37.7952957" y="171.259842" width="214.424316" height="43.4919434" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-8)">
-                    <text x="37.7952957" y="200.096313" font-family="Arial" font-size="31.8795643" fill="#000000" text-decoration="underline" xml:space="preserve">Underlined text</text>
+                    <text x="37.7952957" y="200.119568" font-family="Arial" font-size="31.8795643" fill="#000000" text-decoration="underline" xml:space="preserve">Underlined text</text>
                   </g>
                 </g>
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-9" clipPathUnits="userSpaceOnUse">
-                      <rect x="37.7952957" y="214.72644" width="249.852951" height="43.4857178" />
+                      <rect x="37.7952957" y="214.751785" width="249.852951" height="43.4919434" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-9)">
-                    <text x="37.7952957" y="243.582031" font-family="Arial" font-size="31.8795643" fill="#000000" text-decoration="line-through" xml:space="preserve">Strikethrough text</text>
+                    <text x="37.7952957" y="243.611511" font-family="Arial" font-size="31.8795643" fill="#000000" text-decoration="line-through" xml:space="preserve">Strikethrough text</text>
                   </g>
                 </g>
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-10" clipPathUnits="userSpaceOnUse">
-                      <rect x="37.7952957" y="258.212158" width="320.772552" height="43.7326164" />
+                      <rect x="37.7952957" y="258.243713" width="320.772552" height="43.7385101" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-10)">
-                    <text x="37.7952957" y="287.067749" font-family="Arial" font-size="31.8795643" fill="#000000" text-decoration="underline" style="text-decoration-line: underline; text-decoration-style: double;" xml:space="preserve">Double-underlined text</text>
+                    <text x="37.7952957" y="287.103424" font-family="Arial" font-size="31.8795643" fill="#000000" text-decoration="underline" style="text-decoration-line: underline; text-decoration-style: double;" xml:space="preserve">Double-underlined text</text>
                   </g>
                 </g>
               </g>

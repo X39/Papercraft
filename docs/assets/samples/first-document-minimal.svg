@@ -2,7 +2,7 @@
 <svg version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:papercraft="https://x39.solutions/papercraft" width="755.905518" height="453.543335" viewBox="0 0 755.905518 453.543335" role="img" xmlns="http://www.w3.org/2000/svg">
   <title>Papercraft SVG document</title>
   <metadata>
-    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-11T17:43:02.6241326Z" />
+    <papercraft:document renderer="svg" media-type="image/svg+xml" pages="1" modified="2026-06-13T13:16:20.7238862Z" />
   </metadata>
   <!--Papercraft SVG backend output. Pages: 1. Pages are stacked vertically.-->
   <!--Page 1 of 1-->
@@ -46,21 +46,21 @@
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-5" clipPathUnits="userSpaceOnUse">
-                      <rect x="45.3543549" y="45.3543549" width="241.851974" height="65.2285767" />
+                      <rect x="45.3543549" y="45.3543549" width="241.851974" height="65.237915" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-5)">
-                    <text x="45.3543549" y="88.6377411" font-family="Arial" font-size="47.8193474" fill="#000000" xml:space="preserve">Packing list</text>
+                    <text x="45.3543549" y="88.6439362" font-family="Arial" font-size="47.8193474" fill="#000000" xml:space="preserve">Packing list</text>
                   </g>
                 </g>
                 <g>
                   <defs>
                     <clipPath id="papercraft-clip-6" clipPathUnits="userSpaceOnUse">
-                      <rect x="45.3543549" y="110.582932" width="636.19043" height="43.4857178" />
+                      <rect x="45.3543549" y="110.59227" width="636.19043" height="43.4919434" />
                     </clipPath>
                   </defs>
                   <g clip-path="url(#papercraft-clip-6)">
-                    <text x="45.3543549" y="139.438522" font-family="Arial" font-size="31.8795643" fill="#000000" xml:space="preserve">Use the body for the main document content.</text>
+                    <text x="45.3543549" y="139.451996" font-family="Arial" font-size="31.8795643" fill="#000000" xml:space="preserve">Use the body for the main document content.</text>
                   </g>
                 </g>
               </g>
