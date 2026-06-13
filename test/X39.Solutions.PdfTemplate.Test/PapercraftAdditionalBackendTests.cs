@@ -177,6 +177,61 @@ public sealed class PapercraftAdditionalBackendTests
         Assert.Equal("%PDF", Encoding.ASCII.GetString(bytes, 0, 4));
     }
 
+    [Fact]
+    public async Task PdfSharpBackendRendersMixedRegularAndBoldTextAsPdf()
+    {
+        var backend = new PdfSharpRenderBackend();
+        var displayList = new DisplayList();
+        displayList.Add(
+            new DrawTextCommand(
+                new DisplayTextStyle
+                {
+                    Foreground = DisplayColor.Black,
+                    FontFamily = DisplayFont.Default with { Weight = 599 },
+                    FontSize = 12F,
+                },
+                72.272F,
+                "Regular",
+                4,
+                20));
+        displayList.Add(
+            new DrawTextCommand(
+                new DisplayTextStyle
+                {
+                    Foreground = DisplayColor.Black,
+                    FontFamily = DisplayFont.Default with { Weight = 600 },
+                    FontSize = 12F,
+                },
+                72.272F,
+                "Bold",
+                4,
+                40));
+        var document = new PapercraftDocument(
+            new[]
+            {
+                new PapercraftPage(
+                    0,
+                    1,
+                    1,
+                    new Size(120, 80),
+                    DocumentOptions.Default.DotsPerMillimeter,
+                    displayList),
+            },
+            CultureInfo.InvariantCulture,
+            DocumentOptions.Default);
+        await using var stream = new MemoryStream();
+
+        await backend.RenderAsync(
+            document,
+            new RenderOutput(PapercraftMediaTypes.ApplicationPdf, stream),
+            CancellationToken.None);
+
+        var bytes = stream.ToArray();
+
+        Assert.True(bytes.Length > 100);
+        Assert.Equal("%PDF", Encoding.ASCII.GetString(bytes, 0, 4));
+    }
+
     private static PapercraftDocument CreateSimpleDocument(bool includeText)
     {
         var displayList = new DisplayList();

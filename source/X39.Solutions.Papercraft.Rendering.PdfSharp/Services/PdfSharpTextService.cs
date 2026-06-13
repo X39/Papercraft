@@ -1,53 +1,76 @@
+using PdfSharp.Drawing;
 using X39.Solutions.Papercraft.Abstraction;
 using X39.Solutions.Papercraft.Data;
 using X39.Solutions.Papercraft.Services.TextService;
 
 namespace X39.Solutions.Papercraft.Rendering.PdfSharp.Services;
 
-internal sealed class PdfSharpTextService : ITextService
+internal sealed class PdfSharpTextService : ITextLayoutService
 {
     public Size Measure(TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
     {
-        var fontSize = GetFontSize(textStyle, dpi);
-        var lineHeight = GetLineHeight(textStyle, fontSize);
-        var maxLineWidth = 0F;
-        var lineCount = 0;
-        foreach (var line in LayoutLines(textStyle, dpi, text, maxWidth))
-        {
-            maxLineWidth = Math.Max(maxLineWidth, MeasureLine(textStyle, dpi, line));
-            lineCount++;
-        }
-
-        return lineCount is 0
+        var layout = Layout(textStyle, dpi, text, maxWidth);
+        return layout.Count is 0
             ? Size.Zero
-            : new Size(maxLineWidth, lineCount * lineHeight);
+            : new Size(
+                layout.Max((q) => q.Width),
+                layout.Count * (float) PdfSharpFontHelper.GetLineHeight(textStyle, dpi));
     }
 
     public void Draw(IDrawableCanvas canvas, TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
     {
         ArgumentNullException.ThrowIfNull(canvas);
-        var fontSize = GetFontSize(textStyle, dpi);
-        var lineHeight = GetLineHeight(textStyle, fontSize);
-        var y = fontSize;
-        foreach (var line in LayoutLines(textStyle, dpi, text, maxWidth))
+        foreach (var line in Layout(textStyle, dpi, text, maxWidth))
         {
-            canvas.DrawText(textStyle, dpi, line, 0F, y);
-            y += lineHeight;
+            canvas.DrawText(textStyle, dpi, line.Text, line.X, line.BaselineY);
         }
     }
 
-    private static IReadOnlyList<string> LayoutLines(TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
+    public IReadOnlyList<TextLineLayout> Layout(TextStyle textStyle, float dpi, ReadOnlySpan<char> text, float maxWidth)
+    {
+        using var graphics = PdfSharpFontHelper.CreateMeasureContext();
+        var font = PdfSharpFontHelper.CreateFont(textStyle, dpi);
+        var fontSize = (float) PdfSharpFontHelper.GetFontSize(textStyle.FontSize, dpi);
+        var lineHeight = (float) PdfSharpFontHelper.GetLineHeight(textStyle, dpi);
+        var lines = LayoutLines(graphics, font, textStyle, text, maxWidth);
+        var result = new TextLineLayout[lines.Count];
+        for (var i = 0; i < lines.Count; i++)
+        {
+            var baselineY = fontSize + i * lineHeight;
+            result[i] = new TextLineLayout(
+                lines[i],
+                0F,
+                baselineY,
+                i * lineHeight,
+                lineHeight,
+                MeasureLine(graphics, font, textStyle, lines[i]));
+        }
+
+        return result;
+    }
+
+    private static IReadOnlyList<string> LayoutLines(
+        XGraphics graphics,
+        XFont font,
+        TextStyle textStyle,
+        ReadOnlySpan<char> text,
+        float maxWidth)
     {
         var lines = new List<string>();
         foreach (var paragraph in text.ToString().Split('\n'))
         {
-            lines.AddRange(WrapLine(textStyle, dpi, paragraph.Trim(), maxWidth));
+            lines.AddRange(WrapLine(graphics, font, textStyle, paragraph.Trim(), maxWidth));
         }
 
         return lines;
     }
 
-    private static IReadOnlyList<string> WrapLine(TextStyle textStyle, float dpi, string text, float maxWidth)
+    private static IReadOnlyList<string> WrapLine(
+        XGraphics graphics,
+        XFont font,
+        TextStyle textStyle,
+        string text,
+        float maxWidth)
     {
         var lines = new List<string>();
         if (string.IsNullOrWhiteSpace(text))
@@ -62,16 +85,15 @@ internal sealed class PdfSharpTextService : ITextService
         var remaining = text;
         while (!string.IsNullOrWhiteSpace(remaining))
         {
-            var end = remaining.Length;
-            while (end > 1 && MeasureLine(textStyle, dpi, remaining.AsSpan(0, end)) > maxWidth)
+            if (MeasureLine(graphics, font, textStyle, remaining) <= maxWidth)
             {
-                var whitespace = LastWhitespaceBefore(remaining.AsSpan(), end);
-                end = whitespace > 0
-                    ? whitespace
-                    : Math.Max(1, end - 1);
-                if (whitespace <= 0)
-                    break;
+                lines.Add(remaining.Trim());
+                break;
             }
+
+            var end = FindWhitespaceBreak(graphics, font, textStyle, remaining, maxWidth);
+            if (end <= 0)
+                end = FindLargestPrefix(graphics, font, textStyle, remaining, maxWidth);
 
             lines.Add(remaining[..end].Trim());
             remaining = remaining[end..].TrimStart();
@@ -80,28 +102,66 @@ internal sealed class PdfSharpTextService : ITextService
         return lines;
     }
 
-    private static int LastWhitespaceBefore(ReadOnlySpan<char> text, int endExclusive)
+    private static int FindWhitespaceBreak(
+        XGraphics graphics,
+        XFont font,
+        TextStyle textStyle,
+        string text,
+        float maxWidth)
     {
-        for (var i = Math.Min(endExclusive, text.Length) - 1; i > 0; i--)
+        for (var i = text.Length - 1; i > 0; i--)
         {
-            if (char.IsWhiteSpace(text[i]))
+            if (!char.IsWhiteSpace(text[i]))
+                continue;
+
+            var candidate = text[..i].TrimEnd();
+            if (candidate.Length > 0
+                && MeasureLine(graphics, font, textStyle, candidate) <= maxWidth)
+            {
                 return i;
+            }
         }
 
         return -1;
     }
 
-    private static float MeasureLine(TextStyle textStyle, float dpi, ReadOnlySpan<char> line)
-        => line.Length * GetFontSize(textStyle, dpi) * GetAverageGlyphWidth(textStyle);
+    private static int FindLargestPrefix(
+        XGraphics graphics,
+        XFont font,
+        TextStyle textStyle,
+        string text,
+        float maxWidth)
+    {
+        if (text.Length <= 1
+            || MeasureLine(graphics, font, textStyle, text.AsSpan(0, 1)) > maxWidth)
+        {
+            return 1;
+        }
 
-    private static float GetFontSize(TextStyle textStyle, float dpi)
-        => Math.Max(1F, textStyle.FontSize * dpi / 72.272F * Math.Max(0.01F, textStyle.Scale));
+        var low = 1;
+        var high = text.Length;
+        while (low < high)
+        {
+            var mid = (low + high + 1) / 2;
+            if (MeasureLine(graphics, font, textStyle, text.AsSpan(0, mid)) <= maxWidth)
+                low = mid;
+            else
+                high = mid - 1;
+        }
 
-    private static float GetLineHeight(TextStyle textStyle, float fontSize)
-        => fontSize * Math.Max(0.1F, textStyle.LineHeight);
+        return Math.Max(1, low);
+    }
 
-    private static float GetAverageGlyphWidth(TextStyle textStyle)
-        => textStyle.FontFamily.Family.Contains("mono", StringComparison.OrdinalIgnoreCase)
-            ? 0.6F
-            : 0.55F;
+    private static float MeasureLine(
+        XGraphics graphics,
+        XFont font,
+        TextStyle textStyle,
+        ReadOnlySpan<char> line)
+    {
+        if (line.IsEmpty)
+            return 0F;
+
+        var size = graphics.MeasureString(line.ToString(), font);
+        return (float) (size.Width * PdfSharpFontHelper.GetHorizontalScale(textStyle.Scale));
+    }
 }

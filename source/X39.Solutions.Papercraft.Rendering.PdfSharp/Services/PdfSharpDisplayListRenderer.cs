@@ -97,7 +97,7 @@ internal sealed class PdfSharpDisplayListRenderer
         if (string.IsNullOrEmpty(text.Text) || text.TextStyle.Foreground.Alpha is 0)
             return;
 
-        var font = CreateFont(text.TextStyle, text.Dpi);
+        var font = PdfSharpFontHelper.CreateFont(text.TextStyle, text.Dpi);
         var brush = new XSolidBrush(ToXColor(text.TextStyle.Foreground));
         var x = text.X + state.TranslateX;
         var y = text.Y + state.TranslateY;
@@ -165,52 +165,9 @@ internal sealed class PdfSharpDisplayListRenderer
         page.AddWebLink(ToPdfRectangle(link.Rectangle, state), link.Uri);
     }
 
-    private static XFont CreateFont(DisplayTextStyle textStyle, float dpi)
-        => new(
-            NormalizeFontFamily(textStyle.FontFamily.Family),
-            GetFontSize(textStyle.FontSize, dpi),
-            ToFontStyle(textStyle));
-
-    private static double GetFontSize(float fontSize, float dpi)
-    {
-        var normalized = dpi > 0F
-            ? fontSize * dpi / 72.272F
-            : fontSize;
-        return Math.Max(1D, normalized);
-    }
-
     private static bool NeedsTextTransform(DisplayTextStyle textStyle)
         => Math.Abs(textStyle.Rotation) > float.Epsilon
            || Math.Abs(textStyle.Scale - 1F) > float.Epsilon;
-
-    private static XFontStyleEx ToFontStyle(DisplayTextStyle textStyle)
-    {
-        var style = XFontStyleEx.Regular;
-        if (textStyle.FontFamily.Weight >= 600)
-            style |= XFontStyleEx.Bold;
-        if (textStyle.FontFamily.Style is DisplayFontStyle.Italic or DisplayFontStyle.Oblique)
-            style |= XFontStyleEx.Italic;
-        if (textStyle.Decoration.HasFlag(TextDecoration.Underline)
-            || textStyle.Decoration.HasFlag(TextDecoration.DoubleUnderline))
-            style |= XFontStyleEx.Underline;
-        if (textStyle.Decoration.HasFlag(TextDecoration.StrikeThrough))
-            style |= XFontStyleEx.Strikeout;
-        return style;
-    }
-
-    private static string NormalizeFontFamily(string family)
-    {
-        if (string.Equals(family, "sans-serif", StringComparison.OrdinalIgnoreCase))
-            return "Arial";
-        if (string.Equals(family, "serif", StringComparison.OrdinalIgnoreCase))
-            return "Times New Roman";
-        if (string.Equals(family, "monospace", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(family, "mono", StringComparison.OrdinalIgnoreCase))
-            return "Courier New";
-        return string.IsNullOrWhiteSpace(family)
-            ? "Arial"
-            : family;
-    }
 
     private static XRect ToXRect(DisplayRectangle rectangle)
         => new(rectangle.Left, rectangle.Top, rectangle.Width, rectangle.Height);

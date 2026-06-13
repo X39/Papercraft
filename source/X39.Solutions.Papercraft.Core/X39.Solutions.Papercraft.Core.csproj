@@ -13,6 +13,7 @@ Template parsing and renderer-neutral runtime implementation live here during th
     </PropertyGroup>
     <ItemGroup>
         <InternalsVisibleTo Include="X39.Solutions.Papercraft" />
+        <InternalsVisibleTo Include="X39.Solutions.Papercraft.Rendering.PdfSharp" />
         <InternalsVisibleTo Include="X39.Solutions.Papercraft.Rendering.SkiaSharp" />
         <InternalsVisibleTo Include="X39.Solutions.PdfTemplate" />
         <InternalsVisibleTo Include="X39.Solutions.PdfTemplate.Test" />
