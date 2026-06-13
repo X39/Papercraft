@@ -50,7 +50,7 @@ public sealed class PdfSharpTextServiceTests
     public void MeasureUsesActualGlyphWidths()
     {
         var textService = new PdfSharpTextService();
-        var textStyle = new TextStyle();
+        var textStyle = CreateTextStyleWithTestFont();
 
         var narrow = textService.Measure(textStyle, Dpi, "iiiiiiiiii".AsSpan(), float.MaxValue);
         var wide = textService.Measure(textStyle, Dpi, "WWWWWWWWWW".AsSpan(), float.MaxValue);
@@ -62,7 +62,7 @@ public sealed class PdfSharpTextServiceTests
     public void LayoutAtHighDpiWrapsByMeasuredWidthInsteadOfCharacterCount()
     {
         var textService = new PdfSharpTextService();
-        var textStyle = new TextStyle();
+        var textStyle = CreateTextStyleWithTestFont();
         const string narrowText = "iiiiiiiiii";
         const string wideText = "WWWWWWWWWW";
         var narrowWidth = textService.Measure(textStyle, Dpi, narrowText.AsSpan(), float.MaxValue).Width;
@@ -113,5 +113,27 @@ public sealed class PdfSharpTextServiceTests
 
         Assert.False(regular.Bold);
         Assert.True(bold.Bold);
+    }
+
+    private static TextStyle CreateTextStyleWithTestFont()
+        => new()
+        {
+            FontFamily = new Font(GetTestFont()),
+        };
+
+    private static string GetTestFont()
+    {
+        var fontPath = Path.GetFullPath(
+            Path.Combine(
+                AppContext.BaseDirectory,
+                "..",
+                "..",
+                "..",
+                "..",
+                "fonts",
+                "Nunito_Sans",
+                "NunitoSans-VariableFont_YTLC,opsz,wdth,wght.ttf"));
+        Assert.True(File.Exists(fontPath), $"Font file not found: {fontPath}");
+        return fontPath;
     }
 }

@@ -17,6 +17,9 @@ internal sealed class PdfSharpSystemFontResolver : IFontResolver
 
     public FontResolverInfo? ResolveTypeface(string familyName, bool bold, bool italic)
     {
+        if (TryCreateFontFaceFromPath(familyName, out var fontFace))
+            return ToResolverInfo(fontFace, bold, italic);
+
         var fonts = DiscoveredFonts.Value;
         if (fonts.Count is 0)
             return null;
@@ -152,6 +155,34 @@ internal sealed class PdfSharpSystemFontResolver : IFontResolver
             .Select((q) => q.First())
             .OrderBy((q) => q.Preference)
             .ToArray();
+    }
+
+    private static bool TryCreateFontFaceFromPath(string familyName, out FontFace fontFace)
+    {
+        fontFace = default!;
+        if (string.IsNullOrWhiteSpace(familyName)
+            || !IsFontFile(familyName))
+        {
+            return false;
+        }
+
+        try
+        {
+            var path = Path.GetFullPath(familyName);
+            if (!File.Exists(path))
+                return false;
+
+            fontFace = FontFace.FromPath(path);
+            return true;
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
+        catch (NotSupportedException)
+        {
+            return false;
+        }
     }
 
     private static IEnumerable<string> GetFontDirectories()
