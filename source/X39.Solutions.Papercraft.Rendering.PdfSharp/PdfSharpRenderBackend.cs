@@ -10,8 +10,13 @@ namespace X39.Solutions.Papercraft.Rendering.PdfSharp;
 /// </summary>
 public sealed class PdfSharpRenderBackend : IPapercraftRenderBackend
 {
+    /// <summary>
+    /// The backend id used by <see cref="PapercraftRenderOptions.BackendId"/> to select PDFsharp.
+    /// </summary>
+    public const string RendererId = "pdfsharp";
+
     private static readonly RendererCapabilities StaticCapabilities = new(
-        "pdfsharp",
+        RendererId,
         "PDFsharp",
         RendererOutputKind.Pdf,
         new[] { PapercraftMediaTypes.ApplicationPdf },

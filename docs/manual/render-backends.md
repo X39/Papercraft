@@ -65,13 +65,15 @@ Applications running the SkiaSharp backend on Linux should reference the matchin
 When multiple registered backends can produce the same target, pass `BackendId`:
 
 ```csharp
+using X39.Solutions.Papercraft.Rendering.PdfSharp;
+
 await renderer.RenderAsync(
     reader,
     new RenderOutput(PapercraftMediaTypes.ApplicationPdf, output),
     CultureInfo.CurrentUICulture,
     new PapercraftRenderOptions
     {
-        BackendId = "pdfsharp",
+        BackendId = PdfSharpRenderBackend.RendererId,
     });
 ```
 

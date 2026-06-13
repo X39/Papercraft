@@ -286,6 +286,79 @@ public sealed class PapercraftPackageConsumptionTests
     }
 
     [Fact]
+    public async Task PdfSharpRendererConsumerResolvesRendererAndGeneratesPdfWithExplicitBackend()
+    {
+        using var project = TemporaryConsumerProject.Create(
+            "PdfSharpRendererRuntimeConsumer",
+            new[] { ProjectPath("source", "X39.Solutions.Papercraft.Rendering.PdfSharp", "X39.Solutions.Papercraft.Rendering.PdfSharp.csproj") },
+            """
+            using System;
+            using System.Globalization;
+            using System.IO;
+            using System.Threading.Tasks;
+            using System.Xml;
+            using Microsoft.Extensions.DependencyInjection;
+            using X39.Solutions.Papercraft;
+            using X39.Solutions.Papercraft.Rendering.PdfSharp;
+
+            namespace PdfSharpRendererRuntimeConsumer;
+
+            public static class Program
+            {
+                public static async Task Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddPapercraftPdfSharpRenderer();
+
+                    await using var serviceProvider = services.BuildServiceProvider();
+                    var renderer = serviceProvider.GetRequiredService<PapercraftRenderer>();
+                    await using var output = new MemoryStream();
+                    using var reader = XmlReader.Create(new StringReader(
+                        @"<?xml version=""1.0"" encoding=""utf-8""?>
+                        <template xmlns=""X39.Solutions.PdfTemplate.Controls"">
+                            <body>
+                                <text>PDFsharp runtime consumer</text>
+                            </body>
+                        </template>"));
+
+                    await renderer.GeneratePdfAsync(
+                        output,
+                        reader,
+                        CultureInfo.InvariantCulture,
+                        new PapercraftRenderOptions
+                        {
+                            BackendId = PdfSharpRenderBackend.RendererId,
+                            DocumentOptions = DocumentOptions.Default,
+                        });
+
+                    var bytes = output.ToArray();
+                    if (bytes.Length < 4
+                        || bytes[0] != (byte) '%'
+                        || bytes[1] != (byte) 'P'
+                        || bytes[2] != (byte) 'D'
+                        || bytes[3] != (byte) 'F')
+                    {
+                        throw new InvalidOperationException("PDFsharp consumer did not generate a PDF.");
+                    }
+                }
+            }
+            """,
+            isExecutable: true,
+            packageReferences: new[]
+            {
+                new PackageReferenceSpec("Microsoft.Extensions.DependencyInjection", "10.0.8"),
+            });
+
+        await project.BuildAsync();
+        await project.RunAsync();
+        project.AssertAssetsContainLibrary("X39.Solutions.Papercraft.Rendering.PdfSharp");
+        project.AssertAssetsDoesNotContainLibrary("X39.Solutions.PdfTemplate");
+        project.AssertAssetsDoesNotContainLibrary("SkiaSharp");
+        project.AssertAssetsContainLibrary("X39.Solutions.Papercraft.Core");
+        project.AssertAssetsContainLibrary("PDFsharp");
+    }
+
+    [Fact]
     public async Task EscPosRendererConsumerCompilesExplicitRendererEntryPoint()
     {
         using var project = TemporaryConsumerProject.Create(
