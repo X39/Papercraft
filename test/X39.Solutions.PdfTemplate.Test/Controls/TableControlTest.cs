@@ -637,4 +637,84 @@ public class TableControlTest
         mockCanvas.AssertClip(3, new Rectangle(0, 100, 100, 10)); // first row starts at the next page
         mockCanvas.AssertClip(4, new Rectangle(0, 100, 100, 10)); // first row cell
     }
+
+    [Fact]
+    public async Task InitialHeaderMovesWithFirstRowWhenRemainingPageCannotFitBoth()
+    {
+        var control = await $$"""
+                                <table>
+                                    <th>
+                                        <td><mock width="100px" height="10px"/></td>
+                                    </th>
+                                    <tr>
+                                        <td><mock width="100px" height="10px"/></td>
+                                    </tr>
+                                </table>
+                              """.ToControl<TableControl>();
+        var pageSize   = new Size(100, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        mockCanvas.Translate(new Point(0F, 85F));
+
+        var additionalRenderSize = control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+
+        mockCanvas.AssertState();
+        Assert.Equal(new Size(0, 15), additionalRenderSize);
+        Assert.Equal(5, mockCanvas.ClipCount);
+        mockCanvas.AssertClip(0, new Rectangle(0, 85, 100, 35)); // table, including the page-break gap
+        mockCanvas.AssertClip(1, new Rectangle(0, 100, 100, 10)); // initial table header moved to the next page
+        mockCanvas.AssertClip(2, new Rectangle(0, 100, 100, 10)); // initial header cell
+        mockCanvas.AssertClip(3, new Rectangle(0, 110, 100, 10)); // first row follows the initial header
+        mockCanvas.AssertClip(4, new Rectangle(0, 110, 100, 10)); // first row cell
+    }
+
+    [Fact]
+    public void RowMovesBeforeRenderingWhenCellTextWouldPaginate()
+    {
+        var textControl = new TextControl(
+            new FixedTextLayoutService(
+                lineHeight: 15F,
+                baselineOffset: 10F,
+                lineTopOffset: 5F))
+        {
+            Text = "cell",
+            HorizontalAlignment = EHorizontalAlignment.Left,
+            VerticalAlignment = EVerticalAlignment.Top,
+        };
+        var cell = new TableCellControl
+        {
+            HorizontalAlignment = EHorizontalAlignment.Left,
+            VerticalAlignment = EVerticalAlignment.Top,
+        };
+        cell.Add(textControl);
+        var row = new TableRowControl
+        {
+            HorizontalAlignment = EHorizontalAlignment.Left,
+            VerticalAlignment = EVerticalAlignment.Top,
+        };
+        row.Add(cell);
+        var control = new TableControl
+        {
+            HorizontalAlignment = EHorizontalAlignment.Left,
+            VerticalAlignment = EVerticalAlignment.Top,
+        };
+        control.Add(row);
+        var pageSize   = new Size(100, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+        var textStyle  = textControl.GetTextStyle();
+
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        mockCanvas.Translate(new Point(0F, 85F));
+
+        var additionalRenderSize = control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+
+        mockCanvas.AssertState();
+        Assert.Equal(new Size(0F, 15F), additionalRenderSize);
+        mockCanvas.AssertClip(0, new Rectangle(0F, 85F, 100F, 30F)); // table, including the page-break gap
+        mockCanvas.AssertClip(1, new Rectangle(0F, 100F, 100F, 15F)); // row moved before cell text rendered
+        mockCanvas.AssertClip(2, new Rectangle(0F, 100F, 10F, 15F)); // cell moved with the row
+        mockCanvas.AssertDrawText(textStyle, "cell", 0F, 110F);
+    }
 }

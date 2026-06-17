@@ -288,12 +288,27 @@ public sealed class TableControl : AlignableContentControl
         var additionalWidth  = 0F;
         var additionalHeight = 0F;
         var headers          = Children.OfType<TableHeaderControl>().ToArray();
+        var rows             = Children.OfType<TableRowControl>().ToArray();
+
+        if (ShouldMoveInitialHeadersWithFirstRow(
+                canvas,
+                dpi,
+                parentSize,
+                cultureInfo,
+                headers,
+                rows.FirstOrDefault(),
+                renderControls))
+        {
+            var remainingPageHeight = canvas.GetRemainingPageHeight(parentSize.Height);
+            canvas.Translate(0, remainingPageHeight);
+            additionalHeight += remainingPageHeight;
+        }
 
         var (width, height) = RenderInitialHeaders(canvas, dpi, parentSize, cultureInfo, headers, renderControls);
         additionalWidth  += width;
         additionalHeight += height;
 
-        foreach (var control in Children.OfType<TableRowControl>())
+        foreach (var control in rows)
         {
             if (IsAtStartOfPage(canvas, parentSize.Height))
             {
@@ -307,7 +322,15 @@ public sealed class TableControl : AlignableContentControl
             else
             {
                 var remainingPageHeight = canvas.GetRemainingPageHeight(parentSize.Height);
-                if (control.ArrangementOuter.Height > remainingPageHeight)
+                var rowAdditionalSize = MeasureRenderAdditionalSize(
+                    control,
+                    canvas,
+                    dpi,
+                    parentSize,
+                    cultureInfo,
+                    renderControls);
+                var rowRenderHeight = control.ArrangementOuter.Height + rowAdditionalSize.Height;
+                if (rowRenderHeight > remainingPageHeight + PageBoundaryTolerance)
                 {
                     canvas.Translate(0, remainingPageHeight);
                     additionalHeight += remainingPageHeight;
@@ -327,6 +350,77 @@ public sealed class TableControl : AlignableContentControl
         }
 
         return new Size(additionalWidth, additionalHeight);
+    }
+
+    private static bool ShouldMoveInitialHeadersWithFirstRow(
+        IDeferredCanvas canvas,
+        float dpi,
+        in Size parentSize,
+        CultureInfo cultureInfo,
+        IReadOnlyCollection<TableHeaderControl> headers,
+        TableRowControl? firstRow,
+        bool renderControls)
+    {
+        if (headers.Count is 0 || firstRow is null)
+            return false;
+
+        var usedPageHeight = canvas.GetUsedPageHeight(parentSize.Height);
+        if (usedPageHeight <= PageBoundaryTolerance)
+            return false;
+
+        var dryRunCanvas = DryRunDeferredCanvas.From(canvas);
+        var headersHeight = RenderHeadersAndMeasureHeight(
+            dryRunCanvas,
+            dpi,
+            parentSize,
+            cultureInfo,
+            headers,
+            renderControls);
+        var rowAdditionalSize = MeasureRenderAdditionalSize(
+            firstRow,
+            dryRunCanvas,
+            dpi,
+            parentSize,
+            cultureInfo,
+            renderControls);
+        var requiredHeight = headersHeight + firstRow.ArrangementOuter.Height + rowAdditionalSize.Height;
+        var remainingPageHeight = parentSize.Height - usedPageHeight;
+        return requiredHeight > remainingPageHeight + PageBoundaryTolerance;
+    }
+
+    private static float RenderHeadersAndMeasureHeight(
+        IDeferredCanvas canvas,
+        float dpi,
+        in Size parentSize,
+        CultureInfo cultureInfo,
+        IReadOnlyCollection<TableHeaderControl> headers,
+        bool renderControls)
+    {
+        var height = 0F;
+        foreach (var headerControl in headers)
+        {
+            var additionalSize = RenderControl(headerControl, canvas, dpi, parentSize, cultureInfo, renderControls);
+            var headerHeight = headerControl.ArrangementOuter.Height + additionalSize.Height;
+            height += headerHeight;
+            canvas.Translate(0, headerHeight);
+        }
+
+        return height;
+    }
+
+    private static Size MeasureRenderAdditionalSize(
+        IControl control,
+        IDeferredCanvas canvas,
+        float dpi,
+        in Size parentSize,
+        CultureInfo cultureInfo,
+        bool renderControls)
+    {
+        if (!renderControls)
+            return Size.Zero;
+
+        var dryRunCanvas = DryRunDeferredCanvas.From(canvas);
+        return control.Render(dryRunCanvas, dpi, parentSize, cultureInfo);
     }
 
     private static bool CanRenderRepeatedHeaders(
