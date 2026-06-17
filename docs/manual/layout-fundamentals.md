@@ -106,7 +106,7 @@ Use this table when deciding where content belongs:
 | Repeated bottom content. | `footer` | Repeats on each page and reduces body height. |
 | Page-wide background marks. | `background` | Repeats on each page and does not reserve body space. |
 | Page-wide overlay marks. | `foreground` | Repeats on each page above normal content and does not reserve body space. |
-| Fixed-position marks. | `areas` | Repeats at page coordinates and does not join the body flow. |
+| Fixed-position marks. | `areas` | Renders once at absolute document coordinates and does not join the body flow. |
 
 Use [Areas](areas.md) only when the position matters more than the document flow.
 For normal growing content, keep the XML in `body` so it can continue on later pages.

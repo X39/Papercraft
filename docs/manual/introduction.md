@@ -39,7 +39,7 @@ Start with one `body` section and one visible control.
 {% include sample-preview.html sample="text-basic" alt="Rendered text sample" %}
 
 After that, move to [First document](first-document.md) to learn where repeated headers,
-footers, background content and fixed areas fit into a full template.
+footers, repeated background content and fixed areas fit into a full template.
 
 ## Templates, PDFs And Pages
 
@@ -55,8 +55,9 @@ A PDF page is one sheet inside the output.
 The `body` section flows through the available page space.
 When body content is taller than the space available on one page, the generated PDF continues that body content on
 later pages.
-Headers, footers, background, foreground and fixed areas are page sections or layers that repeat as the generator
-creates the output pages.
+Headers, footers, background and foreground are page sections or layers that repeat as the generator creates the
+output pages.
+Fixed areas render once at absolute document coordinates and do not join the body flow.
 
 The page count can change when template data changes, when rows repeat or when text becomes longer.
 Use [Page number control](controls-page-number.md) instead of typing page numbers by hand.
@@ -82,7 +83,7 @@ If a change breaks rendering, the most recent control, attribute or template-lan
 |------|---------|-----------|
 | Template | The XML document that describes the generated output. | [First document](first-document.md) |
 | Section | A top-level template part such as `body`, `header` or `footer`. | [First document](first-document.md) |
-| Area | A fixed-position rectangle that repeats on generated pages outside the body flow. | [Areas](areas.md) |
+| Area | A fixed-position rectangle rendered once at an absolute document position. | [Areas](areas.md) |
 | Control | An XML element that renders something, such as `text`, `border`, `table` or `image`. | [Controls](controls.md) |
 | Attribute | A setting on a control, such as `fontsize`, `margin`, `padding` or `color`. | [Layout fundamentals](layout-fundamentals.md) |
 | Template data | Values supplied by the application and read by the template. | [Template data](template-data.md) |

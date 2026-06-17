@@ -10,7 +10,8 @@ The root element name is flexible; this manual uses `template`.
 Inside the root, the usual document sections are `body`, `header`, `footer`,
 `background`, `foreground` and `areas`.
 The `body` is the main page flow.
-The other sections are optional layers or repeated page sections that you add only when the document needs them.
+The other sections are optional layers, fixed regions or repeated page sections that you add only when the document
+needs them.
 
 The examples in this manual omit `xmlns` because the XML reader assigns the built-in control namespace
 to elements that do not already have an XML namespace.
@@ -48,7 +49,7 @@ Start with a complete XML file containing one `body` section and one visible con
 | `footer` | Repeated content at the bottom of each page. | Use it for repeated notes, separators or page-number controls. |
 | `background` | Page-wide content behind the document. | It is rendered on every page and ignores the normal page margin. |
 | `foreground` | Page-wide content above the document. | Use it sparingly for overlays such as draft marks. |
-| `areas` | Fixed-position boxes on the page. | Area content is positioned by coordinates and does not follow the body flow. |
+| `areas` | Fixed-position boxes in the document. | Area content is positioned by absolute coordinates and does not follow the body flow. |
 
 ## Understand The Default Namespace
 
@@ -159,6 +160,7 @@ They are useful for watermarks, draft marks and page-wide marks that should not 
 
 Use `areas` when content must sit at a specific page position instead of flowing with the body.
 Common examples are approval stamps, fold marks or fixed labels.
+Each area renders once, on the generated page that contains its absolute document position.
 Do not use areas for normal paragraphs or tables; keep those in the `body` so they can flow naturally.
 
 To make an area visible, give the `area` a size such as `width` and `height`,

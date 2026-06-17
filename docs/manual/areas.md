@@ -7,7 +7,7 @@ Previous: [First document](first-document.md) | [Manual home](index.md) | Next: 
 An area is a fixed rectangle on the page.
 It is defined inside the top-level `areas` section and contains normal controls such as `border`, `text`, `line` or
 `image`.
-Areas are rendered on every generated page.
+Each area is rendered once, on the generated page that contains its absolute document position.
 
 The body flows from top to bottom and can continue on later pages.
 An area does not join that flow.
@@ -17,7 +17,7 @@ rectangle.
 ## When Should I Use This?
 
 Use areas when content must appear at a specific page position and should not move with the body.
-Common uses include approval stamps, fold marks, fixed labels, page-corner notices and other repeatable marks.
+Common uses include approval stamps, fold marks, fixed labels, page-corner notices and other one-time marks.
 
 Do not use areas for normal paragraphs, tables, invoice rows or report content.
 Keep that content in `body` so the generator can lay it out across pages.
@@ -94,6 +94,8 @@ In that case, `height` is ignored.
 ## What Space Does An Area Use?
 
 Area coordinates are measured against the full page, not the body area.
+Vertical coordinates are absolute document offsets, so an area whose top position lands on a later page renders on
+that page only.
 Page margin, header and footer space do not move an area inward.
 
 Inside the area, child controls receive the area rectangle as their available space.
@@ -110,7 +112,7 @@ Use this order when deciding where a mark belongs:
 | Behind everything on every page. | `background` |
 | Normal flowing content. | `body` |
 | Repeated top or bottom content. | `header` or `footer` |
-| Fixed rectangle above body content. | `areas` |
+| Fixed rectangle at an absolute document position. | `areas` |
 | Overlay above areas and body content. | `foreground` |
 
 ## Common Area Mistakes

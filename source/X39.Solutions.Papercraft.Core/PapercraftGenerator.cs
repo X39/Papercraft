@@ -330,30 +330,6 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
             cultureInfo);
         }
 
-        var areaCanvas = CreateLayerCanvas(layout.OriginalPageSize, layout.OriginalPageSize);
-        using (StartLayerActivity("area"))
-        {
-        using (areaCanvas.CreateState())
-        {
-            for (var areaIndex = 0; areaIndex < template.AreaControls.Count; areaIndex++)
-            {
-                var area = template.AreaControls.ElementAt(areaIndex);
-                var tuple = area.CalculateClippingAndTranslationData(options.DotsPerInch, layout.OriginalPageSize);
-                using (areaCanvas.CreateState())
-                {
-                    areaCanvas.Translate(tuple.left, tuple.top);
-                    areaCanvas.Clip(0, 0, tuple.width, tuple.height);
-                    var localAreaCanvas = new RelativeDeferredCanvas(areaCanvas, areaCanvas.Translation, tuple.size);
-                    foreach (var (control, (_, size)) in area.Controls.Zip(layout.AreaSizes.Where((q) => q.areaIndex == areaIndex)))
-                    {
-                        _ = control.Render(localAreaCanvas, options.DotsPerInch, tuple.size, cultureInfo);
-                        localAreaCanvas.Translate(0F, size.Height);
-                    }
-                }
-            }
-        }
-        }
-
         var foregroundCanvas = CreateLayerCanvas(layout.OriginalPageSize, layout.OriginalPageSize);
         using (StartLayerActivity("foreground"))
         {
@@ -366,7 +342,8 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
             cultureInfo);
         }
 
-        var pageCount = Math.Max((ushort)Math.Ceiling(desiredBodyHeight / layout.BodyPageSize.Height), (ushort)1);
+        var bodyPageCount = Math.Max((ushort)Math.Ceiling(desiredBodyHeight / layout.BodyPageSize.Height), (ushort)1);
+        var pageCount = GetPageCountIncludingAreas(template, options, layout.OriginalPageSize, bodyPageCount);
         var pages = new List<PapercraftPage>(pageCount);
         var currentHeight = 0F;
         for (var i = 0; i < pageCount; i++)
@@ -414,6 +391,15 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
 
                 using (displayCanvas.CreateState())
                 {
+                    var areaCanvas = CreateLayerCanvas(layout.OriginalPageSize, layout.OriginalPageSize);
+                    RenderAreasForPage(
+                        areaCanvas,
+                        template,
+                        layout.AreaSizes,
+                        options,
+                        layout.OriginalPageSize,
+                        i,
+                        cultureInfo);
                     areaCanvas.Render(displayCanvas);
                 }
 
@@ -447,6 +433,73 @@ public sealed class PapercraftGenerator : IDisposable, IAsyncDisposable
 
     private static DeferredCanvasImpl CreateLayerCanvas(Size actualPageSize, Size pageSize)
         => new() { ActualPageSize = actualPageSize, PageSize = pageSize };
+
+    private static ushort GetPageCountIncludingAreas(
+        Template template,
+        DocumentOptions options,
+        Size pageSize,
+        ushort minimumPageCount)
+    {
+        var pageCount = (int)minimumPageCount;
+        if (pageSize.Height <= 0)
+            return minimumPageCount;
+
+        foreach (var area in template.AreaControls)
+        {
+            var tuple = area.CalculateClippingAndTranslationData(options.DotsPerInch, pageSize);
+            var areaPageIndex = GetAreaPageIndex(tuple.top, pageSize.Height);
+            if (areaPageIndex >= 0)
+                pageCount = Math.Max(pageCount, areaPageIndex + 1);
+        }
+
+        if (pageCount > ushort.MaxValue)
+            throw new InvalidOperationException("The generated document exceeds the maximum supported page count.");
+        return (ushort)pageCount;
+    }
+
+    private static void RenderAreasForPage(
+        IDeferredCanvas areaCanvas,
+        Template template,
+        IReadOnlyList<(int areaIndex, Size size)> areaSizes,
+        DocumentOptions options,
+        Size pageSize,
+        int pageIndex,
+        CultureInfo cultureInfo)
+    {
+        using (StartLayerActivity("area"))
+        {
+            using (areaCanvas.CreateState())
+            {
+                var absolutePageTop = pageIndex * pageSize.Height;
+                for (var areaIndex = 0; areaIndex < template.AreaControls.Count; areaIndex++)
+                {
+                    var area = template.AreaControls.ElementAt(areaIndex);
+                    var tuple = area.CalculateClippingAndTranslationData(options.DotsPerInch, pageSize);
+                    if (GetAreaPageIndex(tuple.top, pageSize.Height) != pageIndex)
+                        continue;
+
+                    using (areaCanvas.CreateState())
+                    {
+                        areaCanvas.Translate(tuple.left, tuple.top - absolutePageTop);
+                        areaCanvas.Clip(0, 0, tuple.width, tuple.height);
+                        var localAreaCanvas = new RelativeDeferredCanvas(areaCanvas, areaCanvas.Translation, tuple.size);
+                        foreach (var (control, (_, size)) in area.Controls.Zip(areaSizes.Where((q) => q.areaIndex == areaIndex)))
+                        {
+                            _ = control.Render(localAreaCanvas, options.DotsPerInch, tuple.size, cultureInfo);
+                            localAreaCanvas.Translate(0F, size.Height);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static int GetAreaPageIndex(float absoluteTop, float pageHeight)
+    {
+        if (pageHeight <= 0 || float.IsNaN(absoluteTop) || float.IsInfinity(absoluteTop))
+            return -1;
+        return (int)Math.Floor(absoluteTop / pageHeight);
+    }
 
     private static IReadOnlyList<Size> ArrangeControls(
         IEnumerable<IControl> controls,

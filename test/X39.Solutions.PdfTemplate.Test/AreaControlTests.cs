@@ -39,7 +39,7 @@ public sealed class AreaControlTests
     }
 
     [Fact]
-    public async Task AreasRepeatAtSamePositionOnGeneratedPages()
+    public async Task AreasDoNotRepeatAcrossBodyGeneratedPages()
     {
         var document = await GenerateDocumentAsync(
             $$"""
@@ -62,14 +62,44 @@ public sealed class AreaControlTests
             CreatePixelDocumentOptions(100, 100));
 
         Assert.Equal(2, document.Pages.Count);
-        foreach (var page in document.Pages)
-        {
-            var clips = CollectClips(page);
-            Assert.Contains(new Rectangle(10, 15, 20, 20), clips);
-            Assert.Contains(new Rectangle(10, 15, 20, 10), clips);
-            Assert.DoesNotContain(new Rectangle(10, 115, 20, 20), clips);
-            Assert.DoesNotContain(new Rectangle(10, 115, 20, 10), clips);
-        }
+        var firstPageClips = CollectClips(document.Pages[0]);
+        Assert.Contains(new Rectangle(10, 15, 20, 20), firstPageClips);
+        Assert.Contains(new Rectangle(10, 15, 20, 10), firstPageClips);
+
+        var secondPageClips = CollectClips(document.Pages[1]);
+        Assert.DoesNotContain(new Rectangle(10, 15, 20, 20), secondPageClips);
+        Assert.DoesNotContain(new Rectangle(10, 15, 20, 10), secondPageClips);
+    }
+
+    [Fact]
+    public async Task AreasRenderOnceOnAbsoluteTargetPage()
+    {
+        var document = await GenerateDocumentAsync(
+            $$"""
+              <?xml version="1.0" encoding="utf-8"?>
+              <template xmlns="{{Constants.ControlsNamespace}}">
+                  <areas>
+                      <area left="10px" top="115px" width="20px" height="20px">
+                          <table>
+                              <tr>
+                                  <td><mock width="20px" height="10px" /></td>
+                              </tr>
+                          </table>
+                      </area>
+                  </areas>
+              </template>
+              """,
+            CreatePixelDocumentOptions(100, 100));
+
+        Assert.Equal(2, document.Pages.Count);
+
+        var firstPageClips = CollectClips(document.Pages[0]);
+        Assert.DoesNotContain(new Rectangle(10, 15, 20, 20), firstPageClips);
+        Assert.DoesNotContain(new Rectangle(10, 15, 20, 10), firstPageClips);
+
+        var secondPageClips = CollectClips(document.Pages[1]);
+        Assert.Contains(new Rectangle(10, 15, 20, 20), secondPageClips);
+        Assert.Contains(new Rectangle(10, 15, 20, 10), secondPageClips);
     }
 
     private static async Task<PapercraftDocument> GenerateDocumentAsync(string template, DocumentOptions options)
