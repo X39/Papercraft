@@ -59,14 +59,12 @@ await using var session = papercraft.CreateSession();
 using var reader = XmlReader.Create(templateStream);
 await using var output = File.Create("document.pdf");
 
-await session.RenderAsync(
-    reader,
-    new RenderOutput(RenderTarget.Pdf, output),
-    CultureInfo.InvariantCulture);
+await session.GeneratePdfAsync(output, reader, CultureInfo.InvariantCulture);
 ```
 
 The same session can validate templates before rendering, write page-by-page PNG raster output through
-`RenderRasterPagesAsync`, and inspect lowered XML diagnostics through `RenderAsync(..., RenderTarget.LoweredXml, ...)`.
+`RenderRasterPagesAsync`, and inspect lowered XML diagnostics through `ReadLoweredXmlAsync(...)` or
+`RenderAsync(..., RenderTarget.LoweredXml, ...)`.
 
 ## Template Data
 
@@ -83,12 +81,7 @@ The template can then read `@CustomerName` through the template language.
 ```csharp
 using var reader = XmlReader.Create(templateStream);
 
-var lowered = await session.RenderAsync(
-    reader,
-    RenderTarget.LoweredXml,
-    CultureInfo.InvariantCulture);
-
-var loweredXml = lowered.ReadText();
+var loweredXml = await session.ReadLoweredXmlAsync(reader, CultureInfo.InvariantCulture);
 ```
 
 `PapercraftRenderer` remains available as an obsolete compatibility adapter for existing code.

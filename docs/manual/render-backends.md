@@ -42,10 +42,7 @@ Use a `PapercraftSession` for the common PDF path:
 var papercraft = serviceProvider.GetRequiredService<Papercraft>();
 await using var session = papercraft.CreateSession();
 
-await session.RenderAsync(
-    reader,
-    new RenderOutput(RenderTarget.Pdf, output),
-    CultureInfo.CurrentUICulture);
+await session.GeneratePdfAsync(output, reader, CultureInfo.CurrentUICulture);
 ```
 
 Use `RenderRasterPagesAsync(...)` when each page should be written as PNG:
@@ -103,12 +100,7 @@ Use lowered XML output when you need to inspect the template after data binding,
 expansion and style application, but before controls are created and before layout or backend rendering starts.
 
 ```csharp
-var lowered = await session.RenderAsync(
-    reader,
-    RenderTarget.LoweredXml,
-    CultureInfo.CurrentUICulture);
-
-var loweredXml = lowered.ReadText();
+var loweredXml = await session.ReadLoweredXmlAsync(reader, CultureInfo.CurrentUICulture);
 ```
 
 The lowered XML media type is `PapercraftMediaTypes.ApplicationPapercraftLoweredXml`

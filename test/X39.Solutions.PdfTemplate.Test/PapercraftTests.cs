@@ -81,6 +81,52 @@ public sealed class PapercraftTests
     }
 
     [Fact]
+    public async Task PapercraftSessionExtensionsRenderPdfAndLoweredXmlHelpers()
+    {
+        var services = new ServiceCollection();
+        services.AddPapercraft();
+
+        await using var serviceProvider = services.BuildServiceProvider();
+        var papercraft = serviceProvider.GetRequiredService<global::X39.Solutions.Papercraft.Papercraft>();
+        await using var session = papercraft.CreateSession();
+        session.TemplateData.SetVariable("Name", "helper diagnostics");
+
+        await using var output = new MemoryStream();
+        using (var reader = CreateReader("<text>helper pdf</text>"))
+        {
+            await session.GeneratePdfAsync(output, reader, CultureInfo.InvariantCulture);
+        }
+
+        AssertPdfHeader(output);
+
+        PapercraftRenderResult pdf;
+        using (var reader = CreateReader("<text>helper pdf result</text>"))
+        {
+            pdf = await session.RenderPdfAsync(reader, CultureInfo.InvariantCulture);
+        }
+
+        Assert.Equal(RenderTarget.Pdf, pdf.Target);
+        Assert.StartsWith("%PDF", Encoding.ASCII.GetString(pdf.ToArray(), 0, 4), StringComparison.Ordinal);
+
+        using (var reader = CreateReader("<text>@Name</text>"))
+        {
+            var loweredXml = await session.ReadLoweredXmlAsync(reader, CultureInfo.InvariantCulture);
+            XNamespace ns = Constants.ControlsNamespace;
+            var document = XDocument.Parse(loweredXml);
+            Assert.Equal("helper diagnostics", document.Root?.Element(ns + "body")?.Element(ns + "text")?.Value);
+        }
+
+        await using var loweredOutput = new MemoryStream();
+        using (var reader = CreateReader("<text>@Name</text>"))
+        {
+            await session.GenerateLoweredXmlAsync(loweredOutput, reader, CultureInfo.InvariantCulture);
+        }
+
+        var loweredText = Encoding.UTF8.GetString(loweredOutput.ToArray());
+        Assert.Contains("helper diagnostics", loweredText, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task PapercraftSessionsIsolateTemplateDataWhenRenderedConcurrently()
     {
         var services = new ServiceCollection();

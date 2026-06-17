@@ -24,10 +24,7 @@ using X39.Solutions.Papercraft;
 services.AddPapercraft();
 var papercraft = serviceProvider.GetRequiredService<Papercraft>();
 await using var session = papercraft.CreateSession();
-await session.RenderAsync(
-    reader,
-    new RenderOutput(RenderTarget.Pdf, output),
-    CultureInfo.CurrentUICulture);
+await session.GeneratePdfAsync(output, reader, CultureInfo.CurrentUICulture);
 ```
 
 The compatibility package also forwards the Papercraft facade entry points during the migration period,
@@ -62,8 +59,8 @@ expanded renderer support.
 |--------------|----------------|
 | `AddPdfTemplateService()` | `AddPapercraft()` |
 | `PdfTemplateServiceBuilder` | `PapercraftServiceBuilder` |
-| `Generator.GeneratePdfAsync(...)` | `PapercraftSession.RenderAsync(...)` with `RenderTarget.Pdf` or a PDF `RenderOutput` |
-| `Generator.GenerateLoweredXmlAsync(...)` | `PapercraftSession.RenderAsync(..., RenderTarget.LoweredXml, ...)` and `PapercraftRenderResult.ReadText()` |
+| `Generator.GeneratePdfAsync(...)` | `PapercraftSession.GeneratePdfAsync(...)`, or `RenderAsync(...)` with `RenderTarget.Pdf` for custom output plumbing |
+| `Generator.GenerateLoweredXmlAsync(...)` | `PapercraftSession.GenerateLoweredXmlAsync(...)`, `ReadLoweredXmlAsync(...)`, or `RenderAsync(..., RenderTarget.LoweredXml, ...)` |
 | `DocumentOptions` | `PapercraftRenderOptions.DocumentOptions` |
 | implicit Skia renderer choice | renderer capability validation through `ValidateAsync(...)` |
 

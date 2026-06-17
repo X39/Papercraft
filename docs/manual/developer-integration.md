@@ -99,14 +99,14 @@ await using var session = papercraft.CreateSession();
 using var reader = XmlReader.Create(xmlTemplateStream);
 await using var output = File.Create("document.pdf");
 
-await session.RenderAsync(
-    reader,
-    new RenderOutput(RenderTarget.Pdf, output),
-    CultureInfo.CurrentUICulture);
+await session.GeneratePdfAsync(output, reader, CultureInfo.CurrentUICulture);
 ```
 
 `Papercraft` is the DI service. `PapercraftSession` owns per-workflow template data and is disposable.
 Create one session for each isolated render workflow.
+`PapercraftSessionExtensions` provides common helpers such as `GeneratePdfAsync`,
+`RenderPdfAsync`, `ReadLoweredXmlAsync` and `GenerateLoweredXmlAsync`; these helpers delegate to the
+renderer-neutral `RenderAsync` target model.
 
 ## Supply Template Data
 
@@ -209,12 +209,7 @@ session.TemplateData.SetVariable("CustomerName", customer.Name);
 
 using var reader = XmlReader.Create(xmlTemplateStream);
 
-var lowered = await session.RenderAsync(
-    reader,
-    RenderTarget.LoweredXml,
-    CultureInfo.CurrentUICulture);
-
-var loweredXml = lowered.ReadText();
+var loweredXml = await session.ReadLoweredXmlAsync(reader, CultureInfo.CurrentUICulture);
 ```
 
 The same output can be written to a stream:
@@ -223,10 +218,7 @@ The same output can be written to a stream:
 using var reader = XmlReader.Create(xmlTemplateStream);
 await using var output = File.Create("template.lowered.xml");
 
-await session.RenderAsync(
-    reader,
-    new RenderOutput(RenderTarget.LoweredXml, output),
-    CultureInfo.CurrentUICulture);
+await session.GenerateLoweredXmlAsync(output, reader, CultureInfo.CurrentUICulture);
 ```
 
 `RenderTarget.FromMediaType(PapercraftMediaTypes.ApplicationPapercraftLoweredXml)` resolves to the same target.
@@ -459,7 +451,7 @@ Most requests fit one of these rows:
 | `IContentControl` | A custom control must contain child controls. | Implement `CanAdd` and child storage, or derive from an existing content-control base. |
 | `IInitializeControlAsync` | A control needs async setup or request context before rendering. | Implement it on the control; `DocumentOptions.Context` is passed to `InitializeControlAsync`. |
 | `ITransformer` | XML nodes must be conditionally rewritten, removed or repeated before controls are created. | Implement `Name` and `TransformAsync`, then register with `AddTransformer<TTransformer>()`. |
-| `RenderTarget.LoweredXml` | The application needs lowered XML before controls, layout or backend rendering. | Use `session.RenderAsync(..., RenderTarget.LoweredXml, ...)` and `PapercraftRenderResult.ReadText()`, or write to a `RenderOutput` stream. |
+| `RenderTarget.LoweredXml` | The application needs lowered XML before controls, layout or backend rendering. | Use `session.ReadLoweredXmlAsync(...)`, `session.GenerateLoweredXmlAsync(...)`, or `session.RenderAsync(..., RenderTarget.LoweredXml, ...)` and `PapercraftRenderResult.ReadText()`. |
 | `PapercraftGenerator.ReadLoweredXmlAsync(...)` and `XmlNodeInformation` | The application needs the in-memory lowered template tree before controls are created. | Resolve a `PapercraftGenerator`, set its `TemplateData` and call `ReadLoweredXmlAsync(...)`. |
 | `IResourceResolver` | Image sources must be resolved from application-specific storage. | Register an `IResourceResolver` implementation after `AddPapercraft`. |
 | `IParameterConverter<T>` | A custom control attribute needs custom parsing. | Set the converter on the control property with `ParameterAttribute.Converter`. |

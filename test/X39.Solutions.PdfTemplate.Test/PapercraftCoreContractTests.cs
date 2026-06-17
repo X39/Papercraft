@@ -154,6 +154,7 @@ public sealed class PapercraftCoreContractTests
             new object[] { typeof(PapercraftRenderer) },
             new object[] { typeof(PapercraftRenderResult) },
             new object[] { typeof(PapercraftSession) },
+            new object[] { typeof(PapercraftSessionExtensions) },
             new object[] { typeof(PapercraftServiceBuilder) },
             new object[] { typeof(PapercraftServiceCollectionExtensions) },
             new object[] { typeof(PdfTemplateServiceBuilder) },
@@ -224,6 +225,7 @@ public sealed class PapercraftCoreContractTests
         Assert.Contains(typeof(PapercraftRenderResult), forwardedTypes);
         Assert.Contains(typeof(PapercraftRenderer), forwardedTypes);
         Assert.Contains(typeof(PapercraftSession), forwardedTypes);
+        Assert.Contains(typeof(PapercraftSessionExtensions), forwardedTypes);
         Assert.Contains(typeof(PapercraftServiceBuilder), forwardedTypes);
         Assert.Contains(typeof(PapercraftServiceCollectionExtensions), forwardedTypes);
         Assert.Contains(typeof(PdfTemplateServiceBuilder), forwardedTypes);
@@ -250,6 +252,7 @@ public sealed class PapercraftCoreContractTests
         Assert.Contains(typeof(PapercraftRenderResult), forwardedTypes);
         Assert.Contains(typeof(PapercraftRenderer), forwardedTypes);
         Assert.Contains(typeof(PapercraftSession), forwardedTypes);
+        Assert.Contains(typeof(PapercraftSessionExtensions), forwardedTypes);
         Assert.Contains(typeof(PapercraftServiceBuilder), forwardedTypes);
         Assert.Contains(typeof(PapercraftServiceCollectionExtensions), forwardedTypes);
         Assert.DoesNotContain(typeof(PapercraftFacadeServiceCollectionExtensions), forwardedTypes);

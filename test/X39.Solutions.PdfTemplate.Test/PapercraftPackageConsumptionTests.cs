@@ -229,10 +229,7 @@ public sealed class PapercraftPackageConsumptionTests
                     await using var pdf = new MemoryStream();
                     using (var reader = CreateReader("<text>Session PDF</text>"))
                     {
-                        await session.RenderAsync(
-                            reader,
-                            new RenderOutput(RenderTarget.Pdf, pdf),
-                            CultureInfo.InvariantCulture);
+                        await session.GeneratePdfAsync(pdf, reader, CultureInfo.InvariantCulture);
                     }
 
                     var pdfBytes = pdf.ToArray();
@@ -245,16 +242,13 @@ public sealed class PapercraftPackageConsumptionTests
                         throw new InvalidOperationException("Papercraft session consumer did not generate a PDF.");
                     }
 
-                    PapercraftRenderResult lowered;
+                    string lowered;
                     using (var reader = CreateReader("<text>@Name</text>"))
                     {
-                        lowered = await session.RenderAsync(
-                            reader,
-                            RenderTarget.LoweredXml,
-                            CultureInfo.InvariantCulture);
+                        lowered = await session.ReadLoweredXmlAsync(reader, CultureInfo.InvariantCulture);
                     }
 
-                    if (!lowered.ReadText().Contains("session diagnostics", StringComparison.Ordinal))
+                    if (!lowered.Contains("session diagnostics", StringComparison.Ordinal))
                     {
                         throw new InvalidOperationException("Papercraft session consumer did not expose lowered XML text.");
                     }

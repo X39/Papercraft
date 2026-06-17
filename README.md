@@ -139,11 +139,12 @@ await using var session = papercraft.CreateSession();
 using var reader = XmlReader.Create(xmlTemplateStream);
 await using var output = File.Create("document.pdf");
 
-await session.RenderAsync(
-    reader,
-    new RenderOutput(RenderTarget.Pdf, output),
-    CultureInfo.CurrentUICulture);
+await session.GeneratePdfAsync(output, reader, CultureInfo.CurrentUICulture);
 ```
+
+Convenience extension methods such as `GeneratePdfAsync`, `RenderPdfAsync`,
+`GenerateLoweredXmlAsync` and `ReadLoweredXmlAsync` map to the renderer-neutral
+`RenderAsync` targets when callers do not need to construct `RenderOutput` manually.
 
 ## Existing PdfTemplate Users
 

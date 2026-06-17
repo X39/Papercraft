@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 [assembly: TypeForwardedTo(typeof(X39.Solutions.Papercraft.PapercraftRenderer))]
 [assembly: TypeForwardedTo(typeof(X39.Solutions.Papercraft.PapercraftRenderOptions))]
 [assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.PapercraftSession))]
+[assembly: TypeForwardedTo(typeof(global::X39.Solutions.Papercraft.PapercraftSessionExtensions))]
 [assembly: TypeForwardedTo(typeof(X39.Solutions.Papercraft.PapercraftServiceBuilder))]
 [assembly: TypeForwardedTo(typeof(X39.Solutions.Papercraft.PapercraftServiceCollectionExtensions))]
 [assembly: TypeForwardedTo(typeof(X39.Solutions.Papercraft.RasterPageInfo))]

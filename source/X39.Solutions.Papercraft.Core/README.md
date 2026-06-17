@@ -39,13 +39,12 @@ requires an `IPapercraftRenderBackend` registration. Lowered XML output is the e
 var papercraft = serviceProvider.GetRequiredService<Papercraft>();
 await using var session = papercraft.CreateSession();
 
-var lowered = await session.RenderAsync(
-    reader,
-    RenderTarget.LoweredXml,
-    CultureInfo.InvariantCulture);
-
-var loweredXml = lowered.ReadText();
+var loweredXml = await session.ReadLoweredXmlAsync(reader, CultureInfo.InvariantCulture);
 ```
+
+`PapercraftSessionExtensions` also provides helpers such as `RenderPdfAsync`,
+`GeneratePdfAsync` and `GenerateLoweredXmlAsync`. These helpers are thin wrappers over
+the renderer-neutral `RenderAsync` target model.
 
 ## Implement A Renderer
 
