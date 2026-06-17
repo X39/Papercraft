@@ -18,6 +18,7 @@ internal static class ServiceRegistrationOperations
         services.TryAddScoped<ITemplateData, TemplateData>();
         services.TryAddScoped<IResourceResolver, DefaultResourceResolver>();
         services.TryAddScoped<IControlFactory, ControlFactory>();
+        services.TryAddSingleton<Papercraft>();
         services.TryAddTransient<PapercraftGenerator>();
         services.TryAddTransient<PapercraftRenderer>();
     }

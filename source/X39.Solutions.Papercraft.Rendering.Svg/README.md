@@ -26,7 +26,7 @@ services.AddPapercraftSvgRenderer();
 ```
 
 `AddPapercraftSvgRenderer()` also registers Papercraft Core services.
-After registration, resolve `PapercraftRenderer` from the service provider and render to `RenderTarget.FromMediaType("image/svg+xml")`.
+After registration, resolve `Papercraft` from the service provider, create a `PapercraftSession`, and render to `RenderTarget.FromMediaType("image/svg+xml")`.
 
 ## Output Notes
 

@@ -11,7 +11,8 @@ Use `X39.Solutions.Papercraft.Core` instead when you are implementing a custom r
 | Area | Provided by this package |
 |------|--------------------------|
 | Dependency injection entry point | `services.AddPapercraft()` |
-| Main render facade | `PapercraftRenderer` |
+| Main application service | `Papercraft` |
+| Per-render workflow state | `PapercraftSession` |
 | Default backend | `X39.Solutions.Papercraft.Rendering.SkiaSharp` |
 | Core contracts | Type-forwarded from `X39.Solutions.Papercraft.Core` |
 
@@ -31,7 +32,7 @@ var services = new ServiceCollection();
 services.AddPapercraft();
 ```
 
-`AddPapercraft()` registers the core parser, default controls, default transformers, `PapercraftRenderer`, and the SkiaSharp render backend.
+`AddPapercraft()` registers the core parser, default controls, default transformers, `Papercraft`, the compatibility `PapercraftRenderer`, and the SkiaSharp render backend.
 
 Use the overload when adding custom template behavior:
 
@@ -52,26 +53,45 @@ using Microsoft.Extensions.DependencyInjection;
 using X39.Solutions.Papercraft;
 
 await using var provider = services.BuildServiceProvider();
-var renderer = provider.GetRequiredService<PapercraftRenderer>();
+var papercraft = provider.GetRequiredService<Papercraft>();
+await using var session = papercraft.CreateSession();
 
 using var reader = XmlReader.Create(templateStream);
 await using var output = File.Create("document.pdf");
 
-await renderer.GeneratePdfAsync(output, reader, CultureInfo.InvariantCulture);
+await session.RenderAsync(
+    reader,
+    new RenderOutput(RenderTarget.Pdf, output),
+    CultureInfo.InvariantCulture);
 ```
 
-The same renderer can validate templates before rendering, write page-by-page PNG raster output through
-`RenderRasterPagesAsync`, and write lowered XML diagnostics through `GenerateLoweredXmlAsync`.
+The same session can validate templates before rendering, write page-by-page PNG raster output through
+`RenderRasterPagesAsync`, and inspect lowered XML diagnostics through `RenderAsync(..., RenderTarget.LoweredXml, ...)`.
 
 ## Template Data
 
-Template data belongs to the resolved renderer instance:
+Template data belongs to the session:
 
 ```csharp
-renderer.TemplateData.SetVariable("CustomerName", "Ada Lovelace");
+session.TemplateData.SetVariable("CustomerName", "Ada Lovelace");
 ```
 
 The template can then read `@CustomerName` through the template language.
+
+## Lowered XML Diagnostics
+
+```csharp
+using var reader = XmlReader.Create(templateStream);
+
+var lowered = await session.RenderAsync(
+    reader,
+    RenderTarget.LoweredXml,
+    CultureInfo.InvariantCulture);
+
+var loweredXml = lowered.ReadText();
+```
+
+`PapercraftRenderer` remains available as an obsolete compatibility adapter for existing code.
 
 ## Related Projects
 

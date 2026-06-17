@@ -301,7 +301,7 @@ public class XmlTemplateReaderTests
                                     }
                                  </styleMustBeEmptyTagTest>
                                  """;
-        var templateReader = new XmlTemplateReader(default, CultureInfo.InvariantCulture, new TemplateData(), new []{new Papercraft.Transformers.ForTransformer()});
+        var templateReader = new XmlTemplateReader(default, CultureInfo.InvariantCulture, new TemplateData(), new []{new global::X39.Solutions.Papercraft.Transformers.ForTransformer()});
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         var nodeInformation = await templateReader.ReadAsync(xmlReader);

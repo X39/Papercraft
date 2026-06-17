@@ -15,7 +15,7 @@ transformer expansion, before controls and layout run.
 
 The existing `X39.Solutions.PdfTemplate` package remains the compatibility bridge during the
 Papercraft migration. Existing users can keep `services.AddPdfTemplateService()` and `Generator`;
-new code can start using `services.AddPapercraft()` and `PapercraftRenderer`.
+new code can start using `services.AddPapercraft()`, `Papercraft` and `PapercraftSession`.
 
 ## User Manual
 
@@ -124,7 +124,7 @@ Register the library services at startup:
 services.AddPapercraft();
 ```
 
-Then resolve a `PapercraftRenderer` and render the template:
+Then resolve `Papercraft`, create a session, and render the template:
 
 ```csharp
 using System.Globalization;
@@ -133,14 +133,15 @@ using Microsoft.Extensions.DependencyInjection;
 using X39.Solutions.Papercraft;
 
 await using var scope = serviceProvider.CreateAsyncScope();
-var renderer = scope.ServiceProvider.GetRequiredService<PapercraftRenderer>();
+var papercraft = scope.ServiceProvider.GetRequiredService<Papercraft>();
+await using var session = papercraft.CreateSession();
 
 using var reader = XmlReader.Create(xmlTemplateStream);
 await using var output = File.Create("document.pdf");
 
-await renderer.GeneratePdfAsync(
-    output,
+await session.RenderAsync(
     reader,
+    new RenderOutput(RenderTarget.Pdf, output),
     CultureInfo.CurrentUICulture);
 ```
 
@@ -162,7 +163,7 @@ Common extension points are documented in the
 [developer integration appendix](https://x39.github.io/X39.Solutions.PdfTemplate/manual/developer-integration.html):
 
 - Set template variables with `generator.TemplateData.SetVariable("Name", value)`.
-- Diagnose generated template structure with `GenerateLoweredXmlAsync(...)` or `RenderTarget.LoweredXml`.
+- Diagnose generated template structure with `RenderTarget.LoweredXml` and `PapercraftRenderResult.ReadText()`.
 - Add custom functions with `services.AddPapercraft((builder) => builder.AddFunction<MyFunction>())`.
 - Add custom controls with `services.AddPapercraft((builder) => builder.AddControl<TControl>())`.
 - Add custom transformers with `services.AddPapercraft((builder) => builder.AddTransformer<TTransformer>())`.

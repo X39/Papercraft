@@ -126,12 +126,12 @@ public sealed class PapercraftCoreContractTests
             new object[] { typeof(DefaultResourceResolver) },
             new object[] { typeof(IResourceResolver) },
             new object[] { typeof(ITextService) },
-            new object[] { typeof(Papercraft.Transformers.AlternateTransformer) },
-            new object[] { typeof(Papercraft.Transformers.ForEachTransformer) },
-            new object[] { typeof(Papercraft.Transformers.ForTransformer) },
-            new object[] { typeof(Papercraft.Transformers.IfTransformer) },
-            new object[] { typeof(Papercraft.Transformers.SwitchTransformer) },
-            new object[] { typeof(Papercraft.Transformers.VariableTransformer) },
+            new object[] { typeof(global::X39.Solutions.Papercraft.Transformers.AlternateTransformer) },
+            new object[] { typeof(global::X39.Solutions.Papercraft.Transformers.ForEachTransformer) },
+            new object[] { typeof(global::X39.Solutions.Papercraft.Transformers.ForTransformer) },
+            new object[] { typeof(global::X39.Solutions.Papercraft.Transformers.IfTransformer) },
+            new object[] { typeof(global::X39.Solutions.Papercraft.Transformers.SwitchTransformer) },
+            new object[] { typeof(global::X39.Solutions.Papercraft.Transformers.VariableTransformer) },
             new object[] { typeof(ControlName) },
             new object[] { typeof(ParameterName) },
             new object[] { typeof(XmlNode) },
@@ -147,10 +147,13 @@ public sealed class PapercraftCoreContractTests
             new object[] { typeof(DisplayFont) },
             new object[] { typeof(DisplayFontStyle) },
             new object[] { typeof(LinkAnnotationCommand) },
+            new object[] { typeof(global::X39.Solutions.Papercraft.Papercraft) },
             new object[] { typeof(PapercraftDocument) },
             new object[] { typeof(PapercraftPage) },
             new object[] { typeof(PapercraftGenerator) },
             new object[] { typeof(PapercraftRenderer) },
+            new object[] { typeof(PapercraftRenderResult) },
+            new object[] { typeof(PapercraftSession) },
             new object[] { typeof(PapercraftServiceBuilder) },
             new object[] { typeof(PapercraftServiceCollectionExtensions) },
             new object[] { typeof(PdfTemplateServiceBuilder) },
@@ -215,9 +218,12 @@ public sealed class PapercraftCoreContractTests
 
         Assert.Contains(typeof(SkPaintCache), forwardedTypes);
         Assert.Contains(typeof(SkiaSharpCanvasCompatibilityExtensions), forwardedTypes);
+        Assert.Contains(typeof(global::X39.Solutions.Papercraft.Papercraft), forwardedTypes);
         Assert.Contains(typeof(PapercraftGenerator), forwardedTypes);
         Assert.Contains(typeof(PapercraftInstrumentation), forwardedTypes);
+        Assert.Contains(typeof(PapercraftRenderResult), forwardedTypes);
         Assert.Contains(typeof(PapercraftRenderer), forwardedTypes);
+        Assert.Contains(typeof(PapercraftSession), forwardedTypes);
         Assert.Contains(typeof(PapercraftServiceBuilder), forwardedTypes);
         Assert.Contains(typeof(PapercraftServiceCollectionExtensions), forwardedTypes);
         Assert.Contains(typeof(PdfTemplateServiceBuilder), forwardedTypes);
@@ -235,12 +241,15 @@ public sealed class PapercraftCoreContractTests
         Assert.Contains(typeof(IPapercraftTemplateDataAccessor), forwardedTypes);
         Assert.Contains(typeof(RasterPageInfo), forwardedTypes);
         Assert.Contains(typeof(RasterPageRenderOutput), forwardedTypes);
+        Assert.Contains(typeof(global::X39.Solutions.Papercraft.Papercraft), forwardedTypes);
         Assert.Contains(typeof(PapercraftRenderOptions), forwardedTypes);
         Assert.Contains(typeof(PapercraftDocument), forwardedTypes);
         Assert.Contains(typeof(PapercraftPage), forwardedTypes);
         Assert.Contains(typeof(PapercraftGenerator), forwardedTypes);
         Assert.Contains(typeof(PapercraftInstrumentation), forwardedTypes);
+        Assert.Contains(typeof(PapercraftRenderResult), forwardedTypes);
         Assert.Contains(typeof(PapercraftRenderer), forwardedTypes);
+        Assert.Contains(typeof(PapercraftSession), forwardedTypes);
         Assert.Contains(typeof(PapercraftServiceBuilder), forwardedTypes);
         Assert.Contains(typeof(PapercraftServiceCollectionExtensions), forwardedTypes);
         Assert.DoesNotContain(typeof(PapercraftFacadeServiceCollectionExtensions), forwardedTypes);

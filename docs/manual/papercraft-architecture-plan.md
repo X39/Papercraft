@@ -49,7 +49,7 @@ only wrappers, type-forwarders and compatibility documentation.
 - Preserve existing XML templates, control names, transformers, functions and data formats.
 - Keep `AddPdfTemplateService()`, `Generator`, `DocumentOptions`, custom controls and existing
   builder methods working through the bridge.
-- Use `AddPapercraft()` and `PapercraftRenderer` as the recommended new render entry point, without
+- Use `AddPapercraft()`, `Papercraft` and `PapercraftSession` as the recommended new render entry point, without
   forcing applications to change in the same release.
 - Move or rename legacy-namespace types only when type forwarding or wrappers keep existing source
   and binary consumers working.
@@ -64,8 +64,12 @@ Recommended application path:
 
 ```csharp
 services.AddPapercraft();
-var renderer = serviceProvider.GetRequiredService<PapercraftRenderer>();
-await renderer.GeneratePdfAsync(output, reader, CultureInfo.CurrentUICulture);
+var papercraft = serviceProvider.GetRequiredService<Papercraft>();
+await using var session = papercraft.CreateSession();
+await session.RenderAsync(
+    reader,
+    new RenderOutput(RenderTarget.Pdf, output),
+    CultureInfo.CurrentUICulture);
 ```
 
 Renderer-neutral setup path:
@@ -87,12 +91,12 @@ await generator.GeneratePdfAsync(output, reader, CultureInfo.CurrentUICulture);
 |--------------|----------------|
 | `AddPdfTemplateService()` | `AddPapercraft()` |
 | `PdfTemplateServiceBuilder` | `PapercraftServiceBuilder` |
-| `Generator.GeneratePdfAsync(...)` | `PapercraftRenderer.GeneratePdfAsync(...)` |
+| `Generator.GeneratePdfAsync(...)` | `PapercraftSession.RenderAsync(...)` with `RenderTarget.Pdf` or a PDF `RenderOutput` |
 | `DocumentOptions` | `PapercraftRenderOptions.DocumentOptions` |
 | implicit default renderer | backend selection by `PapercraftRenderOptions.BackendId` or target capability |
 
-`PapercraftGenerator` generates backend-neutral `PapercraftDocument` pages. `PapercraftRenderer`
-is the facade for validation, backend selection and rendering. `RenderTarget`, `RenderOutput`,
+`PapercraftGenerator` generates backend-neutral `PapercraftDocument` pages. `PapercraftSession`
+is the application-facing facade for validation, backend selection and rendering. `RenderTarget`, `RenderOutput`,
 `RasterPageRenderOutput`, `PapercraftRenderOptions`, `PapercraftDocument` and `PapercraftPage`
 are the stable contracts between callers, the generator and backends.
 

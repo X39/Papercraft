@@ -10,11 +10,11 @@ public class TransformerParsingBenchmarks
 {
     private readonly ITransformer[] _transformers =
     [
-        new Papercraft.Transformers.ForTransformer(),
-        new Papercraft.Transformers.IfTransformer(),
-        new Papercraft.Transformers.ForEachTransformer(),
-        new Papercraft.Transformers.AlternateTransformer(),
-        new Papercraft.Transformers.VariableTransformer(),
+        new global::X39.Solutions.Papercraft.Transformers.ForTransformer(),
+        new global::X39.Solutions.Papercraft.Transformers.IfTransformer(),
+        new global::X39.Solutions.Papercraft.Transformers.ForEachTransformer(),
+        new global::X39.Solutions.Papercraft.Transformers.AlternateTransformer(),
+        new global::X39.Solutions.Papercraft.Transformers.VariableTransformer(),
     ];
 
     private byte[] _expandedTemplate = null!;

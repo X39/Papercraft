@@ -22,8 +22,12 @@ New code should use the Papercraft facade package:
 using X39.Solutions.Papercraft;
 
 services.AddPapercraft();
-var renderer = serviceProvider.GetRequiredService<PapercraftRenderer>();
-await renderer.GeneratePdfAsync(output, reader, CultureInfo.CurrentUICulture);
+var papercraft = serviceProvider.GetRequiredService<Papercraft>();
+await using var session = papercraft.CreateSession();
+await session.RenderAsync(
+    reader,
+    new RenderOutput(RenderTarget.Pdf, output),
+    CultureInfo.CurrentUICulture);
 ```
 
 The compatibility package also forwards the Papercraft facade entry points during the migration period,
@@ -58,8 +62,8 @@ expanded renderer support.
 |--------------|----------------|
 | `AddPdfTemplateService()` | `AddPapercraft()` |
 | `PdfTemplateServiceBuilder` | `PapercraftServiceBuilder` |
-| `Generator.GeneratePdfAsync(...)` | `PapercraftRenderer.GeneratePdfAsync(...)` |
-| `Generator.GenerateLoweredXmlAsync(...)` | `PapercraftRenderer.GenerateLoweredXmlAsync(...)` |
+| `Generator.GeneratePdfAsync(...)` | `PapercraftSession.RenderAsync(...)` with `RenderTarget.Pdf` or a PDF `RenderOutput` |
+| `Generator.GenerateLoweredXmlAsync(...)` | `PapercraftSession.RenderAsync(..., RenderTarget.LoweredXml, ...)` and `PapercraftRenderResult.ReadText()` |
 | `DocumentOptions` | `PapercraftRenderOptions.DocumentOptions` |
 | implicit Skia renderer choice | renderer capability validation through `ValidateAsync(...)` |
 
@@ -69,7 +73,7 @@ Papercraft renderers expose capabilities before rendering.
 Call `ValidateAsync` when an application lets users choose output formats or renderer backends:
 
 ```csharp
-var result = await renderer.ValidateAsync(
+var result = await session.ValidateAsync(
     reader,
     RenderTarget.Pdf,
     CultureInfo.CurrentUICulture);

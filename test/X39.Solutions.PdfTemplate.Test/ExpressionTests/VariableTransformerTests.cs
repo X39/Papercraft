@@ -59,7 +59,7 @@ public class VariableTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             data,
-            new[] { new Papercraft.Transformers.VariableTransformer() }
+            new[] { new global::X39.Solutions.Papercraft.Transformers.VariableTransformer() }
         );
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
@@ -109,7 +109,7 @@ public class VariableTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             data,
-            new[] { new Papercraft.Transformers.VariableTransformer() }
+            new[] { new global::X39.Solutions.Papercraft.Transformers.VariableTransformer() }
         );
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
@@ -153,7 +153,7 @@ public class VariableTransformerTests
         var templateReader = new XmlTemplateReader(
             default, CultureInfo.InvariantCulture,
             data,
-            new[] { new Papercraft.Transformers.VariableTransformer() }
+            new[] { new global::X39.Solutions.Papercraft.Transformers.VariableTransformer() }
         );
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);

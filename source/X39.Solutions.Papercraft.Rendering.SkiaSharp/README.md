@@ -29,20 +29,26 @@ services.AddPapercraftSkiaSharpRenderer();
 ```
 
 `AddPapercraftSkiaSharpRenderer()` also registers Papercraft Core services.
-After registration, resolve `PapercraftRenderer` from the service provider to render through the selected backend.
+After registration, resolve `Papercraft` from the service provider and create a `PapercraftSession` to render through the selected backend.
 
 ## Output Paths
 
 Render a PDF:
 
 ```csharp
-await renderer.GeneratePdfAsync(outputStream, xmlReader, CultureInfo.InvariantCulture);
+var papercraft = serviceProvider.GetRequiredService<Papercraft>();
+await using var session = papercraft.CreateSession();
+
+await session.RenderAsync(
+    xmlReader,
+    new RenderOutput(RenderTarget.Pdf, outputStream),
+    CultureInfo.InvariantCulture);
 ```
 
 Render each page as PNG:
 
 ```csharp
-await renderer.RenderRasterPagesAsync(
+await session.RenderRasterPagesAsync(
     xmlReader,
     new RasterPageRenderOutput(
         PapercraftMediaTypes.ImagePng,

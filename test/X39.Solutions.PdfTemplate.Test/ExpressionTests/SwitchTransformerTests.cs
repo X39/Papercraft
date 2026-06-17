@@ -320,7 +320,7 @@ public class SwitchTransformerTests
             default,
             CultureInfo.InvariantCulture,
             templateData,
-            new ITransformer[] { new Papercraft.Transformers.SwitchTransformer(), new Papercraft.Transformers.IfTransformer() });
+            new ITransformer[] { new global::X39.Solutions.Papercraft.Transformers.SwitchTransformer(), new global::X39.Solutions.Papercraft.Transformers.IfTransformer() });
         using var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(template));
         using var xmlReader = XmlReader.Create(xmlStream);
         return await templateReader.ReadAsync(xmlReader);

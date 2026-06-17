@@ -198,6 +198,132 @@ public sealed class PapercraftPackageConsumptionTests
     }
 
     [Fact]
+    public async Task FacadePackageConsumerResolvesPapercraftSessionAndRendersTargets()
+    {
+        using var project = TemporaryConsumerProject.Create(
+            "PapercraftFacadeSessionConsumer",
+            new[] { ProjectPath("source", "X39.Solutions.Papercraft", "X39.Solutions.Papercraft.csproj") },
+            """
+            using System;
+            using System.Globalization;
+            using System.IO;
+            using System.Threading.Tasks;
+            using System.Xml;
+            using Microsoft.Extensions.DependencyInjection;
+            using X39.Solutions.Papercraft;
+
+            namespace PapercraftFacadeSessionConsumer;
+
+            public static class Program
+            {
+                public static async Task Main()
+                {
+                    var services = new ServiceCollection();
+                    services.AddPapercraft();
+
+                    await using var serviceProvider = services.BuildServiceProvider();
+                    var papercraft = serviceProvider.GetRequiredService<Papercraft>();
+                    await using var session = papercraft.CreateSession();
+                    session.TemplateData.SetVariable("Name", "session diagnostics");
+
+                    await using var pdf = new MemoryStream();
+                    using (var reader = CreateReader("<text>Session PDF</text>"))
+                    {
+                        await session.RenderAsync(
+                            reader,
+                            new RenderOutput(RenderTarget.Pdf, pdf),
+                            CultureInfo.InvariantCulture);
+                    }
+
+                    var pdfBytes = pdf.ToArray();
+                    if (pdfBytes.Length < 4
+                        || pdfBytes[0] != (byte) '%'
+                        || pdfBytes[1] != (byte) 'P'
+                        || pdfBytes[2] != (byte) 'D'
+                        || pdfBytes[3] != (byte) 'F')
+                    {
+                        throw new InvalidOperationException("Papercraft session consumer did not generate a PDF.");
+                    }
+
+                    PapercraftRenderResult lowered;
+                    using (var reader = CreateReader("<text>@Name</text>"))
+                    {
+                        lowered = await session.RenderAsync(
+                            reader,
+                            RenderTarget.LoweredXml,
+                            CultureInfo.InvariantCulture);
+                    }
+
+                    if (!lowered.ReadText().Contains("session diagnostics", StringComparison.Ordinal))
+                    {
+                        throw new InvalidOperationException("Papercraft session consumer did not expose lowered XML text.");
+                    }
+
+                    var pageStreams = new List<MemoryStream>();
+                    using (var reader = CreateReader("<text>Session raster</text>"))
+                    {
+                        await session.RenderRasterPagesAsync(
+                            reader,
+                            new RasterPageRenderOutput(
+                                PapercraftMediaTypes.ImagePng,
+                                (info, _) =>
+                                {
+                                    if (info.PageNumber < 1)
+                                    {
+                                        throw new InvalidOperationException("Papercraft raster page metadata is invalid.");
+                                    }
+
+                                    var stream = new MemoryStream();
+                                    pageStreams.Add(stream);
+                                    return ValueTask.FromResult<Stream>(stream);
+                                },
+                                leaveStreamsOpen: true),
+                            CultureInfo.InvariantCulture);
+                    }
+
+                    if (pageStreams.Count is 0)
+                    {
+                        throw new InvalidOperationException("Papercraft session consumer did not generate raster pages.");
+                    }
+
+                    var png = pageStreams[0].ToArray();
+                    if (png.Length < 8
+                        || png[0] != 0x89
+                        || png[1] != 0x50
+                        || png[2] != 0x4E
+                        || png[3] != 0x47)
+                    {
+                        throw new InvalidOperationException("Papercraft session consumer did not generate PNG raster output.");
+                    }
+                }
+
+                private static XmlReader CreateReader(string body)
+                    => XmlReader.Create(new StringReader(
+                        $@"<?xml version=""1.0"" encoding=""utf-8""?>
+                        <template xmlns=""X39.Solutions.PdfTemplate.Controls"">
+                            <body>
+                                {body}
+                            </body>
+                        </template>"));
+            }
+            """,
+            isExecutable: true,
+            packageReferences: new[]
+            {
+                new PackageReferenceSpec("Microsoft.Extensions.DependencyInjection", "10.0.8"),
+                new PackageReferenceSpec("SkiaSharp.NativeAssets.Linux", "3.119.4"),
+            });
+
+        await project.BuildAsync();
+        await project.RunAsync();
+        project.AssertAssetsContainLibrary("X39.Solutions.Papercraft");
+        project.AssertAssetsContainLibrary("X39.Solutions.Papercraft.Rendering.SkiaSharp");
+        project.AssertAssetsDoesNotContainLibrary("X39.Solutions.PdfTemplate");
+        project.AssertAssetsContainLibrary("X39.Solutions.Papercraft.Core");
+        project.AssertAssetsContainLibrary("SkiaSharp");
+    }
+
+    [Fact]
     public async Task SkiaSharpRendererConsumerCompilesExplicitRendererEntryPoint()
     {
         using var project = TemporaryConsumerProject.Create(

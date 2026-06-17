@@ -57,7 +57,7 @@ public class ServiceCollectionExtensionsTests
         serviceCollection.AddPdfTemplateService();
         using var serviceProvider = serviceCollection.BuildServiceProvider();
 
-        Assert.Contains(serviceProvider.GetServices<ITransformer>(), (q) => q is Papercraft.Transformers.SwitchTransformer);
+        Assert.Contains(serviceProvider.GetServices<ITransformer>(), (q) => q is global::X39.Solutions.Papercraft.Transformers.SwitchTransformer);
     }
 
     [Fact]

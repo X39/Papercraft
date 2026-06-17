@@ -13,11 +13,11 @@ public class TransformerDirectBenchmarks
     private TemplateData _alternateData = null!;
     private TemplateData _variableData = null!;
 
-    private Papercraft.Transformers.ForTransformer       _forTransformer       = null!;
-    private Papercraft.Transformers.ForEachTransformer   _forEachTransformer   = null!;
-    private Papercraft.Transformers.IfTransformer        _ifTransformer        = null!;
-    private Papercraft.Transformers.AlternateTransformer _alternateTransformer = null!;
-    private Papercraft.Transformers.VariableTransformer  _variableTransformer  = null!;
+    private global::X39.Solutions.Papercraft.Transformers.ForTransformer       _forTransformer       = null!;
+    private global::X39.Solutions.Papercraft.Transformers.ForEachTransformer   _forEachTransformer   = null!;
+    private global::X39.Solutions.Papercraft.Transformers.IfTransformer        _ifTransformer        = null!;
+    private global::X39.Solutions.Papercraft.Transformers.AlternateTransformer _alternateTransformer = null!;
+    private global::X39.Solutions.Papercraft.Transformers.VariableTransformer  _variableTransformer  = null!;
 
     [GlobalSetup]
     public void GlobalSetup()
@@ -31,11 +31,11 @@ public class TransformerDirectBenchmarks
         _alternateData = new TemplateData();
         _variableData = new TemplateData();
 
-        _forTransformer       = new Papercraft.Transformers.ForTransformer();
-        _forEachTransformer   = new Papercraft.Transformers.ForEachTransformer();
-        _ifTransformer        = new Papercraft.Transformers.IfTransformer();
-        _alternateTransformer = new Papercraft.Transformers.AlternateTransformer();
-        _variableTransformer  = new Papercraft.Transformers.VariableTransformer();
+        _forTransformer       = new global::X39.Solutions.Papercraft.Transformers.ForTransformer();
+        _forEachTransformer   = new global::X39.Solutions.Papercraft.Transformers.ForEachTransformer();
+        _ifTransformer        = new global::X39.Solutions.Papercraft.Transformers.IfTransformer();
+        _alternateTransformer = new global::X39.Solutions.Papercraft.Transformers.AlternateTransformer();
+        _variableTransformer  = new global::X39.Solutions.Papercraft.Transformers.VariableTransformer();
 
         ConsumeAsync(
                 _alternateTransformer.TransformAsync(

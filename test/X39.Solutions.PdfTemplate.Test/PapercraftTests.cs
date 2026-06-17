@@ -26,6 +26,7 @@ public sealed class PapercraftTests
 
         using var serviceProvider = services.BuildServiceProvider();
 
+        Assert.NotNull(serviceProvider.GetRequiredService<global::X39.Solutions.Papercraft.Papercraft>());
         var generator = serviceProvider.GetRequiredService<PapercraftRenderer>();
         var renderer = Assert.Single(generator.Backends);
         Assert.Equal("skiasharp", renderer.Capabilities.RendererId);
@@ -45,9 +46,71 @@ public sealed class PapercraftTests
         using var serviceProvider = services.BuildServiceProvider();
 
         Assert.Empty(serviceProvider.GetServices<IPapercraftRenderBackend>());
+        Assert.NotNull(serviceProvider.GetRequiredService<global::X39.Solutions.Papercraft.Papercraft>());
         Assert.Contains(services, (q) => q.ServiceType == typeof(PapercraftGenerator));
         Assert.Null(serviceProvider.GetService<Generator>());
         Assert.NotEmpty(serviceProvider.GetServices<ITransformer>());
+    }
+
+    [Fact]
+    public async Task PapercraftSessionCanRenderLoweredXmlResultWithoutBackendsOrRegisteredControls()
+    {
+        var services = new ServiceCollection();
+        services.AddPapercraftCore();
+
+        await using var serviceProvider = services.BuildServiceProvider();
+        var papercraft = serviceProvider.GetRequiredService<global::X39.Solutions.Papercraft.Papercraft>();
+        await using var session = papercraft.CreateSession();
+        session.TemplateData.SetVariable("Value", "kept");
+        using var reader = CreateReader("""<notRegistered value="@Value">debug node</notRegistered>""");
+
+        var result = await session.RenderAsync(
+            reader,
+            RenderTarget.LoweredXml,
+            CultureInfo.InvariantCulture);
+
+        Assert.Equal(RenderTarget.LoweredXml, result.Target);
+        Assert.Equal(PapercraftMediaTypes.ApplicationPapercraftLoweredXml, result.MediaType);
+        Assert.True(result.Length > 0);
+        XNamespace ns = Constants.ControlsNamespace;
+        var document = XDocument.Parse(result.ReadText());
+        var lowered = document.Root?.Element(ns + "body")?.Element(ns + "notRegistered");
+        Assert.NotNull(lowered);
+        Assert.Equal("debug node", lowered!.Value);
+        Assert.Equal("kept", (string?)lowered.Attribute("value"));
+    }
+
+    [Fact]
+    public async Task PapercraftSessionsIsolateTemplateDataWhenRenderedConcurrently()
+    {
+        var services = new ServiceCollection();
+        services.AddPapercraftCore();
+
+        await using var serviceProvider = services.BuildServiceProvider();
+        var papercraft = serviceProvider.GetRequiredService<global::X39.Solutions.Papercraft.Papercraft>();
+
+        var values = await Task.WhenAll(
+            RenderLoweredTextAsync(papercraft, "first"),
+            RenderLoweredTextAsync(papercraft, "second"));
+
+        Assert.Equal(new[] { "first", "second" }, values);
+
+        static async Task<string> RenderLoweredTextAsync(global::X39.Solutions.Papercraft.Papercraft papercraft, string value)
+        {
+            await using var session = papercraft.CreateSession();
+            session.TemplateData.SetVariable("Name", value);
+            using var reader = CreateReader("<text>@Name</text>");
+
+            var result = await session.RenderAsync(
+                reader,
+                RenderTarget.LoweredXml,
+                CultureInfo.InvariantCulture);
+
+            XNamespace ns = Constants.ControlsNamespace;
+            var document = XDocument.Parse(result.ReadText());
+            return document.Root?.Element(ns + "body")?.Element(ns + "text")?.Value
+                   ?? throw new InvalidOperationException("Lowered XML result did not contain the expected text node.");
+        }
     }
 
     [Fact]

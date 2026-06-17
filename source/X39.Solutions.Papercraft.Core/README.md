@@ -12,7 +12,7 @@ Use this package when you need Papercraft contracts without taking a dependency 
 |------|--------------------------|
 | Core DI entry point | `services.AddPapercraftCore()` |
 | Backend-neutral generation | `PapercraftGenerator` |
-| Render facade and contracts | `PapercraftRenderer`, `IPapercraftRenderBackend`, `RenderTarget`, `RenderOutput` |
+| Application service and contracts | `Papercraft`, `PapercraftSession`, `PapercraftRenderResult`, `IPapercraftRenderBackend`, `RenderTarget`, `RenderOutput` |
 | Lowered XML diagnostics | `RenderTarget.LoweredXml`, `PapercraftMediaTypes.ApplicationPapercraftLoweredXml` |
 | Capability validation | `RendererCapabilities`, `RenderValidationResult`, `RenderDiagnostic` |
 | Activity tracing | `PapercraftInstrumentation.ActivitySource` |
@@ -31,15 +31,20 @@ var services = new ServiceCollection();
 var builder = services.AddPapercraftCore();
 ```
 
-`AddPapercraftCore()` registers parser/runtime services, default controls, default transformers, `PapercraftGenerator`, and `PapercraftRenderer`.
-It does not register a render backend. Normal PDF, raster, SVG or printer-command rendering through `PapercraftRenderer`
+`AddPapercraftCore()` registers parser/runtime services, default controls, default transformers, `Papercraft`, `PapercraftGenerator`, and the compatibility `PapercraftRenderer`.
+It does not register a render backend. Normal PDF, raster, SVG or printer-command rendering through a `PapercraftSession`
 requires an `IPapercraftRenderBackend` registration. Lowered XML output is the exception because it stops before backend rendering:
 
 ```csharp
-await renderer.RenderAsync(
+var papercraft = serviceProvider.GetRequiredService<Papercraft>();
+await using var session = papercraft.CreateSession();
+
+var lowered = await session.RenderAsync(
     reader,
-    new RenderOutput(RenderTarget.LoweredXml, output),
+    RenderTarget.LoweredXml,
     CultureInfo.InvariantCulture);
+
+var loweredXml = lowered.ReadText();
 ```
 
 ## Implement A Renderer

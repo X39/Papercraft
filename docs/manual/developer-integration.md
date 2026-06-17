@@ -16,7 +16,7 @@ Use [renderer backends](render-backends.md) for output-format choices such as Sk
 ## How Do I Start?
 
 Start with the Papercraft facade package and the default renderer:
-`X39.Solutions.Papercraft`, `AddPapercraft()`, `PapercraftRenderer`, `PapercraftRenderOptions`,
+`X39.Solutions.Papercraft`, `AddPapercraft()`, `Papercraft`, `PapercraftSession`, `PapercraftRenderResult`, `PapercraftRenderOptions`,
 `DocumentOptions`, `IFunction`, `ITransformer`, `IControl`, `ITemplateData`, `XmlTemplateReader`,
 `XmlNodeInformation`, `IResourceResolver`, `IDrawableCanvas`, `IDeferredCanvas`, `IImmediateCanvas`,
 `IPropertyAccessCache`, `ITextService` and `IParameterConverter<T>`.
@@ -54,7 +54,7 @@ services.AddPapercraft();
 ```
 
 `AddPapercraft()` registers Papercraft Core services, the built-in controls, the built-in transformers,
-`PapercraftGenerator`, `PapercraftRenderer` and the SkiaSharp render backend.
+`Papercraft`, `PapercraftGenerator`, the compatibility `PapercraftRenderer` and the SkiaSharp render backend.
 
 Use the builder overload when the application needs to add or replace template features:
 
@@ -77,14 +77,14 @@ services.AddPapercraftCore();
 services.AddTransient<IPapercraftRenderBackend, MyRenderBackend>();
 ```
 
-When `PapercraftRenderer` selects a backend by `BackendId` or render target, it uses that backend's
+When a `PapercraftSession` selects a backend by `BackendId` or render target, it uses that backend's
 `ITextService` while generating the document. Custom backends must expose a text service that matches
 their rendering behavior. Renderer-specific package setup and output examples are documented in
 [Renderer backends](render-backends.md).
 
 ## Generate A PDF
 
-Resolve a `PapercraftRenderer`, create an `XmlReader` for the template, and write the PDF to a stream:
+Resolve `Papercraft`, create a session, create an `XmlReader` for the template, and write the PDF to a stream:
 
 ```csharp
 using System.Globalization;
@@ -93,19 +93,20 @@ using Microsoft.Extensions.DependencyInjection;
 using X39.Solutions.Papercraft;
 
 await using var scope = serviceProvider.CreateAsyncScope();
-var renderer = scope.ServiceProvider.GetRequiredService<PapercraftRenderer>();
+var papercraft = scope.ServiceProvider.GetRequiredService<Papercraft>();
+await using var session = papercraft.CreateSession();
 
 using var reader = XmlReader.Create(xmlTemplateStream);
 await using var output = File.Create("document.pdf");
 
-await renderer.GeneratePdfAsync(
-    output,
+await session.RenderAsync(
     reader,
+    new RenderOutput(RenderTarget.Pdf, output),
     CultureInfo.CurrentUICulture);
 ```
 
-`PapercraftRenderer` is registered as transient and owns per-render template data through its
-`PapercraftGenerator`. Resolve a fresh renderer when concurrent renders need isolated data.
+`Papercraft` is the DI service. `PapercraftSession` owns per-workflow template data and is disposable.
+Create one session for each isolated render workflow.
 
 ## Supply Template Data
 
@@ -113,8 +114,8 @@ Template authors can only use data that the application supplies.
 Set variables before rendering:
 
 ```csharp
-renderer.TemplateData.SetVariable("CustomerName", customer.Name);
-renderer.TemplateData.SetVariable("InvoiceTotal", invoice.Total);
+session.TemplateData.SetVariable("CustomerName", customer.Name);
+session.TemplateData.SetVariable("InvoiceTotal", invoice.Total);
 ```
 
 The template can then read those values:
@@ -139,9 +140,9 @@ using System.Globalization;
 using X39.Solutions.Papercraft;
 using X39.Solutions.Papercraft.Data;
 
-await renderer.GeneratePdfAsync(
-    output,
+await session.RenderAsync(
     reader,
+    new RenderOutput(RenderTarget.Pdf, output),
     CultureInfo.CurrentUICulture,
     new PapercraftRenderOptions
     {
@@ -172,7 +173,7 @@ Useful options include:
 Call `ValidateAsync` when an application lets users choose output formats or renderer backends:
 
 ```csharp
-var result = await renderer.ValidateAsync(
+var result = await session.ValidateAsync(
     reader,
     RenderTarget.Pdf,
     CultureInfo.CurrentUICulture);
@@ -193,35 +194,36 @@ Use lowered XML output when you need to diagnose what the template language prod
 render backends are involved. This is the easiest way to inspect variable substitution, function results, transformer
 expansion and style application.
 
-`PapercraftRenderer` handles `RenderTarget.LoweredXml` directly. It reads the source XML, evaluates template-data
-expressions in text and attributes, runs the registered `ITransformer` implementations, applies style nodes, writes the
-materialized XML tree to the supplied stream and stops there.
+`PapercraftSession` handles `RenderTarget.LoweredXml` directly. It reads the source XML, evaluates template-data
+expressions in text and attributes, runs the registered `ITransformer` implementations, applies style nodes, returns the
+materialized XML tree as a render result and stops there.
 
-The convenience method is:
+The in-memory diagnostics path is:
 
 ```csharp
 using System.Globalization;
 using System.Xml;
 using X39.Solutions.Papercraft;
 
-renderer.TemplateData.SetVariable("CustomerName", customer.Name);
+session.TemplateData.SetVariable("CustomerName", customer.Name);
 
 using var reader = XmlReader.Create(xmlTemplateStream);
-await using var output = File.Create("template.lowered.xml");
 
-await renderer.GenerateLoweredXmlAsync(
-    output,
+var lowered = await session.RenderAsync(
     reader,
+    RenderTarget.LoweredXml,
     CultureInfo.CurrentUICulture);
+
+var loweredXml = lowered.ReadText();
 ```
 
-The same output is available through `RenderAsync(...)`:
+The same output can be written to a stream:
 
 ```csharp
 using var reader = XmlReader.Create(xmlTemplateStream);
 await using var output = File.Create("template.lowered.xml");
 
-await renderer.RenderAsync(
+await session.RenderAsync(
     reader,
     new RenderOutput(RenderTarget.LoweredXml, output),
     CultureInfo.CurrentUICulture);
@@ -448,15 +450,16 @@ Most requests fit one of these rows:
 
 | Interface or type | Use when | How it is wired |
 |-------------------|----------|-----------------|
-| `PapercraftRenderer` | The application needs to render or validate a template. | Resolve it from dependency injection for each isolated render workflow. |
+| `Papercraft` | The application needs to render or validate a template. | Resolve it from dependency injection, then create a disposable `PapercraftSession` for each isolated render workflow. |
+| `PapercraftSession` | A render workflow needs template data, validation or output. | Set `TemplateData`, call `ValidateAsync`, `RenderAsync` or `RenderRasterPagesAsync`, then dispose the session. |
 | `PapercraftGenerator` | Advanced code needs a backend-neutral `PapercraftDocument` before rendering. | Resolve it from dependency injection when a backend-neutral document is needed directly. |
-| `ITemplateData` | The application supplies variables, registers functions or evaluates expressions inside custom extensions. | Use `renderer.TemplateData` before rendering; custom transformers and functions receive it through their APIs. |
+| `ITemplateData` | The application supplies variables, registers functions or evaluates expressions inside custom extensions. | Use `session.TemplateData` before rendering; custom transformers and functions receive it through their APIs. |
 | `IFunction` | The template needs a reusable calculated value. | Implement `Name`, argument metadata and `ExecuteAsync`, then register with `AddFunction<TFunction>()`. |
 | `IControl` | The application must render a new XML element. | Add `[Control(...)]`, implement measure/arrange/render behavior and register with `AddControl<TControl>()`. |
 | `IContentControl` | A custom control must contain child controls. | Implement `CanAdd` and child storage, or derive from an existing content-control base. |
 | `IInitializeControlAsync` | A control needs async setup or request context before rendering. | Implement it on the control; `DocumentOptions.Context` is passed to `InitializeControlAsync`. |
 | `ITransformer` | XML nodes must be conditionally rewritten, removed or repeated before controls are created. | Implement `Name` and `TransformAsync`, then register with `AddTransformer<TTransformer>()`. |
-| `RenderTarget.LoweredXml` | The application needs serialized lowered XML before controls, layout or backend rendering. | Use `GenerateLoweredXmlAsync(...)` or `RenderAsync(...)` with `new RenderOutput(RenderTarget.LoweredXml, stream)`. |
+| `RenderTarget.LoweredXml` | The application needs lowered XML before controls, layout or backend rendering. | Use `session.RenderAsync(..., RenderTarget.LoweredXml, ...)` and `PapercraftRenderResult.ReadText()`, or write to a `RenderOutput` stream. |
 | `PapercraftGenerator.ReadLoweredXmlAsync(...)` and `XmlNodeInformation` | The application needs the in-memory lowered template tree before controls are created. | Resolve a `PapercraftGenerator`, set its `TemplateData` and call `ReadLoweredXmlAsync(...)`. |
 | `IResourceResolver` | Image sources must be resolved from application-specific storage. | Register an `IResourceResolver` implementation after `AddPapercraft`. |
 | `IParameterConverter<T>` | A custom control attribute needs custom parsing. | Set the converter on the control property with `ParameterAttribute.Converter`. |
@@ -465,7 +468,9 @@ Most requests fit one of these rows:
 
 Source-checked registration notes:
 
-- `PapercraftRenderer` and `PapercraftGenerator` are registered as transient.
+- `Papercraft` is registered as a singleton-style session factory.
+- `PapercraftRenderer` remains registered as a transient obsolete compatibility adapter.
+- `PapercraftGenerator` is registered as transient.
 - `ITemplateData`, `IResourceResolver` and `IControlFactory` are registered as scoped services.
 - `ControlRegistry`, `ControlActivationCache`, `IPropertyAccessCache`, the default unkeyed `ITextService`, `SkPaintCache` and `SkiaSharpDisplayListRenderer` are registered as singleton services.
 - Built-in transformer registrations are transient; custom transformers added with `AddTransformer<TTransformer>()` use the same path.
@@ -483,7 +488,7 @@ Most applications should not replace them directly.
 | `IDrawableCanvas` | Low-level drawing surface used by controls. Custom controls may call it through the deferred canvas. |
 | `IDeferredCanvas` | Canvas passed to `IControl.Render`; it records drawing work until page-specific values are available. |
 | `IImmediateCanvas` | Canvas exposed inside deferred drawing for page-specific information such as the current page and total pages. |
-| `ITextService` | Text measurement and text display-list service used by text-based controls. `PapercraftRenderer` uses the selected backend's `ITextService`; the unkeyed DI service is a direct-control-activation fallback. |
+| `ITextService` | Text measurement and text display-list service used by text-based controls. `PapercraftSession` uses the selected backend's `ITextService`; the unkeyed DI service is a direct-control-activation fallback. |
 | `IPropertyAccessCache` | Expression-evaluation infrastructure that caches property access. It is not a normal application extension point. |
 
 ## Compatibility Package And Legacy API
@@ -519,7 +524,7 @@ await generator.GeneratePdfAsync(
 `Generator.GenerateLoweredXmlAsync(...)` writes the same backend-free lowered XML diagnostic output as
 `PapercraftRenderer.GenerateLoweredXmlAsync(...)`.
 `Generator.GenerateBitmapsAsync(...)` remains the legacy SkiaSharp bitmap API.
-For new raster workflows, prefer the renderer-neutral `PapercraftRenderer.RenderRasterPagesAsync(...)`.
+For new raster workflows, prefer `PapercraftSession.RenderRasterPagesAsync(...)`.
 
 ## When Template Authors Need Developer Help
 

@@ -28,7 +28,7 @@ services.AddPapercraftPdfSharpRenderer();
 ```
 
 `AddPapercraftPdfSharpRenderer()` also registers Papercraft Core services.
-After registration, resolve `PapercraftRenderer` from the service provider and render with `PapercraftRenderOptions.BackendId = PdfSharpRenderBackend.RendererId` when multiple PDF-capable backends are registered.
+After registration, resolve `Papercraft` from the service provider, create a `PapercraftSession`, and render with `PapercraftRenderOptions.BackendId = PdfSharpRenderBackend.RendererId` when multiple PDF-capable backends are registered.
 
 ## Output Notes
 

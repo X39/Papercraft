@@ -35,20 +35,23 @@ using X39.Solutions.Papercraft;
 services.AddPapercraft();
 ```
 
-This registers Core, the built-in controls, the built-in transformers, `PapercraftRenderer` and the SkiaSharp backend.
-Use `GeneratePdfAsync(...)` for the common PDF path:
+This registers Core, the built-in controls, the built-in transformers, `Papercraft`, the compatibility `PapercraftRenderer` and the SkiaSharp backend.
+Use a `PapercraftSession` for the common PDF path:
 
 ```csharp
-await renderer.GeneratePdfAsync(
-    output,
+var papercraft = serviceProvider.GetRequiredService<Papercraft>();
+await using var session = papercraft.CreateSession();
+
+await session.RenderAsync(
     reader,
+    new RenderOutput(RenderTarget.Pdf, output),
     CultureInfo.CurrentUICulture);
 ```
 
 Use `RenderRasterPagesAsync(...)` when each page should be written as PNG:
 
 ```csharp
-await renderer.RenderRasterPagesAsync(
+await session.RenderRasterPagesAsync(
     reader,
     new RasterPageRenderOutput(
         PapercraftMediaTypes.ImagePng,
@@ -61,13 +64,13 @@ Applications running the SkiaSharp backend on Linux should reference the matchin
 
 ## Explicit Backend Selection
 
-`PapercraftRenderer` chooses a backend from the requested render target and registered backend capabilities.
+`PapercraftSession` chooses a backend from the requested render target and registered backend capabilities.
 When multiple registered backends can produce the same target, pass `BackendId`:
 
 ```csharp
 using X39.Solutions.Papercraft.Rendering.PdfSharp;
 
-await renderer.RenderAsync(
+await session.RenderAsync(
     reader,
     new RenderOutput(PapercraftMediaTypes.ApplicationPdf, output),
     CultureInfo.CurrentUICulture,
@@ -80,7 +83,7 @@ await renderer.RenderAsync(
 Call `ValidateAsync(...)` before rendering when users can select an output format:
 
 ```csharp
-var validation = await renderer.ValidateAsync(
+var validation = await session.ValidateAsync(
     reader,
     RenderTarget.FromMediaType("image/svg+xml"),
     CultureInfo.CurrentUICulture);
@@ -100,19 +103,12 @@ Use lowered XML output when you need to inspect the template after data binding,
 expansion and style application, but before controls are created and before layout or backend rendering starts.
 
 ```csharp
-await renderer.RenderAsync(
+var lowered = await session.RenderAsync(
     reader,
-    new RenderOutput(RenderTarget.LoweredXml, output),
+    RenderTarget.LoweredXml,
     CultureInfo.CurrentUICulture);
-```
 
-The convenience method is equivalent:
-
-```csharp
-await renderer.GenerateLoweredXmlAsync(
-    output,
-    reader,
-    CultureInfo.CurrentUICulture);
+var loweredXml = lowered.ReadText();
 ```
 
 The lowered XML media type is `PapercraftMediaTypes.ApplicationPapercraftLoweredXml`
@@ -133,7 +129,7 @@ services.AddPapercraftSvgRenderer();
 Render with the SVG media type:
 
 ```csharp
-await renderer.RenderAsync(
+await session.RenderAsync(
     reader,
     new RenderOutput(RenderTarget.FromMediaType(SvgRenderBackend.MediaType), output),
     CultureInfo.CurrentUICulture);
@@ -162,7 +158,7 @@ Render to a caller-owned stream:
 ```csharp
 await using var output = new MemoryStream();
 
-await renderer.RenderAsync(
+await session.RenderAsync(
     reader,
     new RenderOutput(EscPosRenderBackend.Target, output),
     CultureInfo.CurrentUICulture,
