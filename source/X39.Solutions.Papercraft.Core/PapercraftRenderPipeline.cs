@@ -59,6 +59,7 @@ internal sealed class PapercraftRenderPipeline
         PapercraftActivity.SetRenderTarget(activity, target);
         try
         {
+            using var diagnosticScope = RenderDiagnosticScope.Begin(null);
             var renderOptions = options ?? PapercraftRenderOptions.Default;
             if (IsLoweredXmlTarget(target))
             {
@@ -84,6 +85,7 @@ internal sealed class PapercraftRenderPipeline
             PapercraftActivity.SetDocument(activity, document);
             var validation = await ValidateBackendAsync(backend, document, target, cancellationToken)
                 .ConfigureAwait(false);
+            validation = CombineWithScopedDiagnostics(validation);
             PapercraftActivity.SetValidation(activity, validation);
             return validation;
         }
@@ -109,6 +111,7 @@ internal sealed class PapercraftRenderPipeline
         PapercraftActivity.SetRenderTarget(activity, output.Target);
         try
         {
+            using var diagnosticScope = RenderDiagnosticScope.Begin(output.DiagnosticSink);
             var renderOptions = options ?? PapercraftRenderOptions.Default;
             if (IsLoweredXmlTarget(output.Target))
             {
@@ -157,6 +160,7 @@ internal sealed class PapercraftRenderPipeline
         PapercraftActivity.SetDocument(activity, document);
         try
         {
+            using var diagnosticScope = RenderDiagnosticScope.Begin(output.DiagnosticSink);
             if (IsLoweredXmlTarget(output.Target))
                 throw new InvalidOperationException("Lowered XML output requires the template-based RenderAsync overload.");
 
@@ -251,6 +255,8 @@ internal sealed class PapercraftRenderPipeline
         {
             var validation = await ValidateBackendAsync(backend, document, output.Target, cancellationToken)
                 .ConfigureAwait(false);
+            RenderDiagnosticScope.Report(validation.Diagnostics);
+            validation = CombineWithScopedDiagnostics(validation);
             PapercraftActivity.SetValidation(activity, validation);
             validation.ThrowIfUnsupportedOrStrictDegraded(options.TreatDegradedAsUnsupported);
             await backend.RenderAsync(document, output, cancellationToken)
@@ -371,6 +377,22 @@ internal sealed class PapercraftRenderPipeline
     private static bool IsLoweredXmlTarget(RenderTarget target)
         => target.OutputKind is RendererOutputKind.LoweredXml
            || string.Equals(target.MediaType, PapercraftMediaTypes.ApplicationPapercraftLoweredXml, StringComparison.OrdinalIgnoreCase);
+
+    private static RenderValidationResult CombineWithScopedDiagnostics(RenderValidationResult validation)
+    {
+        var scopedDiagnostics = RenderDiagnosticScope.CurrentDiagnostics;
+        if (scopedDiagnostics.Count is 0)
+            return validation;
+
+        var diagnostics = validation.Diagnostics
+            .Concat(scopedDiagnostics)
+            .Distinct()
+            .ToArray();
+        return diagnostics.Length == validation.Diagnostics.Count
+               && diagnostics.SequenceEqual(validation.Diagnostics)
+            ? validation
+            : new RenderValidationResult(diagnostics);
+    }
 
     private sealed class BackendTextServiceProvider : IServiceProvider
     {

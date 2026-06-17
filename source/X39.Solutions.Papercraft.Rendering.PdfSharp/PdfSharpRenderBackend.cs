@@ -55,7 +55,8 @@ public sealed class PdfSharpRenderBackend : IPapercraftRenderBackend
         cancellationToken.ThrowIfCancellationRequested();
         var validation = RenderValidationResult.Combine(
             Capabilities.ValidateTarget(target),
-            Capabilities.ValidateDocument(document));
+            Capabilities.ValidateDocument(document),
+            PdfSharpSystemFontResolver.Instance.ValidateDocumentFonts(document));
         return ValueTask.FromResult(validation);
     }
 
@@ -67,8 +68,13 @@ public sealed class PdfSharpRenderBackend : IPapercraftRenderBackend
     {
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(output);
+        var ownsDiagnosticScope = !RenderDiagnosticScope.IsActive;
+        using var diagnosticScope = ownsDiagnosticScope
+            ? RenderDiagnosticScope.Begin(output.DiagnosticSink)
+            : null;
         var validation = await ValidateAsync(document, output.Target, cancellationToken)
             .ConfigureAwait(false);
+        RenderDiagnosticScope.Report(validation.Diagnostics);
         validation.ThrowIfUnsupported();
 
         if (output.Target.OutputKind is not RendererOutputKind.Pdf)

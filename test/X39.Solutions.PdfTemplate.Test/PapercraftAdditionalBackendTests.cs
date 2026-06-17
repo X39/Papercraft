@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using Microsoft.Extensions.DependencyInjection;
@@ -178,6 +179,104 @@ public sealed class PapercraftAdditionalBackendTests
     }
 
     [Fact]
+    public async Task PdfSharpRendererReportsMissingFontThroughRenderOutput()
+    {
+        var services = new ServiceCollection();
+        services.AddPapercraftPdfSharpRenderer();
+        using var provider = services.BuildServiceProvider();
+        var renderer = provider.GetRequiredService<PapercraftRenderer>();
+        var diagnostics = new List<RenderDiagnostic>();
+        await using var stream = new MemoryStream();
+        using var reader = XmlReader.Create(new StringReader(CreateMissingFontTemplate()));
+
+        await renderer.RenderAsync(
+            reader,
+            new RenderOutput(PapercraftMediaTypes.ApplicationPdf, stream, diagnostics.Add),
+            CultureInfo.InvariantCulture,
+            new PapercraftRenderOptions { BackendId = PdfSharpRenderBackend.RendererId });
+
+        Assert.Contains(
+            diagnostics,
+            (q) => q.Code == RenderDiagnosticCodes.MissingFontSubstitution
+                   && q.Level is RendererSupportLevel.Degraded);
+        var bytes = stream.ToArray();
+        Assert.True(bytes.Length > 100);
+        Assert.Equal("%PDF", Encoding.ASCII.GetString(bytes, 0, 4));
+    }
+
+    [Fact]
+    public async Task PdfSharpRendererTreatsMissingFontAsUnsupportedInStrictDegradedMode()
+    {
+        var services = new ServiceCollection();
+        services.AddPapercraftPdfSharpRenderer();
+        using var provider = services.BuildServiceProvider();
+        var renderer = provider.GetRequiredService<PapercraftRenderer>();
+        await using var stream = new MemoryStream();
+        using var reader = XmlReader.Create(new StringReader(CreateMissingFontTemplate()));
+
+        var exception = await Assert.ThrowsAsync<RenderValidationException>(
+            async () => await renderer.RenderAsync(
+                reader,
+                new RenderOutput(PapercraftMediaTypes.ApplicationPdf, stream),
+                CultureInfo.InvariantCulture,
+                new PapercraftRenderOptions
+                {
+                    BackendId = PdfSharpRenderBackend.RendererId,
+                    TreatDegradedAsUnsupported = true,
+                }));
+
+        Assert.Contains(
+            exception.ValidationResult.Diagnostics,
+            (q) => q.Code == RenderDiagnosticCodes.MissingFontSubstitution);
+        Assert.Equal(0, stream.Length);
+    }
+
+    [Fact]
+    public async Task PdfSharpRendererKeepsCalibriRegularAndBoldFacesDistinct()
+    {
+        var fontsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Fonts");
+        if (!OperatingSystem.IsWindows()
+            || !File.Exists(Path.Combine(fontsDirectory, "calibri.ttf"))
+            || !File.Exists(Path.Combine(fontsDirectory, "calibrib.ttf")))
+        {
+            return;
+        }
+
+        var services = new ServiceCollection();
+        services.AddPapercraftPdfSharpRenderer();
+        using var provider = services.BuildServiceProvider();
+        var renderer = provider.GetRequiredService<PapercraftRenderer>();
+        await using var stream = new MemoryStream();
+        using var reader = XmlReader.Create(new StringReader(CreateCalibriTableTemplate()));
+
+        await renderer.RenderAsync(
+            reader,
+            new RenderOutput(PapercraftMediaTypes.ApplicationPdf, stream),
+            CultureInfo.InvariantCulture,
+            new PapercraftRenderOptions
+            {
+                BackendId = PdfSharpRenderBackend.RendererId,
+                DocumentOptions = new DocumentOptions
+                {
+                    DotsPerInch = 96,
+                    PageWidthInMillimeters = 90,
+                    PageHeightInMillimeters = 45,
+                },
+            });
+
+        var baseFonts = ExtractBaseFontNames(stream.ToArray());
+        var calibriFonts = baseFonts
+            .Where((q) => q.Contains("Calibri", StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+
+        Assert.Contains(calibriFonts, (q) => q.Contains("Calibri,Bold", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(
+            calibriFonts,
+            (q) => q.Contains("Calibri", StringComparison.OrdinalIgnoreCase)
+                   && !q.Contains("Bold", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
     public async Task PdfSharpBackendRendersMixedRegularAndBoldTextAsPdf()
     {
         var backend = new PdfSharpRenderBackend();
@@ -317,6 +416,21 @@ public sealed class PapercraftAdditionalBackendTests
         return Encoding.ASCII.GetString(bytes);
     }
 
+    private static IReadOnlyCollection<string> ExtractBaseFontNames(byte[] pdfBytes)
+    {
+        var pdfText = Encoding.Latin1.GetString(pdfBytes);
+        return Regex.Matches(pdfText, @"/BaseFont\s*/(?<name>[^\s/<>\[\]\(\)]+)")
+            .Select((q) => DecodePdfName(q.Groups["name"].Value))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static string DecodePdfName(string name)
+        => Regex.Replace(
+            name,
+            "#(?<hex>[0-9A-Fa-f]{2})",
+            (match) => ((char)Convert.ToByte(match.Groups["hex"].Value, 16)).ToString());
+
     private static string CreateTextTemplate(string text)
         => $$"""
              <?xml version="1.0" encoding="utf-8"?>
@@ -326,4 +440,33 @@ public sealed class PapercraftAdditionalBackendTests
                  </body>
              </template>
              """;
+
+    private static string CreateCalibriTableTemplate()
+        => """
+           <?xml version="1.0" encoding="utf-8"?>
+           <template xmlns="X39.Solutions.PdfTemplate.Controls">
+               <body>
+                   <table margin="2mm">
+                       <tr>
+                           <td width="25mm">
+                               <text fontFamily="Calibri" fontSize="9" horizontalAlignment="right">11,11 EUR</text>
+                           </td>
+                           <td width="25mm">
+                               <text fontFamily="Calibri" fontSize="9" weight="bold" horizontalAlignment="right">22,22 EUR</text>
+                           </td>
+                       </tr>
+                   </table>
+               </body>
+           </template>
+           """;
+
+    private static string CreateMissingFontTemplate()
+        => """
+           <?xml version="1.0" encoding="utf-8"?>
+           <template xmlns="X39.Solutions.PdfTemplate.Controls">
+               <body>
+                   <text fontFamily="Papercraft Missing Font 7B2ED63A3D53415C">Missing font</text>
+               </body>
+           </template>
+           """;
 }

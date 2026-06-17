@@ -783,6 +783,8 @@ public sealed class PapercraftTests
         Assert.Equal("PAPERCRAFT002", RenderDiagnosticCodes.UnsupportedMediaType);
         Assert.Equal("PAPERCRAFT003", RenderDiagnosticCodes.UnsupportedFeature);
         Assert.Equal("PAPERCRAFT004", RenderDiagnosticCodes.DegradedFeature);
+        Assert.Equal("PAPERCRAFT005", RenderDiagnosticCodes.MissingFontSubstitution);
+        Assert.Equal("PAPERCRAFT006", RenderDiagnosticCodes.FontFaceSubstitution);
     }
 
     [Fact]

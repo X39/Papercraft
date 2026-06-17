@@ -66,16 +66,7 @@ internal static class PdfSharpFontHelper
     }
 
     private static string NormalizeFontFamily(string family)
-    {
-        if (string.Equals(family, "sans-serif", StringComparison.OrdinalIgnoreCase))
-            return "Arial";
-        if (string.Equals(family, "serif", StringComparison.OrdinalIgnoreCase))
-            return "Times New Roman";
-        if (string.Equals(family, "monospace", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(family, "mono", StringComparison.OrdinalIgnoreCase))
-            return "Courier New";
-        return string.IsNullOrWhiteSpace(family)
-            ? "Arial"
+        => string.IsNullOrWhiteSpace(family)
+            ? PdfSharpSystemFontResolver.GenericSansSerifFamily
             : family;
-    }
 }

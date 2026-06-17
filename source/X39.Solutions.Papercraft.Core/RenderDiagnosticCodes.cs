@@ -24,4 +24,14 @@ public static class RenderDiagnosticCodes
     /// The selected renderer supports a template feature only with degraded output.
     /// </summary>
     public const string DegradedFeature = "PAPERCRAFT004";
+
+    /// <summary>
+    /// The selected renderer substituted a missing requested font family.
+    /// </summary>
+    public const string MissingFontSubstitution = "PAPERCRAFT005";
+
+    /// <summary>
+    /// The selected renderer substituted a requested font face or style.
+    /// </summary>
+    public const string FontFaceSubstitution = "PAPERCRAFT006";
 }
