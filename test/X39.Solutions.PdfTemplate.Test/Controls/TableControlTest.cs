@@ -670,6 +670,37 @@ public class TableControlTest
     }
 
     [Fact]
+    public async Task InitialHeaderUsesOuterPageFrameWhenTableHasBottomMargin()
+    {
+        var control = await $$"""
+                                <table margin="0 0 0 20px">
+                                    <th>
+                                        <td><mock width="100px" height="10px"/></td>
+                                    </th>
+                                    <tr>
+                                        <td><mock width="100px" height="20px"/></td>
+                                    </tr>
+                                </table>
+                              """.ToControl<TableControl>();
+        var pageSize   = new Size(100, 100);
+        var mockCanvas = new DeferredCanvasMock{ActualPageSize = pageSize, PageSize = pageSize};
+        control.Measure(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        control.Arrange(90, pageSize, pageSize, pageSize, CultureInfo.InvariantCulture);
+        mockCanvas.Translate(new Point(0F, 80F));
+
+        var additionalRenderSize = control.Render(mockCanvas, 90, pageSize, CultureInfo.InvariantCulture);
+
+        mockCanvas.AssertState();
+        Assert.Equal(new Size(0, 20), additionalRenderSize);
+        Assert.Equal(5, mockCanvas.ClipCount);
+        mockCanvas.AssertClip(0, new Rectangle(0, 80, 100, 50)); // table, including page-break gap and margin
+        mockCanvas.AssertClip(1, new Rectangle(0, 100, 100, 10)); // initial table header moved to the next page
+        mockCanvas.AssertClip(2, new Rectangle(0, 100, 100, 10)); // initial header cell
+        mockCanvas.AssertClip(3, new Rectangle(0, 110, 100, 20)); // first row follows the initial header
+        mockCanvas.AssertClip(4, new Rectangle(0, 110, 100, 20)); // first row cell
+    }
+
+    [Fact]
     public void RowMovesBeforeRenderingWhenCellTextWouldPaginate()
     {
         var textControl = new TextControl(

@@ -289,17 +289,19 @@ public sealed class TableControl : AlignableContentControl
         var additionalHeight = 0F;
         var headers          = Children.OfType<TableHeaderControl>().ToArray();
         var rows             = Children.OfType<TableRowControl>().ToArray();
+        var pageHeight       = FramedSize.Height > 0F ? FramedSize.Height : parentSize.Height;
 
         if (ShouldMoveInitialHeadersWithFirstRow(
                 canvas,
                 dpi,
                 parentSize,
+                pageHeight,
                 cultureInfo,
                 headers,
                 rows.FirstOrDefault(),
                 renderControls))
         {
-            var remainingPageHeight = canvas.GetRemainingPageHeight(parentSize.Height);
+            var remainingPageHeight = canvas.GetRemainingPageHeight(pageHeight);
             canvas.Translate(0, remainingPageHeight);
             additionalHeight += remainingPageHeight;
         }
@@ -310,9 +312,9 @@ public sealed class TableControl : AlignableContentControl
 
         foreach (var control in rows)
         {
-            if (IsAtStartOfPage(canvas, parentSize.Height))
+            if (IsAtStartOfPage(canvas, pageHeight))
             {
-                if (CanRenderRepeatedHeaders(headers, control, parentSize.Height))
+                if (CanRenderRepeatedHeaders(headers, control, pageHeight))
                 {
                     (width, height) = RenderRepeatedHeaders(canvas, dpi, parentSize, cultureInfo, headers, renderControls);
                     additionalWidth  += width;
@@ -321,7 +323,7 @@ public sealed class TableControl : AlignableContentControl
             }
             else
             {
-                var remainingPageHeight = canvas.GetRemainingPageHeight(parentSize.Height);
+                var remainingPageHeight = canvas.GetRemainingPageHeight(pageHeight);
                 var rowAdditionalSize = MeasureRenderAdditionalSize(
                     control,
                     canvas,
@@ -334,7 +336,7 @@ public sealed class TableControl : AlignableContentControl
                 {
                     canvas.Translate(0, remainingPageHeight);
                     additionalHeight += remainingPageHeight;
-                    if (CanRenderRepeatedHeaders(headers, control, parentSize.Height))
+                    if (CanRenderRepeatedHeaders(headers, control, pageHeight))
                     {
                         (width, height) = RenderRepeatedHeaders(canvas, dpi, parentSize, cultureInfo, headers, renderControls);
                         additionalWidth  += width;
@@ -356,6 +358,7 @@ public sealed class TableControl : AlignableContentControl
         IDeferredCanvas canvas,
         float dpi,
         in Size parentSize,
+        float pageHeight,
         CultureInfo cultureInfo,
         IReadOnlyCollection<TableHeaderControl> headers,
         TableRowControl? firstRow,
@@ -364,7 +367,7 @@ public sealed class TableControl : AlignableContentControl
         if (headers.Count is 0 || firstRow is null)
             return false;
 
-        var usedPageHeight = canvas.GetUsedPageHeight(parentSize.Height);
+        var usedPageHeight = canvas.GetUsedPageHeight(pageHeight);
         if (usedPageHeight <= PageBoundaryTolerance)
             return false;
 
@@ -384,7 +387,7 @@ public sealed class TableControl : AlignableContentControl
             cultureInfo,
             renderControls);
         var requiredHeight = headersHeight + firstRow.ArrangementOuter.Height + rowAdditionalSize.Height;
-        var remainingPageHeight = parentSize.Height - usedPageHeight;
+        var remainingPageHeight = pageHeight - usedPageHeight;
         return requiredHeight > remainingPageHeight + PageBoundaryTolerance;
     }
 
